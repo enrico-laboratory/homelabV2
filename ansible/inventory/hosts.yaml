@@ -1,0 +1,49 @@
+homelab:
+  hosts:
+    router:
+      ansible_host: "192.168.100.1"
+    control:
+      ansible_host: "192.168.100.52"
+    linux-desktop:
+      ansible_host: "192.168.100.132"
+
+pvenodes:
+  hosts:
+    pve-node1:
+      ansible_host: "192.168.100.20"
+
+k3s:
+  hosts:
+#    k3s-1:
+#      ansible_host: "192.168.100.111"
+#      k3s_host_number: "1"
+#    k3s-2:
+#      ansible_host: "192.168.100.112"
+#      k3s_host_number: "2"
+#    k3s-3:
+#      ansible_host: "192.168.100.113"
+#      k3s_host_number: "3"
+#    k3s-4:
+#      ansible_host: "192.168.100.114"
+#      k3s_host_number: "4"
+#    k3s-5:
+#      ansible_host: "192.168.100.115"
+#      k3s_host_number: "5"
+#    k3s-6:
+#      ansible_host: "192.168.100.116"
+#      k3s_host_number: "6"
+    k3s-proxy:
+      ansible_host: "192.168.100.130"
+      k3s_host_number: "10"
+    k3s-21:
+      ansible_host: "192.168.100.121"
+      k3s_host_number: "6"
+    k3s-22:
+      ansible_host: "192.168.100.122"
+      k3s_host_number: "6"
+    k3s-23:
+      ansible_host: "192.168.100.123"
+      k3s_host_number: "6"
+    k3s-24:
+      ansible_host: "192.168.100.124"
+      k3s_host_number: "6"
