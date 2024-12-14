@@ -4,22 +4,24 @@ services:
     env_file: "semaphore-db.env"
     networks:
       - semaphore_network
-  semaphore:
     ports:
-      - 3000:3000
-    image: semaphoreui/semaphore:v2.10.43
-    env_file: "semaphore-app.env"
-    volumes:
-      - semaphore_data:/var/lib/semaphore
-      - semaphore_config:/etc/semaphore
-      - semaphore_tmp:/tmp/semaphore
-    networks:
-      - semaphore_network
-    depends_on:
-      - mysql
-volumes:
-  semaphore_data:
-  semaphore_config:
-  semaphore_tmp:
+      - 3306:3306
+#  semaphore:
+#    ports:
+#      - 3000:3000
+#    image: semaphoreui/semaphore:v2.10.43
+#    env_file: "semaphore-app.env"
+#    volumes:
+#      - semaphore_data:/var/lib/semaphore
+#      - semaphore_config:/etc/semaphore
+#      - semaphore_tmp:/tmp/semaphore
+#    networks:
+#      - semaphore_network
+#    depends_on:
+#      - semaphore_db
+#volumes:
+#  semaphore_data:
+#  semaphore_config:
+#  semaphore_tmp:
 networks:
   semaphore_network: {driver: "bridge"}
