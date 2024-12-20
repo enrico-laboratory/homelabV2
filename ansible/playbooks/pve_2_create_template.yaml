@@ -1,0 +1,17 @@
+- name: Create templates
+  hosts: pve-node1
+  become: true
+  vars:
+    cloud_init_img: 'jammy-server-cloudimg-amd64.img'
+    image_url: 'https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img'
+    drive_format: qcow2
+    disk_extra_size: "29748" # 32G in total
+    net0: "virtio,bridge=vmbr0"
+    vms:
+      - vmid: 997
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "template-linux"
+        template: true
+  roles:
+    - pve_manage_vms
