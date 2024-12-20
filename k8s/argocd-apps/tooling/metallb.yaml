@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "metallb"
+  namespace: argocd
+spec:
+  project: "metallb-system"
+  source:
+    chart: metallb
+    repoURL: https://metallb.github.io/metallb
+    targetRevision: 0.14.8
+    helm:
+      releaseName: metallb
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "metallb-system"
+  syncPolicy:
+#    automated:
+#      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.100.150-192.168.100.199
