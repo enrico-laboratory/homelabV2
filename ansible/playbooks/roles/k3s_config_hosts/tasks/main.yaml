@@ -1,0 +1,63 @@
+- name: Install NFS
+  ansible.builtin.apt:
+    name:
+      - nfs-common
+      - qemu-guest-agent
+    state: present
+    update_cache: true
+
+- name: Start qemu-guest-agent
+  ansible.builtin.systemd:
+    name: qemu-guest-agent
+    enabled: true
+    state: started
+
+- name: Install prerequisite for ansible kubernetes
+  when: group_names is contains('master_server')
+  block:
+    - name: Install pip
+      ansible.builtin.apt:
+        name:
+          - python3-pip
+          - python3-kubernetes
+        state: present
+        update_cache: false
+    - name: Install helm if not exists
+      ansible.builtin.unarchive:
+        src: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        extra_opts: "--strip-components=1"
+        owner: root
+        group: root
+        mode: "0755"
+        remote_src: true
+      args:
+        creates: /usr/local/bin/helm
+
+- name: Install prerequisite for quick sync
+  ansible.builtin.apt:
+    name:
+      - intel-media-va-driver
+      - intel-gpu-tools
+    state: present
+    update_cache: false
+  when: group_names is contains('gpu')
+
+- name: Configure proxy
+  when: group_names is contains('proxy')
+  block:
+    - name: Install nginx
+      ansible.builtin.apt:
+        name:
+          - nginx
+        state: present
+        update_cache: false
+    - name: Copy nginx config file
+      ansible.builtin.copy:
+        src: nginx_proxy.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Restart nginx
