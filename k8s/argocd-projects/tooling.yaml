@@ -1,14 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: "mediaserver"
+  name: "tooling"
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Project for the Media Server
+  description: Project for tooling
   sourceRepos:
-    - 'https://github.com/enrico-laboratory/homelabV2'
+    - '*'
   destinations:
-    - namespace: "mediaserver"
+    - namespace: '*'
       server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
