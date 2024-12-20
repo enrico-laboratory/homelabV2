@@ -1,0 +1,23 @@
+- name: Add argocd chart repo
+  kubernetes.core.helm_repository:
+    name: argocd
+    repo_url: "{{ argocd_repo }}"
+    state: "{{ state }}"
+
+- name: Deploy argocd
+  kubernetes.core.helm:
+    state: "{{ state }}"
+    name: argocd
+    chart_ref: "{{ chart_ref }}"
+    chart_version: "{{ chart_version }}"
+    release_namespace: argocd
+    create_namespace: true
+    values: "{{ lookup('file', 'values_overwrite.yaml') | from_yaml }}"
+
+- name: Delete argocd
+  kubernetes.core.helm:
+    name: argocd
+    release_namespace: argocd
+    state: absent
+    wait: true
+  when: state == "absent"

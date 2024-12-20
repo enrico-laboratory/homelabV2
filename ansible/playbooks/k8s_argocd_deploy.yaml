@@ -1,0 +1,9 @@
+- name: Install ArgoCD
+  hosts: master_server
+  vars:
+    argocd_repo: "https://argoproj.github.io/argo-helm"
+    chart_ref: "argocd/argo-cd"
+    chart_version: "7.7.10"
+    state: "present"
+  roles:
+    - k8s_argocd_deploy

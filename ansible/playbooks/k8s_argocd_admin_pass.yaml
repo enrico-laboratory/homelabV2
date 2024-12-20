@@ -1,0 +1,14 @@
+- name: Get ArgoCD admin password
+  hosts: master_server
+  tasks:
+    - name: Get admin secret
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: argocd-initial-admin-secret
+        namespace: argocd
+      register: secret
+
+    - name: Print password
+      ansible.builtin.debug:
+        msg: "{{ secret.resources[0].data.password | b64decode }}"
