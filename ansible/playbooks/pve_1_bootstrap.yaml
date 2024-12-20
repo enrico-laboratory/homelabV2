@@ -1,0 +1,22 @@
+# Playbook needs to be run as root and input password at runtime
+# "--user root -k"
+- name: Bootstrap PVE servers
+  hosts: pvenodes
+  vars:
+    user: "eruggieri"
+    zpool_name: "tank"
+    zfs_dataset_name: "images"
+    nfs_mounts:
+      truenas-backup-vms:
+        export: /mnt/slow-pool/backup/proxmox-vms
+        path: /mnt/pve/truenas-backup-vms
+        server: "192.168.100.61"
+        content: "iso,backup,images"
+      truenas-iso-nfs:
+        export: /mnt/backup-pool-1/iso
+        path: /mnt/pve/truenas-iso-nfs
+        server: "192.168.100.60"
+        content: iso
+  roles:
+    - pve_bootstrap
+    - pve_create_storage

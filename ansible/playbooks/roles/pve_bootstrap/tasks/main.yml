@@ -1,0 +1,50 @@
+- name: Copy no-subrscription repository list
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "/etc/apt/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0440"
+  loop:
+    - {src: "repository_list", dest: "source.list" }
+    - {src: "repo_ceph", dest: "sources.list.d/ceph.list"}
+
+- name: Delete enterprise repo list
+  ansible.builtin.file:
+    state: absent
+    path: "/etc/apt/sources.list.d/pve-enterprise.list"
+
+- name: Install sudo and proxmoxer package
+  ansible.builtin.apt:
+    name:
+      - sudo
+      - python3-proxmoxer
+    update_cache: true
+    cache_valid_time: 3600
+    state: present
+
+- name: Create user {{ user }}
+  ansible.builtin.user:
+    name: "{{ user }}"
+    shell: "/bin/bash"
+
+- name: Add ssh public key
+  ansible.posix.authorized_key:
+    user: "{{ user }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+- name: Add user to sudoers
+  ansible.builtin.copy:
+    content: "{{ user }} ALL=(ALL) NOPASSWD: ALL"
+    dest: "/etc/sudoers.d/{{ user }}"
+    owner: root
+    group: root
+    mode: "0440"
+
+- name: Copy network file
+  ansible.builtin.copy:
+    src: interfaces_configuration
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: "0644"

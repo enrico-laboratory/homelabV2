@@ -1,0 +1,33 @@
+- name: Check ZFS pool existance
+  ansible.builtin.shell:
+    cmd: zpool list -Ho name {{ zpool_name }}
+  register: result_pool_list
+  ignore_errors: true
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: Create zfs image pool
+  shell:
+    cmd: >-
+      zpool create
+      -O compression=lz4
+      -o ashift=12
+      {{ zpool_name }}
+      {{ zpool_device }}
+  when: result_pool_list.rc == 1
+  tags:
+    - skip_ansible_lint
+
+- name: Create vmimages dataset
+  community.general.zfs:
+    name: "{{ zpool_name }}/{{ zfs_dataset_name }}"
+    state: present
+
+- name: Copy storage config file
+  ansible.builtin.template:
+    src: pve_storage_config.cfg
+    dest: "/etc/pve/storage.cfg"
+    owner: root
+    group: www-data
+    mode: "0640"
