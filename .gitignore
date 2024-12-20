@@ -1,2 +1,9 @@
 *.env
 /.idea/
+api_token
+ssh_keys
+
+.terraform
+.terraform.lock.hcl
+pve_credentials
+terraform.tfstate*
