@@ -1,0 +1,60 @@
+# code: language=ansible
+- name: Check VM status {{ item.vm_name }}
+  community.general.proxmox_vm_info:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ api_user }}"
+    api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+    api_token_id: "{{ api_token_id }}"
+    node: "{{ node_name }}"
+    name: "{{ item.vm_name }}"
+  register: initial_status
+
+- name: Stop ore Delete VM
+  when: (item.state == "absent" or item.state == "stopped") and (initial_status.proxmox_vms | length > 0)
+  block:
+
+    - name: VM does not exist {{ item.vm_name }}
+      ansible.builtin.debug:
+        msg: '{{ item.vm_name }} is in "{{ initial_status.proxmox_vms[0].status }}" state'
+
+    - name: Stop vm if running {{ item.vm_name }}
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        node: "{{ node_name }}"
+        name: "{{ item.vm_name }}"
+        state: "stopped"
+        update: true
+      when: initial_status.proxmox_vms[0].status == "running"
+
+    - name: Check vm status {{ item.vm_name }}
+      community.general.proxmox_vm_info:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        node: "{{ node_name }}"
+        name: "{{ item.vm_name }}"
+      register: new_status
+      failed_when: new_status.proxmox_vms[0].status == "running"
+      retries: 10
+      delay: 5
+
+    - name: Delete VM {{ item.vm_name }}
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        node: "{{ node_name }}"
+        name: "{{ item.vm_name }}"
+        state: "absent"
+        update: true
+      when: item.state == "absent"
+
+- name: VM does not exist {{ item.vm_name }}
+  when: (initial_status.proxmox_vms | length == 0)
+  ansible.builtin.debug:
+    msg: "The {{ item.vm_name }} does not exist, nothing to do"

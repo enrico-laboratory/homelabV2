@@ -1,0 +1,9 @@
+- name: Create VMs
+  ansible.builtin.include_tasks:
+    file: create_vms.yml
+  loop: "{{ vms }}"
+
+- name: Stop or Delete VMs
+  ansible.builtin.include_tasks:
+    file: stop_or_delete_vms.yml
+  loop: "{{ vms }}"

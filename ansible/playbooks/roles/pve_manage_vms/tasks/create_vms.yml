@@ -1,0 +1,103 @@
+# code: language=ansible
+- name: Create VM
+  when: item.state == "present"
+  block:
+    - name: Download cloud-init image if it does not exist
+      block:
+        - name: Check if image exists
+          ansible.builtin.stat:
+            path: '{{ image_path }}/{{ cloud_init_img }}'
+          register: path
+
+        - name: Download cloud-init images
+          ansible.builtin.get_url:
+            url: '{{ image_url }}'
+            dest: '{{ image_path }}/{{ cloud_init_img }}'
+            mode: 644
+          when: not path.stat.exists
+
+    - name: Create vm {{ item.vm_name }}
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        vmid: "{{ item.vmid }}"
+        name: "{{ item.vm_name }}"
+        node: "{{ node_name }}"
+        vga: serial0
+        scsihw: virtio-scsi-single
+        ostype: 'l26'
+        onboot: false
+        cpu: 'host'
+        balloon: 0
+        agent: 'enabled=1'
+        serial: '{"serial0":"socket"}'
+        net:
+          net0: "{{ net0 }}"
+        ide:
+          ide2: '{{ drive_storage }}:cloudinit'
+
+    - name: Create disk
+      ansible.builtin.shell:
+        cmd: |
+          qm disk import {{ item.vmid }} {{ image_path }}/{{ cloud_init_img }} {{ drive_storage }} \
+          --format {{ drive_format }} \
+          --target-disk {{ item.disk_type }}
+      register: out
+      ignore_errors: true
+      tags:
+        - skip_ansible_lint
+
+    - name: Read out
+      ansible.builtin.debug:
+        msg: "{{ out.stderr }}"
+
+    - name: Resize disk
+      when: out.stderr == ""
+      block:
+        - name: Sleep
+          ansible.builtin.wait_for:
+            timeout: 5
+        - name: Resize disk
+          ansible.builtin.shell:
+            cmd: "qm disk resize {{ item.vmid }} {{ item.disk_type }} +{{ disk_extra_size }}M"
+          failed_when: false
+          tags:
+            - skip_ansible_lint
+
+    - name: Convert to template
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        vmid: "{{ item.vmid }}"
+        name: "{{ item.vm_name }}"
+        node: "{{ node_name }}"
+        update: true
+        state: template
+      when: item.template
+
+    - name: Update cloud-init values
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        vmid: "{{ item.vmid }}"
+        name: "{{ item.vm_name }}"
+        node: "{{ node_name }}"
+        update: true
+        boot: "order={{ item.disk_type }}"
+        onboot: "{{ item.onboot | default('yes') }}"
+        cores: "{{ item.cores | default('2') }}"
+        memory: "{{ item.memory | default('2048') }}"
+        searchdomains: "{{ item.searchdomains }}"
+        nameservers: "{{ item.nameservers }}"
+        ipconfig:
+          ipconfig0: "ip=192.168.100.{{ item.vmid }}/24,gw={{ gateway }}"
+        ciupgrade: true
+        ciuser: "{{ default_user }}"
+        sshkeys: "{{ lookup('file', 'sshkeys') }}"
+      when: not item.template
