@@ -1,0 +1,92 @@
+- name: Create K3S vms
+  hosts: pve-node1
+  become: true
+  vars:
+    cloud_init_img: 'jammy-server-cloudimg-amd64.img'
+    image_url: 'https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img'
+    drive_format: qcow2
+    name_suffix: "k3s-"
+    disk_extra_size: "29748" # 32G in total
+    gateway: "192.168.100.1"
+    net0: "virtio,bridge=vmbr0"
+    vms:
+      - vmid: 121
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}121"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 122
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}122"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 123
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}123"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 131
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}131"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 132
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}132"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 140
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}proxy"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+  roles:
+    - pve_manage_vms
