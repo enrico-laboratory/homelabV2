@@ -7,7 +7,7 @@ spec:
   project: "metallb-system"
   source:
     repoURL: "https://github.com/enrico-laboratory/homelabV2"
-    targetRevision: metallb
+    targetRevision: HEAD
     path: "k8s/tooling/metallb"
   destination:
     server: https://kubernetes.default.svc
