@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  namespace: mediaserver
+  labels:
+    app: transmission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      tolerations:
+        - key: "arm"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: transmission
+          image: ghcr.io/linuxserver/transmission:latest
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Amsterdam"
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: transmission-secrets
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  key: pass
+                  name: transmission-secrets
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /downloads
+              name: downloads
+            - mountPath: /watch
+              name: watch
+
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/transmission
+        - name: downloads
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/media/torrent/downloads
+        - name: watch
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/media/torrent/watch
