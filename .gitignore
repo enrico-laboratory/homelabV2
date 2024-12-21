@@ -7,3 +7,7 @@ ssh_keys
 .terraform.lock.hcl
 pve_credentials
 terraform.tfstate*
+
+/ansible/inventories/
+
+secret*
