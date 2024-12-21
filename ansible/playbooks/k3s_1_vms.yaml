@@ -19,8 +19,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
       - vmid: 122
@@ -32,8 +32,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
       - vmid: 123
@@ -45,8 +45,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
       - vmid: 131
@@ -58,8 +58,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
       - vmid: 132
@@ -71,8 +71,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
       - vmid: 140
@@ -84,8 +84,8 @@
         cores: 2
         memory: 2048
         nameservers:
+          - "192.168.100.149"
           - "8.8.8.8"
-          - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
   roles:
