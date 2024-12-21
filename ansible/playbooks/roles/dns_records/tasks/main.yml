@@ -1,0 +1,12 @@
+- name: Copy files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - {"src": "custom.list", "dest": "/etc/pihole/custom.list"}
+    - {"src": "05-pihole-custom-cname.conf", "dest": "/etc/dnsmasq.d/05-pihole-custom-cname.conf"}
+  notify:
+    - Restart Pihole service

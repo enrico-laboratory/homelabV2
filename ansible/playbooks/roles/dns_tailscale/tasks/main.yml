@@ -1,0 +1,24 @@
+- name: IP forward
+  ansible.posix.sysctl:
+    name: "net.{{ item }}"
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+  loop:
+    - "ipv4.ip_forward"
+    - "ipv6.conf.all.forwarding"
+
+- name: Start Tailscale
+  ansible.builtin.shell:
+    cmd: |
+      tailscale up \
+      --advertise-routes={{ subnet }}/24 \
+      --advertise-exit-node
+  register: out
+  tags:
+    - skip_ansible_lint
+
+- name: Print tailscae stdout
+  ansible.builtin.debug:
+    msg: "{{ out }}"

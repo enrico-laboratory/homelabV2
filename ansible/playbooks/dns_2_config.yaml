@@ -1,0 +1,15 @@
+- name: Configure DNS
+  hosts: dns
+  become: true
+  vars:
+    subnet: "192.168.100.0"
+  tasks:
+    # pihole was manually installed
+    - name: Dns and CNAMEs record for pihole
+      ansible.builtin.include_role:
+        name: dns_records
+
+    # Tailscale was manually installed
+    - name: Config Tailscale
+      ansible.builtin.include_role:
+        name: dns_tailscale

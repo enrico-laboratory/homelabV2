@@ -1,0 +1,16 @@
+192.168.100.2 ap.enricoruggieri.com # asus router access point
+192.168.100.21 proxmox.enricoruggieri.com
+192.168.100.40 win-gaming.enricoruggieri.com
+192.168.100.52 pihole.enricoruggieri.com
+192.168.100.54 linux-desktop.enricoruggieri.com
+192.168.100.61 truenas.enricoruggieri.com
+192.168.100.60 truenas-backup.enricoruggieri.com
+192.168.100.71 win-desktop.enricoruggieri.com    
+192.168.100.80 tailscale.enricoruggieri.com
+192.168.100.111 k3s-1.enricoruggieri.com
+192.168.100.112 k3s-2.enricoruggieri.com
+192.168.100.113 k3s-3.enricoruggieri.com
+192.168.100.114 k3s-4.enricoruggieri.com
+192.168.100.115 k3s-5.enricoruggieri.com
+192.168.100.116 k3s-6.enricoruggieri.com
+192.168.100.130 k3s-proxy.enricoruggieri.com
