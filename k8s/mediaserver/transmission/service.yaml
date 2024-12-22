@@ -3,10 +3,8 @@ kind: Service
 metadata:
   name: transmission-service
   namespace: mediaserver
-  annotations:
-    metallb.universe.tf/loadBalancerIPs: 192.168.100.151
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: transmission
   ports:
