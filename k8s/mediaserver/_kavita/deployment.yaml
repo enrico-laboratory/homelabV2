@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kavita
+  namespace: mediaserver
+  labels:
+    app: kavita
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kavita
+  template:
+    metadata:
+      labels:
+        app: kavita
+    spec:
+      tolerations:
+        - key: "arm"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: kavita
+          image: jvmilazz0/kavita:latest
+          volumeMounts:
+            - mountPath: /kavita/config
+              name: config
+            - mountPath: /manga
+              name: books
+            - mountPath: /books-kavita
+              name: books-kavita
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/kavita
+        - name: books
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/library/books
+        - name: books-kavita
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/library-kavita

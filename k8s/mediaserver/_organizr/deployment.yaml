@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: organizr
+  namespace: mediaserver
+  labels:
+    app: organizr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: organizr
+  template:
+    metadata:
+      labels:
+        app: organizr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: organizr
+#          command: ["/bin/sh" ]
+#          args: ["-c", "sleep 80000"]
+          image: organizr/organizr
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Amsterdam"
+#            - name: fpm
+#              value: "true"
+            - name: branch
+              value: "v2-master"
+          volumeMounts:
+            - mountPath: /config
+              name: config
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/organizr
+

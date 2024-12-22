@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calibreweb
+  namespace: mediaserver
+  labels:
+    app: calibreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calibreweb
+  template:
+    metadata:
+      labels:
+        app: calibreweb
+    spec:
+      tolerations:
+        - key: "arm"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: calibreweb
+          image: lscr.io/linuxserver/calibre-web:latest
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Amsterdam"
+            - name: DOCKER_MODS
+              value: "linuxserver/mods:universal-calibre"
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /data/books
+              name: books
+
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/calibreweb
+        - name: books
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/library/books

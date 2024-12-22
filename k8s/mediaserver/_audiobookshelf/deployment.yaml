@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf
+  namespace: mediaserver
+  labels:
+    app: audiobookshelf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audiobookshelf
+  template:
+    metadata:
+      labels:
+        app: audiobookshelf
+    spec:
+      nodeName: k3s-3
+      containers:
+        - name: audiobookshelf
+          image: ghcr.io/advplyr/audiobookshelf:latest
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /metadata
+              name: metadata
+              readOnly: false
+            - mountPath: /audiobooks
+              name: audiobooks
+              readOnly: false
+            - mountPath: /podcast
+              name: podcast
+              readOnly: false
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/audiobookshelf/config
+        - name: metadata
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/audiobookshelf/metadata
+        - name: audiobooks
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/media/audiobooks
+            readOnly: false
+        - name: podcast
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/media/podcast
+            readOnly: false

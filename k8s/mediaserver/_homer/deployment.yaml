@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homer
+  namespace: mediaserver
+  labels:
+    app: homer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homer
+  template:
+    metadata:
+      labels:
+        app: homer
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: homer
+          image: b4bz/homer:latest
+          env:
+            - name: IPV6_DISABLE
+              value: "1"
+            - name: INIT_ASSETS
+              value: "1"
+          volumeMounts:
+            - mountPath: /www/assets
+              name: configs
+      volumes:
+        - name: configs
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/docker-configs/homer/

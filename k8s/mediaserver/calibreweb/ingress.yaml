@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: calibreweb
+  namespace: mediaserver
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "calibreweb.enricoruggieri.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: calibreweb-service
+                port:
+                  number: 8083

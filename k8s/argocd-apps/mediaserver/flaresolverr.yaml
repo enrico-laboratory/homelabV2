@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "flaresolverr"
+  namespace: argocd
+spec:
+  project: "mediaserver"
+  source:
+    repoURL: "https://github.com/enrico-laboratory/homelabV2"
+    targetRevision: HEAD
+    path: "k8s/mediaserver/flaresolverr"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "mediaserver"
+  syncPolicy:
+    automated:
+      selfHeal: true
