@@ -4,6 +4,7 @@ metadata:
   name: jellyfin
   namespace: mediaserver
 spec:
+  ingressClassName: nginx
 #  tls:
 #    - hosts:
 #       - "jellyfin.enricoruggieri.com"
