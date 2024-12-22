@@ -1,48 +1,48 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: "prometheus"
-#   namespace: argocd
-# spec:
-#   project: "tooling"
-#   destination:
-#     server: https://kubernetes.default.svc
-#     namespace: "tooling"
-#   syncPolicy:
-#     automated:
-#       selfHeal: true
-#     syncOptions:
-#       - CreateNamespace=true
-#       - Replace=true
-#   source:
-#     chart: kube-prometheus-stack
-#     repoURL: https://prometheus-community.github.io/helm-charts
-#     targetRevision: 67.4.0
-#     helm:
-#       values: |
-#         crds:
-#           enabled: false
-#         grafana:
-#           ingress:
-#             ingressClassName: nginx
-#             enabled: true
-#             hosts:
-#               - grafana.enricoruggieri.com
-#         prometheus:
-#           ingress:
-#             enabled: true
-#             ingressClassName: nginx
-#             hosts:
-#               - prometheus.enricoruggieri.com
-#           prometheusSpec:
-#             additionalScrapeConfigs:
-#               - job_name: node-exporter
-#                 static_configs:
-#                   - targets: 
-#                     - '192.168.100.21:9100'
-#                     - '192.168.100.80:9100'
-#               - job_name: "hass"
-#                 metrics_path: /api/prometheus
-#                 scheme: http
-#                 static_configs:
-#                   - targets: ['192.168.100.70:8123']
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "prometheus"
+  namespace: argocd
+spec:
+  project: "tooling"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "tooling"
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - Replace=true
+  source:
+    chart: kube-prometheus-stack
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 67.4.0
+    helm:
+      values: |
+        crds:
+          enabled: false
+        grafana:
+          ingress:
+            ingressClassName: nginx
+            enabled: true
+            hosts:
+              - grafana.enricoruggieri.com
+        prometheus:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+              - prometheus.enricoruggieri.com
+          prometheusSpec:
+            additionalScrapeConfigs:
+              - job_name: node-exporter
+                static_configs:
+                  - targets: 
+                    - '192.168.100.21:9100'
+                    - '192.168.100.80:9100'
+              - job_name: "hass"
+                metrics_path: /api/prometheus
+                scheme: http
+                static_configs:
+                  - targets: ['192.168.100.70:8123']
