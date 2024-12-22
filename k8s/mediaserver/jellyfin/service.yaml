@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-service
+  namespace: mediaserver
+  # annotations:
+  #   metallb.universe.tf/loadBalancerIPs: 192.168.100.234
+spec:
+  type: LoadBalancer
+  selector:
+    app: jellyfin
+  ports:
+    - port: 8096
