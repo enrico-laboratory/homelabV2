@@ -83,7 +83,7 @@ variable "iso_storage" {
 }
 variable "vm_storage" {
   type = string
-  default = "vmimages"
+  default = "vmimages2"
 }
 variable "cpu_type" {
   type    = string
