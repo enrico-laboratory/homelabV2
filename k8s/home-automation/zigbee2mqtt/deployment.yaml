@@ -16,7 +16,7 @@ spec:
         app: zigbee2mqtt
     spec:
       nodeName:
-        k3s-2
+        k3s-131
       containers:
         - name: zigbee2mqtt
           image: koenkk/zigbee2mqtt:1.40.1
