@@ -19,7 +19,7 @@
   tags:
     - skip_ansible_lint
 
-- name: Create vmimages dataset
+- name: Create vmimages2 dataset
   community.general.zfs:
     name: "{{ zpool_name }}/{{ zfs_dataset_name }}"
     state: present

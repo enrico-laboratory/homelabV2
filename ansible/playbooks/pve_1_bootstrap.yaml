@@ -2,10 +2,12 @@
 # "--user root -k"
 - name: Bootstrap PVE servers
   hosts: pvenodes
+  become: true
   vars:
     user: "eruggieri"
-    zpool_name: "tank"
+    zpool_name: "tank2"
     zfs_dataset_name: "images"
+    zpool_device: "/dev/nvme1n1"
     nfs_mounts:
       truenas-backup-vms:
         export: /mnt/slow-pool/backup/proxmox-vms
