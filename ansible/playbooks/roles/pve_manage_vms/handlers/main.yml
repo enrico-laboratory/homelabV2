@@ -1,0 +1,3 @@
+- name: Wait for updates
+  ansible.builtin.wait_for:
+    timeout: 6

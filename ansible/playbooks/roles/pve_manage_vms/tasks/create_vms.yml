@@ -101,3 +101,17 @@
         ciuser: "{{ default_user }}"
         sshkeys: "{{ lookup('file', 'sshkeys') }}"
       when: not item.template
+      notify: Wait for updates
+
+    - name: Start vms
+      community.general.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ api_user }}"
+        api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+        api_token_id: "{{ api_token_id }}"
+        vmid: "{{ item.vmid }}"
+        name: "{{ item.vm_name }}"
+        node: "{{ node_name }}"
+        update: true
+        state: "started"
+      when: not item.template and item.started
