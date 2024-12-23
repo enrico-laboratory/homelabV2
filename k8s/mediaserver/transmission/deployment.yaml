@@ -30,16 +30,16 @@ spec:
               value: "1000"
             - name: TZ
               value: "Europe/Amsterdam"
-            - name: USER
-              valueFrom:
-                secretKeyRef:
-                  key: user
-                  name: transmission-secrets
-            - name: PASS
-              valueFrom:
-                secretKeyRef:
-                  key: pass
-                  name: transmission-secrets
+            # - name: USER
+            #   valueFrom:
+            #     secretKeyRef:
+            #       key: user
+            #       name: transmission-secrets
+            # - name: PASS
+            #   valueFrom:
+            #     secretKeyRef:
+            #       key: pass
+            #       name: transmission-secrets
           volumeMounts:
             - mountPath: /config
               name: config
