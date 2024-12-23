@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  namespace: home-automation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      containers:
+        - name: mosquitto
+          image: eclipse-mosquitto
+#          securityContext:
+#            privileged: true
+          ports:
+            - containerPort: 1883
+            - containerPort: 9001
+          volumeMounts:
+            - mountPath: /mosquitto/config/mosquitto.conf
+              name: config
+              subPath: mosquitto.conf
+            - mountPath: /mosquitto/config/user
+              name: config
+              subPath: user
+#            - mountPath: /mosquitto/data
+#              name: data
+#            - mountPath: /mosquitto/log
+#              name: log
+      volumes:
+        - name: config
+          configMap:
+            name: mosquitto-config
+        - name: data
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/home-assistant/mosquitto/data
+        - name: log
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/fast-pool1/home-assistant/mosquitto/log

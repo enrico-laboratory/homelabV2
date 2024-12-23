@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: home-automation
+  name: mosquitto
+spec:
+  selector:
+    app: mosquitto
+  type: LoadBalancer
+  ports:
+    - name: mqtt
+      protocol: TCP
+      port: 1883
+      targetPort: 1883
+    - name: mqtt1
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
