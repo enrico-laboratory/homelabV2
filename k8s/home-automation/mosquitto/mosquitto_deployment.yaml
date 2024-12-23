@@ -16,8 +16,6 @@ spec:
       containers:
         - name: mosquitto
           image: eclipse-mosquitto
-#          securityContext:
-#            privileged: true
           ports:
             - containerPort: 1883
             - containerPort: 9001
@@ -30,8 +28,8 @@ spec:
               subPath: user
 #            - mountPath: /mosquitto/data
 #              name: data
-#            - mountPath: /mosquitto/log
-#              name: log
+            - mountPath: /mosquitto/log
+              name: log
       volumes:
         - name: config
           configMap:
