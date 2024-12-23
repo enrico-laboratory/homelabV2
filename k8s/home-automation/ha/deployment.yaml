@@ -1,60 +1,60 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  namespace: home-automation
-  name: home-assistant
-  labels:
-    app: home-assistant
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: home-assistant
-  template:
-    metadata:
-      labels:
-        app: home-assistant
-    spec:
-      nodeName:
-          k3s-131
-      containers:
-        - name: home-assistant
-          image: homeassistant/home-assistant:2024.8.2
-          ports:
-            - containerPort: 8123
-          lifecycle:
-            postStart:
-              exec:
-                command: [ "/bin/sh", "-c", "wget -O https://get.hacs.xyz | bash -" ]
-          volumeMounts:
-            - mountPath: /config
-              name: config
-            # - mountPath: /dev/ttyACM0
-            #   name: sonoff
-#            - mountPath: /config/configuration.yaml
-#              subPath: configuration.yaml
-#              name: configmap-file-india
-#            - mountPath: /config/automations.yaml
-#              subPath: automations.yaml
-#              name: configmap-file-india
-#            - mountPath: /dev/ttyUSB1
-#              name: zigbee
-#          securityContext:
-#            privileged: true
-      hostNetwork: true
-      volumes:
-        - name: config
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/home-assistant/config
-        # - name: sonoff
-        #   hostPath:
-        #     path: /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240105134827-if00
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   namespace: home-automation
+#   name: home-assistant
+#   labels:
+#     app: home-assistant
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: home-assistant
+#   template:
+#     metadata:
+#       labels:
+#         app: home-assistant
+#     spec:
+#       nodeName:
+#           k3s-131
+#       containers:
+#         - name: home-assistant
+#           image: homeassistant/home-assistant:2024.8.2
+#           ports:
+#             - containerPort: 8123
+#           lifecycle:
+#             postStart:
+#               exec:
+#                 command: [ "/bin/sh", "-c", "wget -O https://get.hacs.xyz | bash -" ]
+#           volumeMounts:
+#             - mountPath: /config
+#               name: config
+#             # - mountPath: /dev/ttyACM0
+#             #   name: sonoff
+# #            - mountPath: /config/configuration.yaml
+# #              subPath: configuration.yaml
+# #              name: configmap-file-india
+# #            - mountPath: /config/automations.yaml
+# #              subPath: automations.yaml
+# #              name: configmap-file-india
+# #            - mountPath: /dev/ttyUSB1
+# #              name: zigbee
+# #          securityContext:
+# #            privileged: true
+#       hostNetwork: true
+#       volumes:
+#         - name: config
+#           nfs:
+#             server: 192.168.100.61
+#             path: /mnt/fast-pool1/home-assistant/config
+#         # - name: sonoff
+#         #   hostPath:
+#         #     path: /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240105134827-if00
 
-#        - name: configmap-file-india
-#          configMap:
-#            name: ha-india-configmap
-#        - name: zigbee
-#          hostPath:
-#            path: /dev/ttyACM0
+# #        - name: configmap-file-india
+# #          configMap:
+# #            name: ha-india-configmap
+# #        - name: zigbee
+# #          hostPath:
+# #            path: /dev/ttyACM0
 
