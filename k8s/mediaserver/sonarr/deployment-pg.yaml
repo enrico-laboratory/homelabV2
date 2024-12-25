@@ -39,5 +39,5 @@ spec:
         - name: data
           nfs:
             server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/postgres
+            path: /mnt/fast-pool1/docker-configs/postgres/data
 
