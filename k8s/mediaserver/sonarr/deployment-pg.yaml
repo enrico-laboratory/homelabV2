@@ -18,13 +18,9 @@ spec:
       containers:
         - name: postgres
           image: postgres:14
-          # lifecycle:
-          #   postStart:
-          #     exec:
-          #       command: [ "/bin/sh", "-c", "psql -c \"create database radarr-logs\"" ]
           env:
-            - name: POSTGRES_INITDB_ARGS
-              value: "--auth-host=scram-sha-256"
+            # - name: POSTGRES_INITDB_ARGS
+            #   value: "--auth-host=scram-sha-256"
             - name: POSTGRES_USER
               value: admin
             - name: POSTGRES_PASSWORD
