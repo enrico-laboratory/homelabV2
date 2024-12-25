@@ -32,9 +32,9 @@ spec:
                   name: postgres-secrets
           ports:
             - containerPort: 5432
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: data
+          # volumeMounts:
+          #   - mountPath: /var/lib/postgresql/data
+          #     name: data
       volumes:
         - name: data
           nfs:
