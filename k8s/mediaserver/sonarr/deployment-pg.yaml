@@ -18,10 +18,10 @@ spec:
       containers:
         - name: postgres
           image: postgres:14
-          lifecycle:
-            postStart:
-              exec:
-                command: [ "/bin/sh", "-c", "psql -c \"create database radarr-logs\"" ]
+          # lifecycle:
+          #   postStart:
+          #     exec:
+          #       command: [ "/bin/sh", "-c", "psql -c \"create database radarr-logs\"" ]
           env:
             - name: POSTGRES_USER
               value: admin
