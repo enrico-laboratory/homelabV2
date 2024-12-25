@@ -22,7 +22,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: sonarr
-          image: ghcr.io/linuxserver/sonarr:4.0.9
+          image: ghcr.io/linuxserver/sonarr:4.0.11
           env:
             - name: PUID
               value: "1000"
