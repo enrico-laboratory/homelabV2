@@ -15,11 +15,6 @@ spec:
       labels:
         app: radarr
     spec:
-      tolerations:
-        - key: "arm"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
       containers:
         - name: radarr
           image: ghcr.io/linuxserver/radarr:5.16.3

@@ -15,11 +15,6 @@ spec:
       labels:
         app: sonarr
     spec:
-      tolerations:
-        - key: "arm"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
       containers:
         - name: sonarr
           image: ghcr.io/linuxserver/sonarr:4.0.11
