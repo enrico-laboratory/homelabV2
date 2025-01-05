@@ -15,7 +15,8 @@ spec:
       labels:
         app: jellyfin
     spec:
-      nodeName: k3s-133
+      nodeSelector: 
+        feature.node.kubernetes.io/cpu-model.vendor_id: "Intel"
       containers:
         - name: jellyfin
           image: ghcr.io/linuxserver/jellyfin
