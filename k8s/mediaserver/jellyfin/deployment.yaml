@@ -21,9 +21,11 @@ spec:
           image: ghcr.io/linuxserver/jellyfin
           resources:
             limits:
-              cpu: "4"
+              cpu: "2"
+              memory: "1536Mi"
             requests:
               cpu: "2"
+              memory: "1536Mi"
           env:
             - name: PUID
               value: "1000"
