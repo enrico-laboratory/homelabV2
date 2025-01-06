@@ -26,8 +26,6 @@ spec:
             - name: TZ
               value: "Europe/Amsterdam"
           volumeMounts:
-            - mountPath: /config_temp
-              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /movies
