@@ -1,12 +1,12 @@
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: radarr-pvc
-#   namespace: mediaserver
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-#   storageClassName: longhorn
-#   resources:
-#     requests:
-#       storage: 250Mi
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radarr-pvc
+  namespace: mediaserver
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 250Mi
