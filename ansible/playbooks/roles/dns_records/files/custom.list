@@ -13,4 +13,5 @@
 192.168.100.114 k3s-4.enricoruggieri.com
 192.168.100.115 k3s-5.enricoruggieri.com
 192.168.100.116 k3s-6.enricoruggieri.com
-192.168.100.130 k3s-proxy.enricoruggieri.com
+192.168.100.121 k3s-121.enricoruggieri.com
+192.168.100.140 k3s-proxy.enricoruggieri.com
