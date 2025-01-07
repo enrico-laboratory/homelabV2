@@ -26,8 +26,6 @@ spec:
             - name: TZ
               value: "Europe/Amsterdam"
           volumeMounts:
-            - mountPath: /config_temp
-              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /tv
@@ -35,13 +33,13 @@ spec:
             - mountPath: /downloads
               name: downloads
       volumes:
-        - name: config-temp
+        - name: config
           persistentVolumeClaim:
             claimName: sonarr-pvc        
-        - name: config
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/sonarr
+        # - name: config
+        #   nfs:
+        #     server: 192.168.100.61
+        #     path: /mnt/fast-pool1/docker-configs/sonarr
         - name: tvshows
           nfs:
             server: 192.168.100.61
