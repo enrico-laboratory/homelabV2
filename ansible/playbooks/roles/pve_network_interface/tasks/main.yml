@@ -1,0 +1,7 @@
+- name: Copy network file
+  ansible.builtin.template:
+    src: interfaces_configuration
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: "0644"

@@ -6,7 +6,7 @@
     group: root
     mode: "0440"
   loop:
-    - {src: "repository_list", dest: "source.list" }
+    - {src: "repository_list", dest: "sources.list" }
     - {src: "repo_ceph", dest: "sources.list.d/ceph.list"}
 
 - name: Delete enterprise repo list
@@ -40,11 +40,3 @@
     owner: root
     group: root
     mode: "0440"
-
-- name: Copy network file
-  ansible.builtin.copy:
-    src: interfaces_configuration
-    dest: /etc/network/interfaces
-    owner: root
-    group: root
-    mode: "0644"

@@ -1,0 +1,22 @@
+auto lo
+iface lo inet loopback
+
+iface enp1s0 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+        address 192.168.100.21/24
+        gateway 192.168.100.1
+        bridge-ports enp1s0
+        bridge-stp off
+        bridge-fd 0
+
+iface enp3s0 inet manual
+
+iface enx009027f55440 inet manual
+
+iface enp4s0 inet manual
+
+iface enx0023a4061671 inet manual
+
+source /etc/network/interfaces.d/*

@@ -7,7 +7,8 @@
     user: "eruggieri"
     zpool_name: "tank2"
     zfs_dataset_name: "images"
-    zpool_device: "/dev/nvme1n1"
+    # zpool_device: this variable is stored into host variable files
+    pve_image_storage_name: vmimages2
     nfs_mounts:
       truenas-backup-vms:
         export: /mnt/slow-pool/backup/proxmox-vms
@@ -22,3 +23,5 @@
   roles:
     - pve_bootstrap
     - pve_create_storage
+    # - pve_network_interface
+    - prometheus.prometheus.node_exporter
