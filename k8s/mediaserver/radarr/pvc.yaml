@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: radarr-pvc
   namespace: mediaserver
+  labels:
+    recurring-job.longhorn.io/every-day: enabled
 spec:
   accessModes:
     - ReadWriteOnce
