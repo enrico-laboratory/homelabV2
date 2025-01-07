@@ -41,8 +41,6 @@ spec:
             #       key: pass
             #       name: transmission-secrets
           volumeMounts:
-            - mountPath: /config-temp
-              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /downloads
@@ -50,13 +48,9 @@ spec:
             - mountPath: /watch
               name: watch
       volumes:
-        - name: config-temp
+        - name: config
           persistentVolumeClaim:
             claimName: transmission-pvc    
-        - name: config
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/transmission
         - name: downloads
           nfs:
             server: 192.168.100.61
