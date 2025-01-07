@@ -26,6 +26,8 @@ spec:
             - name: TZ
               value: "Europe/Amsterdam"
           volumeMounts:
+            - mountPath: /config_temp
+              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /tv
@@ -33,6 +35,9 @@ spec:
             - mountPath: /downloads
               name: downloads
       volumes:
+        - name: config-temp
+          persistentVolumeClaim:
+            claimName: sonarr-pvc        
         - name: config
           nfs:
             server: 192.168.100.61
