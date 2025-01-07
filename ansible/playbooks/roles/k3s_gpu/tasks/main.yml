@@ -1,0 +1,7 @@
+- name: Install prerequisite for quick sync
+  ansible.builtin.apt:
+    name:
+      - intel-media-va-driver
+      - intel-gpu-tools
+    state: present
+    update_cache: false

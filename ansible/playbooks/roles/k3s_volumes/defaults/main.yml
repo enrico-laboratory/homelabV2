@@ -1,0 +1,4 @@
+k3s_volumes_vg_name: 'lh_vg'
+k3s_volumes_lv_name: 'lh_lv'
+k3s_volumes_device_number: 1
+k3s_volumes_fstype: 'ext4'

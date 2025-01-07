@@ -1,0 +1,40 @@
+- name: Check if could-init configuration exists
+  ansible.builtin.stat:
+    path: "{{ cloud_init_path | default('/etc/netplan/50-cloud-init.yaml') }}"
+  register: configuration
+
+- name: Copy cloud-init configuration to tmp
+  ansible.builtin.copy:
+    src: "{{ cloud_init_path | default('/etc/netplan/50-cloud-init.yaml') }}"
+    dest: /tmp/50-cloud-init.yaml
+    mode: "0600"
+    owner: root
+    group: root
+    remote_src: true
+  when: configuration.stat.exists
+
+- name: Delete cloud-init configuration
+  ansible.builtin.file:
+    path: "{{ cloud_init_path | default('/etc/netplan/50-cloud-init.yaml') }}"
+    state: absent
+
+- name: Copy interface configuration
+  ansible.builtin.template:
+    src: "interface.template.j2"
+    dest: "{{ interface_configuration_path | default('/etc/netplan/00-main-conf.yaml') }}"
+    mode: "0600"
+    owner: root
+    group: root
+  register: copy_configuration
+
+- name: Apply configuration
+  ansible.builtin.shell:
+    cmd: "netplan apply"
+  when: copy_configuration.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Delete cloud-init configuration in temp folder
+  ansible.builtin.file:
+    path: /tmp/50-cloud-init.yaml
+    state: absent

@@ -1,0 +1,16 @@
+network:
+  version: 2
+  ethernets:
+    {{ interface_name }}:
+      addresses:
+      - "{{ ip_address | default(inventory_hostname) }}/24"
+      nameservers:
+        addresses:
+{% for nameserver in nameservers %}
+        - {{ nameserver }}
+{% endfor %}
+        search:
+        - {{ search_domain }}
+      routes:
+      - to: "default"
+        via: "{{ gateway }}"

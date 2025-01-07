@@ -1,0 +1,24 @@
+- name: Get Kernel
+  ansible.builtin.shell:
+    cmd: "uname -r"
+  register: out
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - nfs-common
+      - qemu-guest-agent
+      # added linux-modules-extra to allow usb pass through
+      - "linux-modules-extra-{{ out.stdout }}"
+      - open-iscsi
+    state: present
+    update_cache: true
+
+- name: Start qemu-guest-agent
+  ansible.builtin.systemd:
+    name: qemu-guest-agent
+    enabled: true
+    state: started

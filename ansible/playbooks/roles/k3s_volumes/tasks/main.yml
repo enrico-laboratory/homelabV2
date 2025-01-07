@@ -1,0 +1,36 @@
+- name: Create partition
+  community.general.parted:
+    device: "{{ device }}"
+    number: "{{ device_number | default(1) }}"
+    flags:
+      - lvm
+    state: present
+
+- name: Creating Volume Group
+  community.general.lvg:
+    vg: "{{ vg_name | default(k3s_volumes_vg_name) }}"
+    pvs: "{{ device }}{{ device_number | default(k3s_volumes_device_number) }}"
+
+- name: Create Logical Volume
+  community.general.lvol:
+    vg: "{{ vg_name | default(k3s_volumes_vg_name) }}"
+    lv: "{{ lv_name | default(k3s_volumes_lv_name) }}"
+    size: 100%VG
+
+- name: Create directory data1 if does not exist
+  ansible.builtin.file:
+    path: "{{ lh_folder }}"
+    state: directory
+    mode: '0755'
+
+- name: Format Logical Volume
+  community.general.filesystem:
+    fstype: "{{ fstype | default(k3s_volumes_fstype) }}"
+    dev: "/dev/{{ vg_name | default(k3s_volumes_vg_name) }}/{{ lv_name | default(k3s_volumes_lv_name) }}"
+
+- name: Mount Volume
+  ansible.posix.mount:
+    path: "{{ lh_folder }}"
+    src: "/dev/{{ vg_name | default(k3s_volumes_vg_name) }}/{{ lv_name | default(k3s_volumes_lv_name) }}"
+    fstype: "{{ fstype | default(k3s_volumes_fstype) }}"
+    state: mounted

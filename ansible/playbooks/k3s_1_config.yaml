@@ -1,0 +1,47 @@
+- name: Configure K3s cluster
+  hosts:
+    - k3s_cluster
+    - proxy
+  become: true
+  vars:
+    helm_version: "v3.16.3"
+    interface_name: eth0
+    gateway: 192.168.100.1
+    nameservers:
+      - 192.168.100.149
+      - 192.168.100.80
+      - 8.8.8.8
+      - 8.8.4.4
+    search_domain: enricoruggieri.com
+    device: "/dev/sdb"
+    lh_folder: "/var/lib/longhorn"
+  tasks:
+    - name: Packages common
+      ansible.builtin.include_role:
+        name: k3s_common
+
+    - name: Network interface
+      ansible.builtin.include_role:
+        name: network_interface
+
+    - name: Configure Ansible kubernetes
+      when: group_names is contains('master_server')
+      ansible.builtin.include_role:
+        name: k3s_ansible_kubernetes
+
+    - name: Configure proxy
+      when: group_names is contains('proxy')
+      ansible.builtin.include_role:
+        name: k3s_proxy
+
+    - name: Configure gpu passthrough
+# To install in the pve with intel alder lake cpu https://www.derekseaman.com/2024/07/proxmox-ve-8-2-windows-11-vgpu-vt-d-passthrough-with-intel-alder-lake.html
+# To install in the host https://dgpu-docs.intel.com/driver/installation.html#ubuntu
+      when: group_names is contains('gpu')
+      ansible.builtin.include_role:
+        name: k3s_gpu
+
+    - name: Add longhorn volumes to worker
+      when: group_names is contains('agent')
+      ansible.builtin.include_role:
+        name: k3s_volumes
