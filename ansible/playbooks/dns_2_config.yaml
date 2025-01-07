@@ -3,7 +3,23 @@
   become: true
   vars:
     subnet: "192.168.100.0"
+    interface_name: eth0
+    gateway: 192.168.100.1
+    nameservers:
+      - 8.8.8.8
+      - 8.8.4.4
+    search_domain: enricoruggieri.com
   tasks:
+
+    - name: Network configuration
+      ansible.builtin.include_role:
+        name: network_interface
+
+    - name: Install qemu agent
+      ansible.builtin.include_role:
+        name: install_qemu_agent
+      when: group_names is contains('dns_vm')
+
     # pihole was manually installed
     - name: Dns and CNAMEs record for pihole
       ansible.builtin.include_role:
@@ -13,3 +29,7 @@
     - name: Config Tailscale
       ansible.builtin.include_role:
         name: dns_tailscale
+
+    - name: Install node exporter
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter
