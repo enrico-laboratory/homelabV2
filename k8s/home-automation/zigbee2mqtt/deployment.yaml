@@ -30,17 +30,8 @@ spec:
               name: sonoff
             - mountPath: /app/data
               name: data
-      #            - mountPath: /config/configuration.yaml
-      #              subPath: configuration.yaml
-      #              name: configmap-file-india
-      #            - mountPath: /config/automations.yaml
-      #              subPath: automations.yaml
-      #              name: configmap-file-india
-      #            - mountPath: /dev/ttyUSB1
-      #              name: zigbee
           securityContext:
             privileged: true
-      # hostNetwork: true
       volumes:
         - name: sonoff
           hostPath:
@@ -49,9 +40,3 @@ spec:
           nfs:
             server: 192.168.100.61
             path: /mnt/fast-pool1/home-assistant/zigbee2mqtt/
-#        - name: configmap-file-india
-#          configMap:
-#            name: ha-india-configmap
-#        - name: zigbee
-#          hostPath:
-#            path: /dev/ttyACM0

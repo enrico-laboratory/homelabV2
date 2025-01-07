@@ -29,32 +29,16 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
-            # - mountPath: /dev/ttyACM0
-            #   name: sonoff
 #            - mountPath: /config/configuration.yaml
 #              subPath: configuration.yaml
 #              name: configmap-file-india
 #            - mountPath: /config/automations.yaml
 #              subPath: automations.yaml
 #              name: configmap-file-india
-#            - mountPath: /dev/ttyUSB1
-#              name: zigbee
-#          securityContext:
-#            privileged: true
-      # hostNetwork: true
       volumes:
         - name: config
           nfs:
             server: 192.168.100.61
             path: /mnt/fast-pool1/home-assistant/config
-        # - name: sonoff
-        #   hostPath:
-        #     path: /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240105134827-if00
 
-#        - name: configmap-file-india
-#          configMap:
-#            name: ha-india-configmap
-#        - name: zigbee
-#          hostPath:
-#            path: /dev/ttyACM0
 
