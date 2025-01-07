@@ -36,10 +36,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: radarr-pvc
-        # - name: config
-        #   nfs:
-        #     server: 192.168.100.61
-        #     path: /mnt/fast-pool1/docker-configs/radarr
         - name: movies
           nfs:
             server: 192.168.100.61

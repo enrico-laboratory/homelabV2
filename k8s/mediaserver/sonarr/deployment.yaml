@@ -36,10 +36,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: sonarr-pvc        
-        # - name: config
-        #   nfs:
-        #     server: 192.168.100.61
-        #     path: /mnt/fast-pool1/docker-configs/sonarr
         - name: tvshows
           nfs:
             server: 192.168.100.61
