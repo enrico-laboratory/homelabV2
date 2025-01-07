@@ -3,6 +3,13 @@
     file: create_vms.yml
   loop: "{{ vms }}"
 
+- name: Create or Delete Volume
+  ansible.builtin.include_tasks:
+    file: create_volume.yml
+  loop: "{{ vms }}"
+  loop_control:
+    loop_var: vm
+
 - name: Stop or Delete VMs
   ansible.builtin.include_tasks:
     file: stop_or_delete_vms.yml

@@ -1,10 +1,10 @@
 - name: Create K3S vms
-  hosts: pve-node1
+  hosts: pve_node1
   become: true
   vars:
     cloud_init_img: 'jammy-server-cloudimg-amd64.img'
     image_url: 'https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img'
-    drive_format: qcow2
+    drive_format: raw
     name_suffix: "k3s-"
     disk_extra_size: "29748" # 32G in total
     gateway: "192.168.100.1"
@@ -14,10 +14,11 @@
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}121"
+        node_name: "pve-node1"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 4
+        memory: 3092
         started: true
         nameservers:
           - "192.168.100.149"
@@ -28,10 +29,11 @@
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}122"
+        node_name: "pve-node1"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 4
+        memory: 3092
         started: true
         nameservers:
           - "192.168.100.149"
@@ -42,10 +44,11 @@
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}123"
+        node_name: "pve-node2"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 4
+        memory: 3092
         started: true
         nameservers:
           - "192.168.100.149"
@@ -56,20 +59,28 @@
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}131"
+        node_name: "pve-node1"
         template: false
         onboot: true
         cores: 2
         memory: 2048
         started: true
+        usb_device: "host=1a76:55d4"
         nameservers:
           - "192.168.100.149"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
+        disks:
+          - disk: scsi1
+            format: raw
+            size: 20
+            state: "present"
       - vmid: 132
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}132"
+        node_name: "pve-node1"
         template: false
         onboot: true
         cores: 2
@@ -80,10 +91,36 @@
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
+        disks:
+          - disk: scsi1
+            format: raw
+            size: 20
+            state: "present"
+      - vmid: 133
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}133"
+        node_name: "pve-node2"
+        template: false
+        onboot: true
+        cores: 2
+        memory: 2048
+        started: true
+        nameservers:
+          - "192.168.100.149"
+          - "8.8.8.8"
+        searchdomains:
+          - enricoruggieri.com
+        disks:
+          - disk: scsi1
+            format: raw
+            size: 20
+            state: "present"
       - vmid: 140
         state: "present"
         disk_type: "scsi0"
         vm_name: "{{ name_suffix }}proxy"
+        node_name: "pve-node1"
         template: false
         onboot: true
         cores: 2
@@ -94,5 +131,40 @@
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
+      - vmid: 149
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "dns"
+        node_name: "pve-node1"
+        template: false
+        onboot: true
+        cores: 1
+        memory: 2048
+        started: true
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+      - vmid: 199
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "test"
+        node_name: "pve-node1"
+        template: false
+        onboot: true
+        cores: 1
+        memory: 2048
+        started: true
+        nameservers:
+          - "8.8.8.8"
+          - "8.8.4.4"
+        searchdomains:
+          - enricoruggieri.com
+        disks:
+          - disk: scsi1
+            format: raw
+            size: 20
+            state: "present"
   roles:
     - pve_manage_vms

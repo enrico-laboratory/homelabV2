@@ -24,7 +24,7 @@
         api_token_id: "{{ api_token_id }}"
         vmid: "{{ item.vmid }}"
         name: "{{ item.vm_name }}"
-        node: "{{ node_name }}"
+        node: "{{ item.node_name }}"
         vga: serial0
         scsihw: virtio-scsi-single
         ostype: 'l26'
@@ -45,6 +45,7 @@
           --format {{ drive_format }} \
           --target-disk {{ item.disk_type }}
       register: out
+      delegate_to: "{{ item.node_name | replace('-', '_')}}"
       ignore_errors: true
       tags:
         - skip_ansible_lint
@@ -55,6 +56,7 @@
 
     - name: Resize disk
       when: out.stderr == ""
+      delegate_to: "{{ item.node_name | replace('-', '_')}}"
       block:
         - name: Sleep
           ansible.builtin.wait_for:
@@ -74,7 +76,7 @@
         api_token_id: "{{ api_token_id }}"
         vmid: "{{ item.vmid }}"
         name: "{{ item.vm_name }}"
-        node: "{{ node_name }}"
+        node: "{{ item.node_name }}"
         update: true
         state: template
       when: item.template
@@ -87,7 +89,7 @@
         api_token_id: "{{ api_token_id }}"
         vmid: "{{ item.vmid }}"
         name: "{{ item.vm_name }}"
-        node: "{{ node_name }}"
+        node: "{{ item.node_name }}"
         update: true
         boot: "order={{ item.disk_type }}"
         onboot: "{{ item.onboot | default('yes') }}"
@@ -101,7 +103,21 @@
         ciuser: "{{ default_user }}"
         sshkeys: "{{ lookup('file', 'sshkeys') }}"
       when: not item.template
-      notify: Wait for updates
+
+# Only root can set usb...
+    # - name: Add usb device
+    #   community.general.proxmox_kvm:
+    #     api_host: "{{ ansible_host }}"
+    #     api_user: "{{ api_user }}"
+    #     api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+    #     api_token_id: "{{ api_token_id }}"
+    #     vmid: "{{ item.vmid }}"
+    #     name: "{{ item.vm_name }}"
+    #     node: "{{ item.node_name }}"
+    #     update: true
+    #     usb:
+    #       usb1: "{{ item.usb_device }}"
+    #   when: item.usb_device is defined
 
     - name: Start vms
       community.general.proxmox_kvm:
@@ -111,7 +127,7 @@
         api_token_id: "{{ api_token_id }}"
         vmid: "{{ item.vmid }}"
         name: "{{ item.vm_name }}"
-        node: "{{ node_name }}"
+        node: "{{ item.node_name }}"
         update: true
         state: "started"
       when: not item.template and item.started

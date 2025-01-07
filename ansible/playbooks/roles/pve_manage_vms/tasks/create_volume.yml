@@ -1,0 +1,18 @@
+- name: Create or delete new disk in VM {{ vm.vmid }}
+  community.general.proxmox_disk:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ api_user }}"
+    api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+    api_token_id: "{{ api_token_id }}"
+    vmid: "{{ vm.vmid }}"
+    disk: "{{ disk.disk }}"
+    backup: "{{ disk.backup | default(true) }}"
+    cache: none
+    format: "{{ disk.format }}"
+    storage: "{{ disk.drive_storage | default(drive_storage) }}"
+    size: "{{ disk.size }}"
+    state: "{{ disk.state }}"
+  loop: "{{ vm.disks }}"
+  loop_control:
+    loop_var: disk
+  when: vm.disks is defined
