@@ -26,7 +26,7 @@ spec:
               type: NodePort
               nodePort: "30123"
           defaultSettings:
-            backup-target: nfs://truenas-backup.enricoruggieri.com:/mnt/backup-pool-1/longhorn-backup
+            backupTarget: "nfs://truenas-backup.enricoruggieri.com:/mnt/backup-pool-1/longhorn-backup"
             defaultDataPath: "/var/lib/longhorn/"
       #     ingress:
       #       enabled: true
