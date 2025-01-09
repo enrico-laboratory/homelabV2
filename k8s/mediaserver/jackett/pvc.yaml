@@ -9,7 +9,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn-gpu
+  storageClassName: longhorn
   resources:
     requests:
       storage: 50Mi
