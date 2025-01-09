@@ -31,11 +31,16 @@ spec:
             - name: TZ
               value: "Europe/Amsterdam"
           volumeMounts:
+            - mountPath: /config-temp
+              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /downloads
               name: downloads
       volumes:
+        - name: config-temp
+          persistentVolumeClaim:
+            claimName: transmission-pvc    
         - name: config
           nfs:
             server: 192.168.100.61
