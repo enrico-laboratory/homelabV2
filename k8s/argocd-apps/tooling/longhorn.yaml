@@ -25,8 +25,10 @@ spec:
             ui: 
               type: NodePort
               nodePort: "30123"
+          defaultSettings:
+            backup-target: nfs://truenas-backup.enricoruggieri.com:/mnt/backup-pool-1/longhorn-backup
+            defaultDataPath: "/var/lib/longhorn/"
       #     ingress:
       #       enabled: true
       #       ingressClassName: nginx
-      #     defaultSettings:
-      #       defaultDataPath: "/var/lib/longhorn/"
+
