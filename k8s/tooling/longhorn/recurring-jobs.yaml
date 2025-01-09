@@ -32,3 +32,16 @@ spec:
   concurrency: 2
   groups:
     - default
+---
+apiVersion: longhorn.io/v1beta1
+kind: RecurringJob
+metadata:
+  name: backup-every-week
+  namespace: longhorn-system
+spec:
+  cron: "0 2 * * 3"
+  task: "backup"
+  retain: 2
+  concurrency: 2
+  groups:
+    - default
