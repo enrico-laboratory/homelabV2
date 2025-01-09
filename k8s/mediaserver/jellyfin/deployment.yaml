@@ -52,8 +52,6 @@ spec:
               mountPath: /dev/dri
             - mountPath: /config
               name: config
-            - mountPath: /config-temp
-              name: config-temp
             - mountPath: /data/tvshows
               name: tv-shows
               readOnly: false
@@ -69,13 +67,9 @@ spec:
         - name: dri
           hostPath:
             path: /dev/dri
-        - name: config-temp
+        - name: config
           persistentVolumeClaim:
             claimName: jellyfin-pvc    
-        - name: config
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/jellyfin
         - name: tv-shows
           nfs:
             server: 192.168.100.61
