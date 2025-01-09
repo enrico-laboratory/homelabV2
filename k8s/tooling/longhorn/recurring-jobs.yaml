@@ -9,7 +9,7 @@ spec:
   retain: 3
   concurrency: 2
   groups:
-    - every-week
+    - every-day
 ---
 apiVersion: longhorn.io/v1beta1
 kind: RecurringJob
