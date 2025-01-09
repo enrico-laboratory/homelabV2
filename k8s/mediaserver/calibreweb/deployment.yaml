@@ -28,20 +28,14 @@ spec:
             - name: DOCKER_MODS
               value: "linuxserver/mods:universal-calibre"
           volumeMounts:
-            - mountPath: /config-temp
-              name: config-temp
             - mountPath: /config
               name: config
             - mountPath: /data/books
               name: books
       volumes:
-        - name: config-temp
+        - name: config
           persistentVolumeClaim:
             claimName: calibre-web-pvc    
-        - name: config
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/calibreweb
         - name: books
           nfs:
             server: 192.168.100.61
