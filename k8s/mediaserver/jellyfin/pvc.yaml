@@ -5,6 +5,8 @@ metadata:
   namespace: mediaserver
   labels:
     recurring-job.longhorn.io/snapshot-every-week: enabled
+    recurring-job.longhorn.io/backup-every-week: enabled
+    recurring-job.longhorn.io/trim-every-week: enabled
     recurring-job.longhorn.io/source: enabled 
 spec:
   accessModes:
