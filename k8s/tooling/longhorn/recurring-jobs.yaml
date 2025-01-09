@@ -8,6 +8,8 @@ spec:
   task: "snapshot"
   retain: 3
   concurrency: 2
+  groups:
+    - every-week
 ---
 apiVersion: longhorn.io/v1beta1
 kind: RecurringJob
@@ -19,6 +21,8 @@ spec:
   task: "snapshot"
   retain: 3
   concurrency: 2
+  groups:
+  - every-week
 ---
 apiVersion: longhorn.io/v1beta1
 kind: RecurringJob
@@ -31,6 +35,7 @@ spec:
   retain: 3
   concurrency: 2
   groups:
+    - every-week
     - default
 ---
 apiVersion: longhorn.io/v1beta1
@@ -44,4 +49,4 @@ spec:
   retain: 2
   concurrency: 2
   groups:
-    - default
+    - every-week
