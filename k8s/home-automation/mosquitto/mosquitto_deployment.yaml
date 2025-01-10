@@ -30,10 +30,20 @@ spec:
 #              name: data
             - mountPath: /mosquitto/log
               name: log
+            - mountPath: /mosquitto/log-temp
+              name: log-temp
+            - mountPath: /mosquitto/data-temp
+              name: data-temp
       volumes:
         - name: config
           configMap:
             name: mosquitto-config
+        - name: log-temp
+          persistentVolumeClaim:
+            claimName: mosquitto-pvc-log
+        - name: data-temp
+          persistentVolumeClaim:
+            claimName: mosquitto-pvc-data
         - name: data
           nfs:
             server: 192.168.100.61
