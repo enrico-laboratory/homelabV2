@@ -28,8 +28,6 @@ spec:
           volumeMounts:
             - mountPath: /dev/ttyACM0
               name: sonoff
-            - mountPath: /app/data-temp
-              name: data-temp
             - mountPath: /app/data
               name: data
           securityContext:
@@ -38,10 +36,7 @@ spec:
         - name: sonoff
           hostPath:
             path: /dev/ttyACM0
-        - name: data-temp
+        - name: data
           persistentVolumeClaim:
             claimName: zigbee2mqtt-data 
-        - name: data
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/home-assistant/zigbee2mqtt/
+
