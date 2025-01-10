@@ -27,6 +27,8 @@ spec:
               exec:
                 command: [ "/bin/sh", "-c", "wget -O https://get.hacs.xyz | bash -" ]
           volumeMounts:
+            - mountPath: /config-temp
+              name: config-temp
             - mountPath: /config
               name: config
 #            - mountPath: /config/configuration.yaml
@@ -36,6 +38,9 @@ spec:
 #              subPath: automations.yaml
 #              name: configmap-file-india
       volumes:
+        - name: config-temp
+          persistentVolumeClaim:
+            claimName: home-assistant-pvc       
         - name: config
           nfs:
             server: 192.168.100.61
