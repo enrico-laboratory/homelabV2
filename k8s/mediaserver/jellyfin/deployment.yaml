@@ -72,8 +72,8 @@ spec:
             claimName: jellyfin-pvc    
         - name: tv-shows
           nfs:
-            server: 192.168.100.61
-            path: /mnt/slow-pool/media/tv-shows
+            server: 192.168.100.62
+            path: /mnt/tank/media/tv-shows
             readOnly: false
         - name: movies
           nfs:
