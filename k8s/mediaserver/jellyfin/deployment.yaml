@@ -62,7 +62,7 @@ spec:
               name: music
               readOnly: false
             - mountPath: /data/video
-              name: video
+              name: videos
       volumes:
         - name: dri
           hostPath:
@@ -85,8 +85,8 @@ spec:
             server: 192.168.100.61
             path: /mnt/slow-pool/media/music
             readOnly: false
-        - name: video
+        - name: videos
           nfs:
             server: 192.168.100.62
-            path: /mnt/tank/media/video
+            path: /mnt/tank/media/videos
             readOnly: false
