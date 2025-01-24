@@ -1,92 +1,92 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: jellyfin
-#   namespace: mediaserver
-#   labels:
-#     app: jellyfin
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: jellyfin
-#   template:
-#     metadata:
-#       labels:
-#         app: jellyfin
-#     spec:
-#       affinity:
-#         nodeAffinity:
-#           requiredDuringSchedulingIgnoredDuringExecution:
-#             nodeSelectorTerms:
-#             - matchExpressions:
-#               - key: feature.node.kubernetes.io/cpu-model.vendor_id
-#                 operator: In
-#                 values:
-#                 - Intel
-#               - key: node-role.kubernetes.io/control-plane
-#                 operator: DoesNotExist
-#       containers:
-#         - name: jellyfin
-#           image: ghcr.io/linuxserver/jellyfin
-#           resources:
-#             limits:
-#               cpu: "2"
-#               # memory: "1536Mi"
-#             requests:
-#               cpu: "2"
-#               # memory: "1536Mi"
-#           env:
-#             - name: PUID
-#               value: "1000"
-#             - name: PGID
-#               value: "1000"
-#             - name: TZ
-#               value: "Europe/Amsterdam"
-#             - name: JELLYFIN_PublishedServerUrl
-#               value: "192.168.56.30"
-#           securityContext:
-#             privileged: true
-#           volumeMounts:
-#             - name: dri
-#               mountPath: /dev/dri
-#             - mountPath: /config
-#               name: config
-#             - mountPath: /data/tvshows
-#               name: tv-shows
-#               readOnly: false
-#             - mountPath: /data/movies
-#               name: movies
-#               readOnly: false
-#             - mountPath: /data/music
-#               name: music
-#               readOnly: false
-#             - mountPath: /data/video
-#               name: videos
-#       volumes:
-#         - name: dri
-#           hostPath:
-#             path: /dev/dri
-#         - name: config
-#           persistentVolumeClaim:
-#             claimName: jellyfin-pvc    
-#         - name: tv-shows
-#           nfs:
-#             server: 192.168.100.62
-#             path: /mnt/tank/media/tv-shows
-#             readOnly: false
-#         - name: movies
-#           nfs:
-#             server: 192.168.100.62
-#             path: /mnt/tank/media/movies
-#             readOnly: false
-#         - name: music
-#           nfs:
-#             server: 192.168.100.61
-#             path: /mnt/slow-pool/media/music
-#             readOnly: false
-#         - name: videos
-#           nfs:
-#             server: 192.168.100.62
-#             path: /mnt/tank/media/videos
-#             readOnly: false
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: mediaserver
+  labels:
+    app: jellyfin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/cpu-model.vendor_id
+                operator: In
+                values:
+                - Intel
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+      containers:
+        - name: jellyfin
+          image: ghcr.io/linuxserver/jellyfin
+          resources:
+            limits:
+              cpu: "2"
+              # memory: "1536Mi"
+            requests:
+              cpu: "2"
+              # memory: "1536Mi"
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Amsterdam"
+            - name: JELLYFIN_PublishedServerUrl
+              value: "192.168.56.30"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: dri
+              mountPath: /dev/dri
+            - mountPath: /config
+              name: config
+            - mountPath: /data/tvshows
+              name: tv-shows
+              readOnly: false
+            - mountPath: /data/movies
+              name: movies
+              readOnly: false
+            - mountPath: /data/music
+              name: music
+              readOnly: false
+            - mountPath: /data/video
+              name: videos
+      volumes:
+        - name: dri
+          hostPath:
+            path: /dev/dri
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyfin-pvc    
+        - name: tv-shows
+          nfs:
+            server: 192.168.100.62
+            path: /mnt/tank/media/tv-shows
+            readOnly: false
+        - name: movies
+          nfs:
+            server: 192.168.100.62
+            path: /mnt/tank/media/movies
+            readOnly: false
+        - name: music
+          nfs:
+            server: 192.168.100.61
+            path: /mnt/slow-pool/media/music
+            readOnly: false
+        - name: videos
+          nfs:
+            server: 192.168.100.62
+            path: /mnt/tank/media/videos
+            readOnly: false
