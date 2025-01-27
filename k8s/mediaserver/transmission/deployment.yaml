@@ -54,7 +54,7 @@ spec:
         - name: downloads
           nfs:
             server: 192.168.100.62
-            path: /mnt/tank/media/torrent/
+            path: /mnt/tank/media/torrents/
         - name: watch
           nfs:
             server: 192.168.100.62
