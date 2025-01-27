@@ -1,41 +1,41 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres
-  namespace: mediaserver
-  labels:
-    app: postgres
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-        - name: postgres
-          image: postgres:14
-          env:
-            # - name: POSTGRES_INITDB_ARGS
-            #   value: "--auth-host=scram-sha-256"
-            - name: POSTGRES_USER
-              value: admin
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: pass
-                  name: postgres-secrets
-          ports:
-            - containerPort: 5432
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: data
-      volumes:
-        - name: data
-          nfs:
-            server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/postgres/data
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: postgres
+#   namespace: mediaserver
+#   labels:
+#     app: postgres
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: postgres
+#   template:
+#     metadata:
+#       labels:
+#         app: postgres
+#     spec:
+#       containers:
+#         - name: postgres
+#           image: postgres:14
+#           env:
+#             # - name: POSTGRES_INITDB_ARGS
+#             #   value: "--auth-host=scram-sha-256"
+#             - name: POSTGRES_USER
+#               value: admin
+#             - name: POSTGRES_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   key: pass
+#                   name: postgres-secrets
+#           ports:
+#             - containerPort: 5432
+#           volumeMounts:
+#             - mountPath: /var/lib/postgresql/data
+#               name: data
+#       volumes:
+#         - name: data
+#           nfs:
+#             server: 192.168.100.62
+#             path: /mnt/fast-pool1/docker-configs/postgres/data
 

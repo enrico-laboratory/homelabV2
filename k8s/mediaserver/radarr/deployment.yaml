@@ -42,5 +42,5 @@ spec:
             path: /mnt/tank/media/movies
         - name: downloads
           nfs:
-            server: 192.168.100.61
-            path: /mnt/slow-pool/media/torrent/downloads
+            server: 192.168.100.62
+            path: /mnt/tank/media/torrent/
