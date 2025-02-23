@@ -16,7 +16,7 @@ spec:
         app: zigbee2mqtt
     spec:
       nodeName:
-        k3s-131
+        k3s-133
       containers:
         - name: zigbee2mqtt
           image: koenkk/zigbee2mqtt:1.40.1
@@ -26,16 +26,16 @@ spec:
           ports:
             - containerPort: 8080
           volumeMounts:
-            # - mountPath: /dev/ttyACM0
-            #   name: sonoff
+            - mountPath: /dev/ttyACM0
+              name: sonoff
             - mountPath: /app/data
               name: data
           securityContext:
             privileged: true
       volumes:
-        # - name: sonoff
-        #   hostPath:
-        #     path: /dev/ttyACM0
+        - name: sonoff
+          hostPath:
+            path: /dev/ttyACM0
         - name: data
           persistentVolumeClaim:
             claimName: zigbee2mqtt-data 
