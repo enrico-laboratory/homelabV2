@@ -4,7 +4,7 @@ metadata:
   name: zigbee2mqtt
   namespace: home-automation
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: zigbee2mqtt
   ports:
