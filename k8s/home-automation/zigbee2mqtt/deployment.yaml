@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: sonoff
           hostPath:
-            path: /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240105134827-if00
+            path: /dev/bus/usb/002/002
         - name: data
           persistentVolumeClaim:
             claimName: zigbee2mqtt-data 
