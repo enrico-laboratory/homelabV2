@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: sonoff
           hostPath:
-            path: /dev/bus/usb/002/002
+            path: /dev/ttyUSB-SONOFF
         - name: data
           persistentVolumeClaim:
             claimName: zigbee2mqtt-data 
