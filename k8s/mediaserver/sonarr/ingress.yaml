@@ -16,3 +16,7 @@ spec:
                 name: sonarr-service
                 port:
                   number: 8989
+  tls:
+  - hosts:
+    - sonarr.enricoruggieri.com
+    secretName: internal-cert-tls
