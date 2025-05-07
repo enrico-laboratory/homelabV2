@@ -3,12 +3,10 @@ kind: Ingress
 metadata:
   name: jellyfin
   namespace: mediaserver
+  annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: nginx
-#  tls:
-#    - hosts:
-#       - "jellyfin.enricoruggieri.com"
-#      secretName: dns-cert-enricoruggiericom-jellyfin
   rules:
     - host: "jellyfin.enricoruggieri.com"
       http:
@@ -20,3 +18,7 @@ spec:
                 name: jellyfin-service
                 port:
                   number: 8096
+  tls:
+  - hosts:
+    - jellyfin.enricoruggieri.com
+    secretName: jellyfin-cert-tls

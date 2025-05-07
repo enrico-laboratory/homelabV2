@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: radarr
   namespace: mediaserver
+  annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: nginx
   rules:
@@ -16,3 +18,7 @@ spec:
                 name: radarr-service
                 port:
                   number: 7878
+  tls:
+  - hosts:
+    - radarr.enricoruggieri.com
+    secretName: radarr-cert-tls
