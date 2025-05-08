@@ -30,56 +30,43 @@ spec:
           enabled: true
           persistentVolumeClaim:
             registry:
-              storageClass: standard
+              storageClass: longhorn
               accessMode: ReadWriteOnce
               size: 5Gi
             database:
-              storageClass: standard
+              storageClass: longhorn
               accessMode: ReadWriteOnce
               size: 2Gi
             jobservice:
-              storageClass: standard
+              storageClass: longhorn
               accessMode: ReadWriteOnce
               size: 1Gi
             redis:
-              storageClass: standard
+              storageClass: longhorn
               accessMode: ReadWriteOnce
               size: 1Gi
-
         database:
           type: internal
-
         redis:
           type: internal
-
         trivy:
           enabled: false
-
         notary:
           enabled: false
-
         chartmuseum:
           enabled: false
-
         metrics:
           enabled: false
-
         nginx:
           enabled: true
-
         portal:
           replicas: 1
-
         core:
           replicas: 1
-
         jobservice:
           replicas: 1
-
         registry:
           replicas: 1
-
-
   destination:
     server: https://kubernetes.default.svc
     namespace: harbor
