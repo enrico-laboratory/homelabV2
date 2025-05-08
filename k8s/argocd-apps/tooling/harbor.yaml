@@ -10,7 +10,7 @@ spec:
     chart: harbor
     targetRevision: 1.13.2  # Set the version you want
     helm:
-      vakues: |
+      values: |
         expose:
           type: ingress
           tls:
