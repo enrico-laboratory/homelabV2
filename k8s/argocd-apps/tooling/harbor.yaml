@@ -11,7 +11,7 @@ spec:
     targetRevision: 1.13.2  # Set the version you want
     helm:
       valueFiles:
-        - ../tooling/harbor/values.yaml
+        - ../tooling/harbor/value.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: harbor
