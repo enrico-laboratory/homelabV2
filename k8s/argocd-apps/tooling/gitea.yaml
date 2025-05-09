@@ -25,7 +25,7 @@ spec:
         ingress:
           enabled: true
           className: nginx
-          annotation:
+          annotations:
             cert-manager.io/cluster-issuer: letsencrypt-cloudflare
           hosts:
             - host: gitea.local
