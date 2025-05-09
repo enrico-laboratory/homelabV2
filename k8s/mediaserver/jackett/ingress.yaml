@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: jackett
   namespace: mediaserver
+  annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: nginx
   rules:
@@ -16,3 +18,7 @@ spec:
                 name: jackett-service
                 port:
                   number: 9117
+  tls:
+  - hosts:
+    - jackett.enricoruggieri.com
+    secretName: jackett-cert-tls

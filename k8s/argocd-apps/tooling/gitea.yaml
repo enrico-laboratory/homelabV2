@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitea
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://dl.gitea.io/charts/
+    chart: gitea
+    targetRevision: 10.1.3  # Check latest version
+    helm:
+      values: |
+        persistence:
+          enabled: true
+          size: 1Gi
+        gitea:
+          admin:
+            username: admin
+            password: strong-password
+            email: admin@example.com
+          config:
+            server:
+              ROOT_URL: "https://gitea.enricoruggieri.com"
+        ingress:
+          enabled: true
+          className: nginx
+          annotation:
+            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+          hosts:
+            - host: gitea.local
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+          - hosts:
+            - gitea.enricoruggieri.com
+            secretName: gitea-cert-tls
+        service:
+          http:
+            type: LoadBalancer
+          ssh:
+            type: LoadBalancer
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitea
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
