@@ -17,8 +17,18 @@
     state: present
     update_cache: true
 
-- name: Start qemu-guest-agent
-  ansible.builtin.systemd:
-    name: qemu-guest-agent
-    enabled: true
-    state: started
+- name: Qemu
+  when: group_names is not contains('bare_metal')
+  block:
+    - name: Install package
+      ansible.builtin.apt:
+        name:
+          - qemu-guest-agent
+        state: present
+        update_cache: false
+
+    - name: Start qemu-guest-agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        enabled: true
+        state: started

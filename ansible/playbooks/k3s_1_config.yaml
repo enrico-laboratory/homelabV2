@@ -8,7 +8,7 @@
     interface_name: eth0
     gateway: 192.168.100.1
     nameservers:
-      - 192.168.100.149
+      # - 192.168.100.149
       - 192.168.100.80
       - 8.8.8.8
       - 8.8.4.4
@@ -20,9 +20,10 @@
       ansible.builtin.include_role:
         name: k3s_common
 
-    - name: Network interface
-      ansible.builtin.include_role:
-        name: network_interface
+# NOT WORKING
+#     - name: Network interface
+#       ansible.builtin.include_role:
+#         name: network_interface
 
     - name: Configure Ansible kubernetes
       when: group_names is contains('master_server')
@@ -35,13 +36,14 @@
         name: k3s_proxy
 
     - name: Configure gpu passthrough
-# To install in the pve with intel alder lake cpu https://www.derekseaman.com/2024/07/proxmox-ve-8-2-windows-11-vgpu-vt-d-passthrough-with-intel-alder-lake.html
+# To install in the pve with intel alder lake cpu
+# https://www.derekseaman.com/2024/07/proxmox-ve-8-2-windows-11-vgpu-vt-d-passthrough-with-intel-alder-lake.html
 # To install in the host https://dgpu-docs.intel.com/driver/installation.html#ubuntu
       when: group_names is contains('gpu')
       ansible.builtin.include_role:
         name: k3s_gpu
 
     - name: Add longhorn volumes to worker
-      when: group_names is contains('agent')
+      when: group_names is contains('agent') and group_names is not contains('bare_metal')
       ansible.builtin.include_role:
         name: k3s_volumes
