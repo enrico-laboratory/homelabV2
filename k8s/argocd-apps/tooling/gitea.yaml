@@ -28,7 +28,7 @@ spec:
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-cloudflare
           hosts:
-            - host: gitea.local
+            - host: gitea.enricoruggieri.com
               paths:
                 - path: /
                   pathType: Prefix
