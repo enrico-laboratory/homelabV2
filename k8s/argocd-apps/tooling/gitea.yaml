@@ -16,7 +16,7 @@ spec:
           size: 1Gi
         gitea:
           admin:
-            username: admin
+            username: gitea_admin
             password: strong-password
             email: admin@example.com
           config:
