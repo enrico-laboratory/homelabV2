@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jellyfin
+  name: navidrome
   namespace: mediaserver
   labels:
     app: navidrome
