@@ -17,7 +17,7 @@ spec:
               service:
                 name: navidrome-service
                 port:
-                  number: 8096
+                  number: 4533
   tls:
   - hosts:
     - navidrome.enricoruggieri.com
