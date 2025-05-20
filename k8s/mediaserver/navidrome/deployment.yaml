@@ -21,6 +21,18 @@ spec:
           env:
             - name: ND_BASEURL
               value: "https://navidrome.enricoruggieri.com"
+            - name: ND_LASTFM_ENABLED
+              value: "true"
+            - name: ND_LASTFM_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  key: lastFmApiKey
+                  name: navidrome-secrets
+            - name: ND_LASTFM_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: lastFmApiSecret
+                  name: navidrome-secrets
           volumeMounts:
             - mountPath: /data
               name: data
