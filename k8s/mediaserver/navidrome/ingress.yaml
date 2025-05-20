@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: navidrome
+  namespace: mediaserver
+  annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "navidrome.enricoruggieri.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: navidrome-service
+                port:
+                  number: 8096
+  tls:
+  - hosts:
+    - navidrome.enricoruggieri.com
+    secretName: navidrome-cert-tls

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: mediaserver
+  labels:
+    app: navidrome
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: navidrome
+  template:
+    metadata:
+      labels:
+        app: navidrome
+    spec:
+      containers:
+        - name: navidrome
+          image: deluan/navidrome:0.55.2
+          env:
+            - name: ND_BASEURL
+              value: "https://navidrome.enricoruggieri.com"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Amsterdam"
+            - name: JELLYFIN_PublishedServerUrl
+              value: "192.168.56.30"
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /music
+              name: music
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: navidrome-pvc
+        - name: music
+          nfs:
+            server: 192.168.100.62
+            path: /mnt/tank/media/music
+            readOnly: true
