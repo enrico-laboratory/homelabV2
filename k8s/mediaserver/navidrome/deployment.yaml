@@ -21,12 +21,6 @@ spec:
           env:
             - name: ND_BASEURL
               value: "https://navidrome.enricoruggieri.com"
-            - name: PGID
-              value: "1000"
-            - name: TZ
-              value: "Europe/Amsterdam"
-            - name: JELLYFIN_PublishedServerUrl
-              value: "192.168.56.30"
           volumeMounts:
             - mountPath: /data
               name: data
@@ -39,5 +33,5 @@ spec:
         - name: music
           nfs:
             server: 192.168.100.62
-            path: /mnt/tank/media/music
+            path: /mnt/tank/media/music/music
             readOnly: true
