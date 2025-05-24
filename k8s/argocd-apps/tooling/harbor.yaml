@@ -15,6 +15,7 @@ spec:
           type: ingress
           tls:
             enabled: true
+            certSource: secret
             secret:
               secretName: harbor-core-minimal-ingress
           ingress:
