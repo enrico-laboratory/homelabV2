@@ -15,7 +15,8 @@ spec:
           type: ingress
           tls:
             enabled: true
-            secretName: harbor-core-minimal-ingress
+            secret:
+              secretName: harbor-core-minimal-ingress
           ingress:
             hosts:
               core: harbor.enricoruggieri.com
