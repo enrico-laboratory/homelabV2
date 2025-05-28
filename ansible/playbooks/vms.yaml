@@ -21,7 +21,7 @@
         memory: 3092
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -36,7 +36,7 @@
         memory: 3092
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -51,7 +51,7 @@
         memory: 3092
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -62,12 +62,12 @@
         node_name: "pve-node1"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 3
+        memory: 3092
         started: true
         usb_device: "host=1a76:55d4"
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -83,11 +83,11 @@
         node_name: "pve-node1"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 3
+        memory: 3092
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -103,11 +103,33 @@
         node_name: "pve-node2"
         template: false
         onboot: true
-        cores: 2
-        memory: 2048
+        cores: 5
+        memory: 4096
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
+          - "8.8.8.8"
+        searchdomains:
+          - enricoruggieri.com
+        disks:
+          - disk: scsi1
+            format: raw
+            size: 20
+            state: "present"
+      - vmid: 134
+        image_url: 'https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img'
+        cloud_init_img: 'noble-server-cloudimg-amd64.img'
+        state: "present"
+        disk_type: "scsi0"
+        vm_name: "{{ name_suffix }}134"
+        node_name: "pve-node1"
+        template: false
+        onboot: true
+        cores: 3
+        memory: 3092
+        started: true
+        nameservers:
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -127,7 +149,7 @@
         memory: 2048
         started: true
         nameservers:
-          - "192.168.100.149"
+          - "192.168.100.80"
           - "8.8.8.8"
         searchdomains:
           - enricoruggieri.com
@@ -146,25 +168,5 @@
           - "8.8.4.4"
         searchdomains:
           - enricoruggieri.com
-      - vmid: 199
-        state: "present"
-        disk_type: "scsi0"
-        vm_name: "test"
-        node_name: "pve-node1"
-        template: false
-        onboot: true
-        cores: 1
-        memory: 2048
-        started: true
-        nameservers:
-          - "8.8.8.8"
-          - "8.8.4.4"
-        searchdomains:
-          - enricoruggieri.com
-        disks:
-          - disk: scsi1
-            format: raw
-            size: 20
-            state: "present"
   roles:
     - pve_manage_vms

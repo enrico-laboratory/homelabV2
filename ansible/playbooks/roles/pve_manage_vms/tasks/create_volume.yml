@@ -2,7 +2,7 @@
   community.general.proxmox_disk:
     api_host: "{{ ansible_host }}"
     api_user: "{{ api_user }}"
-    api_token_secret: "{{ lookup('file', playbook_dir + '/api_token') }}"
+    api_token_secret: "{{ lookup('file', playbook_dir + 'secrets/api_token') }}"
     api_token_id: "{{ api_token_id }}"
     vmid: "{{ vm.vmid }}"
     disk: "{{ disk.disk }}"
