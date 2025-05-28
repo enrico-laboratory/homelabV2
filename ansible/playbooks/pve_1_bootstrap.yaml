@@ -11,9 +11,9 @@
     pve_image_storage_name: vmimages2
     nfs_mounts:
       truenas-backup-vms:
-        export: /mnt/slow-pool/backup/proxmox-vms
+        export: /mnt/backup-pool-1/proxmox-vms
         path: /mnt/pve/truenas-backup-vms
-        server: "192.168.100.61"
+        server: "192.168.100.62"
         content: "iso,backup,images"
       truenas-iso-nfs:
         export: /mnt/backup-pool-1/iso
