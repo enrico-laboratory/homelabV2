@@ -1,0 +1,53 @@
+- name: Install Certbot and DNS plugin
+  ansible.builtin.apt:
+    name:
+      - certbot
+      - "{{ certbot_plugin_package }}"
+    state: present
+    update_cache: true
+
+- name: Create Cloudflare credentials file
+  ansible.builtin.copy:
+    dest: "{{ certbot_credentials_file }}"
+    content: |
+      dns_cloudflare_api_token = {{ cloudflare_api_token }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Issue certificate using Certbot DNS-01
+  ansible.builtin.command: >
+    certbot certonly
+    --dns-{{ certbot_dns_plugin | regex_replace('^dns-', '') }}
+    --dns-{{ certbot_dns_plugin | regex_replace('^dns-', '') }}-credentials {{ certbot_credentials_file }}
+    --email {{ certbot_email }}
+    --agree-tos
+    --non-interactive
+    {% for domain in certbot_domains %}
+    -d {{ domain }}
+    {% endfor %}
+  register: certbot_result
+  changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
+
+- name: Debug Certbot output
+  ansible.builtin.debug:
+    var: certbot_result.stdout
+
+- name: Install certbot-renew systemd service
+  ansible.builtin.template:
+    src: certbot-renew.service.j2
+    dest: /etc/systemd/system/certbot-renew.service
+
+- name: Install certbot-renew systemd timer
+  ansible.builtin.template:
+    src: certbot-renew.timer.j2
+    dest: /etc/systemd/system/certbot-renew.timer
+
+- name: Reload systemd daemon
+  ansible.builtin.command: systemctl daemon-reexec
+
+- name: Enable and start certbot-renew.timer
+  ansible.builtin.systemd:
+    name: certbot-renew.timer
+    enabled: true
+    state: started

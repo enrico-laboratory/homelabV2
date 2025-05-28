@@ -1,0 +1,15 @@
+- name: Install acme with certbot
+  hosts: web
+  become: true
+  vars:
+    certbot_email: "{{ lookup('file', playbook_dir + 'secrets/email') }}"
+    certbot_domains:
+      - "example.com"
+      - "*.example.com"
+    cloudflare_api_token: "{{ lookup('file', playbook_dir + 'secrets/cloudflare-toekn') }}"
+    certbot_dns_plugin: "dns-cloudflare"
+    certbot_plugin_package: "python3-certbot-dns-cloudflare"
+    certbot_credentials_file: "/etc/letsencrypt/cloudflare.ini"
+    certbot_reload_command: "systemctl reload nginx"
+  roles:
+    - role: acme_certbot
