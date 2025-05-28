@@ -1,53 +1,57 @@
-## ArgoCD configuration
-## Ref: https://github.com/argoproj/argo-cd
-##
-## Server
+global:
+  domain: "argocd.enricoruggieri.com"
+config:
+  params:
+    server.insecure: true
 server:
-  ## ArgoCD config
-  ## reference https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
-  configEnabled: true
-  ingress:
-    enabled: true
-    hosts:
-      - "argocd.enricoruggieri.com"
-    paths:
-      - /
+  # ingress:
+  #   enabled: true
+  #   ingressClassName: nginx
+  #   path: /https
+  #   tls: false
+  #   annotations:
+  #     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  #   extraRules:
+  #   - http:
+  #       paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         backend:
+  #           service:
+  #             name: argocd-server
+  #             port:
+  #               name: http
   service:
     type: LoadBalancer
-    annotations:
-      metallb.universe.tf/loadBalancerIPs: 192.168.100.150
+    # -- Server service http port
+    servicePortHttp: 8089
+    # -- Server service https port
+    servicePortHttps: 4437
 configs:
   repositories:
     private-repo:
       url: https://github.com/enrico-laboratory/homelabV2.git
 extraObjects:
-  # - apiVersion: argoproj.io/v1alpha1
-  #   kind: Application
-  #   metadata:
-  #     name: argocd
-  #     namespace: argocd
-  #   spec:
-  #     project: argocd
-  #   sources:
-  #     - repoURL: 'https://argoproj.github.io/argo-helm'
-  #       chart: argocd
-  #       targetRevision: 3.2.2
-  #     #  helm:
-  #     #    valueFiles:
-  #     #      - $values/charts/argocd/values.yaml
-  #     - repoURL: 'https://github.com/enrico-laboratory/homelabV2.git'
-  #       helm:
-  #         valueFiles:
-  #           - k8s/argocd/values_overwrite.yaml
-  #   destination:
-  #     namespace: argocd
-  #     server: https://kubernetes.default.svc
-  #   syncPolicy:
-  #     automated:
-  #       selfHeal: true
-  #       prune: true
-  #     syncOptions:
-  #       - CreateNamespace=true
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: argocd-server-http-ingress
+      namespace: argocd
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    spec:
+      ingressClassName: nginx
+      rules:
+      - http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  name: http
+        host: argocd.enricoruggieri.com
   - apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -106,3 +110,41 @@ extraObjects:
           kind: '*'
       orphanedResources:
         warn: false
+  # - apiVersion: argoproj.io/v1alpha1
+  #   kind: Application
+  #   metadata:
+  #     name: argocd
+  #     namespace: argocd
+  #   spec:
+  #     project: argocd
+  #     destination:
+  #       namespace: argocd
+  #       server: https://kubernetes.default.svc
+  #     syncPolicy:
+  #       automated:
+  #         selfHeal: true
+  #         prune: true
+  #       syncOptions:
+  #         - CreateNamespace=true
+  #     sources:
+  #       - repoURL: 'https://argoproj.github.io/argo-helm'
+  #         chart: argo-cd
+  #         targetRevision: 7.7.10
+  #         helm:
+  #           values: |
+  #             server:
+  #               configEnabled: true
+  #               ingress:
+  #                 enabled: true
+  #                 hosts:
+  #                   - "argocd.enricoruggieri.com"
+  #                 paths:
+  #                   - /
+  #               service:
+  #                 type: LoadBalancer
+  #                 annotations:
+  #                   metallb.universe.tf/loadBalancerIPs: 192.168.100.150
+  #             configs:
+  #               repositories:
+  #                 private-repo:
+  #                   url: https://github.com/enrico-laboratory/homelabV2.git
