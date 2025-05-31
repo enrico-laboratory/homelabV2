@@ -22,20 +22,25 @@ spec:
             targetPort: 80
             port: 8789
           ingress:
-            enabled: false
+            enabled: true
             className: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-cloudflare
             hosts:
-              - host: registry-ui.example.com
+              - host: registry.enricoruggieri.com
                 paths:
                   - path: /
                     pathType: Prefix
             tls:
               - secretName: registry-ui-tls
                 hosts:
-                  - registry-ui.example.com
+                  - registry.enricoruggieri.com
         registry:
           enabled: true
           image: registry:2.8.2
+          dataVolume:
+            persistentVolumeClaim:
+              claimName: sonarr-pvc
   destination:
     server: https://kubernetes.default.svc
     namespace: registry-ui
