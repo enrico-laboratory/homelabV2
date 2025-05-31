@@ -23,10 +23,10 @@ registry:
       secretName: registry-tls
 ui:
   image: joxit/docker-registry-ui:2.5.7-debian
-  port: 8989
+  port: 8889
   service:
     type: LoadBalancer
-    port: 8989
+    port: 8889
   ingress:
     enabled: false
     className: nginx
