@@ -18,7 +18,7 @@ spec:
           service:
             type: LoadBalancer
             targetPort: 80
-            port: 8889
+            port: 8789
           ingress:
             enabled: false
             className: nginx
