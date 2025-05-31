@@ -5,7 +5,7 @@ registry:
   persistence:
     enabled: true
     accessMode: ReadWriteOnce
-    size: 500Mib
+    size: 500Mi
     storageClassName: longhorn
     labels:
       recurring-job-group.longhorn.io/every-week: enabled
@@ -22,7 +22,7 @@ registry:
       enabled: true
       secretName: registry-tls
 ui:
-  image: registry-ui:latest
+  image: joxit/docker-registry-ui:1.5.0
   port: 8989
   service:
     type: LoadBalancer
