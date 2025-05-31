@@ -1,0 +1,78 @@
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: harbor-core-minimal
+#  namespace: argocd
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: https://helm.goharbor.io
+#    chart: harbor
+#    targetRevision: 1.13.2  # Set the version you want
+#    helm:
+#      values: |
+#        expose:
+#          type: ingress
+#          tls:
+#            enabled: true
+#            certSource: secret
+#            secret:
+#              secretName: harbor-core-minimal-ingress
+#          ingress:
+#            hosts:
+#              core: harbor.enricoruggieri.com
+#            className: "nginx"
+#            annotations:
+#              cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+#        externalURL: https://harbor.enricoruggieri.com
+#        harborAdminPassword: "Harbor12345"
+#        persistence:
+#          enabled: true
+#          persistentVolumeClaim:
+#            registry:
+#              storageClass: longhorn
+#              accessMode: ReadWriteOnce
+#              size: 5Gi
+#            database:
+#              storageClass: longhorn
+#              accessMode: ReadWriteOnce
+#              size: 2Gi
+#            jobservice:
+#              storageClass: longhorn
+#              accessMode: ReadWriteOnce
+#              size: 1Gi
+#            redis:
+#              storageClass: longhorn
+#              accessMode: ReadWriteOnce
+#              size: 1Gi
+#        database:
+#          type: internal
+#        redis:
+#          type: internal
+#        trivy:
+#          enabled: false
+#        notary:
+#          enabled: false
+#        chartmuseum:
+#          enabled: false
+#        metrics:
+#          enabled: false
+#        nginx:
+#          enabled: true
+#        portal:
+#          replicas: 1
+#        core:
+#          replicas: 1
+#        jobservice:
+#          replicas: 1
+#        registry:
+#          replicas: 1
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: harbor
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
