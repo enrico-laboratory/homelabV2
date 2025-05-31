@@ -37,6 +37,9 @@ spec:
           dataVolume:
             persistentVolumeClaim:
               claimName: registry-ui-pvc
+          auth:
+            basic:
+              enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: registry-ui
