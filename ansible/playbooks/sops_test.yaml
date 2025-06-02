@@ -1,4 +1,9 @@
 - hosts: localhost
   gather_facts: no
-  roles:
-    - role: sops_test
+
+  tasks:
+    - name: Install community.sops collection
+      ansible.builtin.shell: ansible-galaxy collection install community.sops
+    - name: Soap test role
+      ansible.builtin.include_role:
+        name: sops_test
