@@ -1,0 +1,45 @@
+pvenodes:
+  hosts:
+    pve_node1:
+      ansible_host: 192.168.100.20
+    pve_node2:
+      ansible_host: 192.168.100.21
+
+k3s_cluster:
+  children:
+    server:
+      hosts:
+        192.168.100.121:
+        192.168.100.122:
+        192.168.100.123:
+    master_server:
+      hosts:
+        192.168.100.121:        
+    agent:
+      hosts:
+        192.168.100.131:
+        192.168.100.132:
+        192.168.100.133:
+        192.168.100.134:
+        192.168.100.139:
+    bare_metal:
+      hosts:
+        192.168.100.139:
+    gpu:
+      hosts:
+        192.168.100.133:
+
+proxy:
+  hosts:
+    192.168.100.140:
+
+pihole:
+  hosts:
+    192.168.100.80:
+
+dns:
+  hosts:
+    192.168.100.149:
+  children:
+    dns_vm:
+      192.168.100.149:

@@ -1,0 +1,2 @@
+sops_test_example: default_example_value
+sops_test_password: default_password

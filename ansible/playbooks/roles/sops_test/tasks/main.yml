@@ -1,0 +1,7 @@
+- name: Print regular variable
+  ansible.builtin.debug:
+    msg: "sops_test_example value: {{ sops_test_example }}"
+
+- name: Print encrypted value
+  ansible.builtin.debug:
+    msg: "sops_test_password value: {{ sops_test_password }}"

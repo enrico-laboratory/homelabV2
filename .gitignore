@@ -9,6 +9,8 @@ pve_credentials
 terraform.tfstate*
 /dns/terraform.tfvars
 
-/ansible/inventories/
+!/ansible/inventories/host_vars/localhost.sops.yaml
+/ansible/inventories/group_vars
+/ansible/inventories/host_vars
 
 secret*
