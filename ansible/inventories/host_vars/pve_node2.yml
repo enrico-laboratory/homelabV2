@@ -1,0 +1,10 @@
+zpool_device: "/dev/nvme0n1"
+pve_storage_local: |
+  dir: local
+      path /var/lib/vz
+      content iso,vztmpl,backup
+
+  lvmthin: local-lvm
+          thinpool data
+          vgname pve
+          content rootdir,images

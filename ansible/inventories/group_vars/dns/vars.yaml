@@ -1,0 +1,4 @@
+homelab_repo_dest: "/opt/homelabV2"
+bin_path: "/usr/local/bin:/usr/bin"
+inventory_path: "inventories/hosts.yaml"
+playbooks_folder: "playbooks"

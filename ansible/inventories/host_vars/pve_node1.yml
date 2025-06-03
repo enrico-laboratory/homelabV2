@@ -1,0 +1,5 @@
+zpool_device: "/dev/nvme1n1"
+pve_storage_local: |
+  dir: local
+      path /var/lib/vz
+      content iso,vztmpl,backup,rootdir

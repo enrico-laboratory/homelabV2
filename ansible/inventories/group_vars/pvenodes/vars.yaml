@@ -1,0 +1,8 @@
+api_user: "{{ main_user }}@pam"
+api_token_id: "{{ main_user }}"
+api_token_dir: "/home/{{ main_user }}/repos/homelabV2/ansible/playbooks"
+image_path: '/mnt/pve/truenas-iso-nfs/template/iso/'
+drive_storage: "vmimages2"
+default_user: "{{ main_user }}"
+reboot_after_update: false
+notification_after_update: true
