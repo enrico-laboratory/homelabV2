@@ -39,6 +39,16 @@ spec:
               receiver: telegram
             receivers:
             - name: telegram
+              webhook_configs:
+                - url: https://api.telegram.org/bot123456789:your-real-token/sendMessage
+                  send_resolved: true
+                  http_config:
+                    bearer_token_file: /etc/secrets/telegram/telegram_token
+                  body: |
+                    {
+                      "chat_id": "<YOUR_CHAT_ID>",
+                      "text": "[{{ .Status | toUpper }}] {{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}"
+                    }
           ingress:
             enabled: true
             ingressClassName: nginx
