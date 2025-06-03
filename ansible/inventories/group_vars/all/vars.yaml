@@ -1,0 +1,3 @@
+success_message: "✅ Ansible playbook succeeded on {{ inventory_hostname }}"
+failure_message: "❌ Ansible playbook failed on {{ inventory_hostname }}"
+play_failed: false

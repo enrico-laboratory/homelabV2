@@ -2,33 +2,40 @@
   hosts: dns
   become: true
   vars:
-    subnet: "192.168.100.0"
-    interface_name: eth0
-    gateway: 192.168.100.1
-    nameservers:
-      - 8.8.8.8
-      - 8.8.4.4
-    search_domain: enricoruggieri.com
+
+
+    docker_gpg_keyring: "/etc/apt/keyrings/docker.asc"
+    docker_gpg_key_url: "{{ docker_repo_url }}/gpg"
+    docker_repo_url: "https://download.docker.com/linux/ubuntu"
   tasks:
 
     - name: Network configuration
+      vars:
+        nameservers:
+          - "{{ inventory_hostname }}"
+          - 8.8.8.8
       ansible.builtin.include_role:
         name: network_interface
 
     - name: Install qemu agent
       ansible.builtin.include_role:
         name: install_qemu_agent
-      when: group_names is contains('dns_vm')
 
-    # pihole was manually installed
-    - name: Dns and CNAMEs record for pihole
+    - name: Install ansible
       ansible.builtin.include_role:
-        name: dns_records
+        name: ansible_install
 
-    # Tailscale was manually installed
-    - name: Config Tailscale
+    - name: Copy ssh keys
       ansible.builtin.include_role:
-        name: dns_tailscale
+        name: ssh_key_copy
+
+    - name: Install sops and age
+      ansible.builtin.include_role:
+        name: sops_age_install
+
+    - name: Clone homelabV2 repo
+      ansible.builtin.include_role:
+        name: git_clone
 
     - name: Install node exporter
       ansible.builtin.include_role:

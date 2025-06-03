@@ -1,0 +1,6 @@
+subnet: "192.168.100.0"
+interface_name: eth0
+gateway: 192.168.100.1
+nameservers:
+  - 8.8.8.8
+  - 8.8.4.4

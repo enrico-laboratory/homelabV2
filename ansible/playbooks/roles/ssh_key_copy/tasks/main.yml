@@ -1,0 +1,8 @@
+- name: Copy collection requirements file
+  become: false
+  copy:
+    src: "{{ src_ssh_keys_folder}}/{{ item }}"
+    dest: "{{ dest_ssh_keys_folder}}/{{ item }}"
+    mode: 0600
+    owner: "{{ main_user }}"
+  loop: "{{ key_names }}"

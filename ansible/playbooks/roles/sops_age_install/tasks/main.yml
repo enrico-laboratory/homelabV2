@@ -1,0 +1,42 @@
+- name: Ensure dependencies are installed
+  become: true
+  apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: Download and install sops
+  become: true
+  get_url:
+    url: "https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops_{{ sops_version }}_{{ sops_arch }}.deb"
+    dest: "/tmp/sops_{{ sops_version }}.deb"
+
+- name: Install sops .deb package
+  become: true
+  apt:
+    deb: "/tmp/sops_{{ sops_version }}.deb"
+
+- name: Install age via apt
+  become: true
+  apt:
+    name: age
+    state: present
+
+- name: Ensure remote age key directory exists
+  become: true
+  file:
+    path: "{{ age_key_remote_path | dirname }}"
+    state: directory
+    mode: '0700'
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+
+- name: Copy age key from local to remote host
+  become: false
+  copy:
+    src: "{{ age_key_local_path }}"
+    dest: "{{ age_key_remote_path }}"
+    mode: '0600'

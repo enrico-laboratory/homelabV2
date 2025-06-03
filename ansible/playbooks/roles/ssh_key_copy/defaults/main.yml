@@ -1,0 +1,5 @@
+src_ssh_keys_folder: "/Users/{{ main_user }}/.ssh"
+dest_ssh_keys_folder: "/home/{{ main_user }}/.ssh"
+key_names:
+  - id_rsa
+  - id_rsa.pub
