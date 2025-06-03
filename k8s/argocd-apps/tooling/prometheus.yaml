@@ -28,11 +28,11 @@ spec:
             hosts:
               - grafana.enricoruggieri.com
         alertmanager:
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          hosts:
-            - prometheus.enricoruggieri.com    
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+              - prometheus.enricoruggieri.com    
         prometheus:
           ingress:
             enabled: true
