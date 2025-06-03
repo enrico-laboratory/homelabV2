@@ -13,10 +13,15 @@
     path: /var/run/reboot-required
   register: reboot_required
 
-- name: Reboot the machine if required
-  reboot:
-    msg: "Reboot triggered by Ansible after package upgrade"
-    pre_reboot_delay: 5
-    post_reboot_delay: 30
-    reboot_timeout: 600
+- name: send a telegram if machine require reboot
+  delegate_to: localhost
+  become: false
   when: reboot_required.stat.exists
+  uri:
+    url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      chat_id: "{{ telegram_chat_id }}"
+      text: "The host {{ inventory_hostname }} needs reboot"
+

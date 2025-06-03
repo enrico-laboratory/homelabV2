@@ -2,5 +2,21 @@
   hosts: all
   gather_facts: true
   become: true
-  roles:
-    - update_host
+  tasks:
+  - name: update hosts
+    block:
+      - name: update hosts role
+        register: result
+        ansible.builtin.include_role:
+          name: update_host
+    rescue:
+      - name: Send Telegram message based on play result
+        become: false
+        uri:
+          url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+          method: POST
+          body_format: json
+          body:
+            chat_id: "{{ telegram_chat_id }}"
+            text: "{{ failure_message }}"
+        delegate_to: localhost
