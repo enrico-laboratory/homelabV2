@@ -1,0 +1,41 @@
+- name: Install required packages
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+
+- name: download apt key
+  ansible.builtin.get_url:
+    url: "{{ docker_gpg_key_url }}"
+    dest: "{{ docker_gpg_keyring }}"
+
+- name: Add Docker repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ docker_gpg_keyring }}] {{ docker_repo_url }} {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install Docker packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker is started and enabled
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Add user to the docker group
+  user:
+    name: eruggieri
+    groups: docker
+    append: yes
+
