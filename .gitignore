@@ -9,5 +9,6 @@ ssh_keys
 pve_credentials
 terraform.tfstate*
 /dns/terraform.tfvars
+terraform.tfvars.decrypted
 
 secret*
