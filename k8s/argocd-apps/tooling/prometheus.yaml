@@ -32,6 +32,7 @@ spec:
             global:
               resolve_timeout: 6m
             receivers:
+            - name: 'null'
             - name: telegram
               webhook_configs:
                 - url: https://api.telegram.org/bot123456789:your-real-token/sendMessage
