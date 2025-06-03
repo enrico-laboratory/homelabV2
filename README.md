@@ -3,7 +3,7 @@
 This repository contains all the configurations related to my homelab.
 ## To do
 * make argocd ingress works
-* pve bootstrap create network infterface make dyanimc for different pve nodes
+* pve bootstrap create network interface dynamically 
 * configure truenas exporter 
 * install prometheus to all hosts
 * enable alertmanager
@@ -13,5 +13,5 @@ This repository contains all the configurations related to my homelab.
 * replace router with pfsense
 
 * fix k3s_1_config playbook
-    * role k3s_common, do not install qemu agent on bare matel
+    * role k3s_common, do not install qemu agent on bare metal
     * longhorn is failing
