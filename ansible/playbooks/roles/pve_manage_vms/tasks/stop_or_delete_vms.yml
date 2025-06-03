@@ -3,7 +3,7 @@
   community.general.proxmox_vm_info:
     api_host: "{{ ansible_host }}"
     api_user: "{{ api_user }}"
-    api_token_secret: "{{ lookup('file', playbook_dir + 'secrets/api_token') }}"
+    api_token_secret: "{{ api_token }}"
     api_token_id: "{{ api_token_id }}"
     node: "{{ item.node_name }}"
     name: "{{ item.vm_name }}"
@@ -21,7 +21,7 @@
       community.general.proxmox_kvm:
         api_host: "{{ ansible_host }}"
         api_user: "{{ api_user }}"
-        api_token_secret: "{{ lookup('file', playbook_dir + 'secrets/api_token') }}"
+        api_token_secret: "{{ api_token }}"
         api_token_id: "{{ api_token_id }}"
         node: "{{ item.node_name }}"
         name: "{{ item.vm_name }}"
@@ -34,7 +34,7 @@
       community.general.proxmox_vm_info:
         api_host: "{{ ansible_host }}"
         api_user: "{{ api_user }}"
-        api_token_secret: "{{ lookup('file', playbook_dir + 'secrets/api_token') }}"
+        api_token_secret: "{{ api_token }}"
         api_token_id: "{{ api_token_id }}"
         node: "{{ item.node_name }}"
         name: "{{ item.vm_name }}"
@@ -47,7 +47,7 @@
       community.general.proxmox_kvm:
         api_host: "{{ ansible_host }}"
         api_user: "{{ api_user }}"
-        api_token_secret: "{{ lookup('file', playbook_dir + 'secrets/api_token') }}"
+        api_token_secret: "{{ api_token }}"
         api_token_id: "{{ api_token_id }}"
         node: "{{ item.node_name }}"
         name: "{{ item.vm_name }}"
