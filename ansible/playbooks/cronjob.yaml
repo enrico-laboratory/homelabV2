@@ -1,0 +1,21 @@
+- name: Set up a cron job on dns
+  hosts: dns
+  gather_facts: true
+
+  tasks:
+    - name : set envs
+      cron:
+        name: PATH
+        env: yes
+        job: "{{ bin_path }}"
+        state: present
+
+    - name: Create a cron job for current user
+      cron:
+        name: "Update hosts"
+        minute: "0"
+        hour: "8"
+        weekday: "5"
+        job: 'cd {{ homelab_repo_dest }}/ansible && ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/update_hosts.yaml > update_hosts_last_run.log'
+        state: present
+        user: "{{ main_user }}"
