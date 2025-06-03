@@ -1,0 +1,6 @@
+main_user: username  # Override this when running
+age_key_local_path: "/Users/{{ main_user }}/.sops/age_key.txt"
+age_key_remote_path: "/home/{{ main_user }}/.config/sops/age/keys.txt"
+
+sops_version: "3.10.2"
+sops_arch: "amd64"

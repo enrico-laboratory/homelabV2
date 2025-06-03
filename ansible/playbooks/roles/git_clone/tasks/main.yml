@@ -1,0 +1,24 @@
+- name: Ensure git is installed
+  become: true
+  apt:
+    name: git
+    state: present
+    update_cache: true
+
+- name: Create target directory for homelab repo
+  become: true
+  file:
+    path: "{{ homelab_repo_dest }}"
+    state: directory
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    mode: "0755"
+
+- name: Clone or pull the homelab repository
+  become: false
+  ansible.builtin.git:
+    repo: "{{ homelab_repo_url }}"
+    dest: "{{ homelab_repo_dest }}"
+    version: "{{ homelab_repo_version }}"
+    update: true
+    force: false
