@@ -30,7 +30,7 @@ spec:
         alertmanager:
           config:
             global:
-              resolve_timeout: 5m
+              resolve_timeout: 6m
             route:
               group_by: ['namespace']
               group_wait: 30s
