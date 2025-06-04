@@ -1,46 +1,46 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: radarr
-  namespace: mediaserver
-  labels:
-    app: radarr
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: radarr
-  template:
-    metadata:
-      labels:
-        app: radarr
-    spec:
-      containers:
-        - name: radarr
-          image: ghcr.io/linuxserver/radarr:5.16.3
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: TZ
-              value: "Europe/Amsterdam"
-          volumeMounts:
-            - mountPath: /config
-              name: config
-            - mountPath: /movies
-              name: movies
-            - mountPath: /downloads
-              name: downloads
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: radarr-pvc
-        - name: movies
-          nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/movies
-        - name: downloads
-          nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/torrents/
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: radarr
+#  namespace: mediaserver
+#  labels:
+#    app: radarr
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: radarr
+#  template:
+#    metadata:
+#      labels:
+#        app: radarr
+#    spec:
+#      containers:
+#        - name: radarr
+#          image: ghcr.io/linuxserver/radarr:5.16.3
+#          env:
+#            - name: PUID
+#              value: "1000"
+#            - name: PGID
+#              value: "1000"
+#            - name: TZ
+#              value: "Europe/Amsterdam"
+#          volumeMounts:
+#            - mountPath: /config
+#              name: config
+#            - mountPath: /movies
+#              name: movies
+#            - mountPath: /downloads
+#              name: downloads
+#      volumes:
+#        - name: config
+#          persistentVolumeClaim:
+#            claimName: radarr-pvc
+#        - name: movies
+#          nfs:
+#            server: 192.168.100.62
+#            path: /mnt/tank/media/movies
+#        - name: downloads
+#          nfs:
+#            server: 192.168.100.62
+#            path: /mnt/tank/media/torrents/
