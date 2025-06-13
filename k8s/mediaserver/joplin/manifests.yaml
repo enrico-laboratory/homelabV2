@@ -1,0 +1,151 @@
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: joplin-data
+#  labels:
+#    recurring-job-group.longhorn.io/every-week: enabled
+#    recurring-job.longhorn.io/source: enabled
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 1Gi
+#  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  labels:
+    recurring-job-group.longhorn.io/every-week: enabled
+    recurring-job.longhorn.io/source: enabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: joplin
+            - name: POSTGRES_PASSWORD
+              value: joplinpass
+            - name: POSTGRES_DB
+              value: joplin
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joplin
+spec:
+  selector:
+    app: joplin
+  ports:
+    - port: 22300
+      targetPort: 22300
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joplin
+spec:
+  selector:
+    matchLabels:
+      app: joplin
+  template:
+    metadata:
+      labels:
+        app: joplin
+    spec:
+      containers:
+        - name: joplin
+          image: joplin/server:latest
+          ports:
+            - containerPort: 22300
+          env:
+            - name: APP_PORT
+              value: "22300"
+            - name: DB_CLIENT
+              value: pg
+            - name: POSTGRES_PASSWORD
+              value: joplinpass
+            - name: POSTGRES_DATABASE
+              value: joplin
+            - name: POSTGRES_USER
+              value: joplin
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_HOST
+              value: postgres
+#          volumeMounts:
+#            - mountPath: /home/joplin/.joplin
+#              name: joplin-storage
+#      volumes:
+#        - name: joplin-storage
+#          persistentVolumeClaim:
+#            claimName: joplin-data
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: joplin-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  rules:
+    - host: joplin.enricoruggieri.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: joplin
+                port:
+                  number: 22300
+  tls:
+    - hosts:
+        - joplin.enricoruggieri.com
+      secretName: joplin-tls
