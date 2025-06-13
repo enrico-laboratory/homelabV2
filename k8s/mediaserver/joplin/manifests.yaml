@@ -65,6 +65,8 @@ spec:
               value: joplinpass
             - name: POSTGRES_DB
               value: joplin
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-storage
