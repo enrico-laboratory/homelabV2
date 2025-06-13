@@ -133,9 +133,9 @@ kind: Ingress
 metadata:
   name: joplin-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
+  ingressClassName: nginx
   rules:
     - host: joplin.enricoruggieri.com
       http:
