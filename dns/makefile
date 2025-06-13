@@ -15,6 +15,6 @@ decrypt_tfvars:
 apply:
 	@tmpfile=$$(mktemp) && \
 	SOPS_AGE_KEY_FILE=$(SOPS_KEY_PATH) sops -d $(ENCRYPTED_FILE) > $$tmpfile && \
-	terraform apply -var-file=$$tmpfile || \
+	terraform apply -y -var-file=$$tmpfile || \
 	rm -f $$tmpfile
 
