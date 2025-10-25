@@ -28,7 +28,7 @@ spec:
                 operator: DoesNotExist
       containers:
         - name: jellyfin
-          image: ghcr.io/linuxserver/jellyfin:10.11.0
+          image: ghcr.io/linuxserver/jellyfin:10.10.7
           resources:
             limits:
               cpu: "2"
