@@ -1,21 +1,47 @@
 - name: Ensure Prometheus output directory exists locally
   delegate_to: localhost
   file:
-    path: "{{ prometheus_compose_folder }}/{{ prometheus_config_folder }}"
+    path: "{{ prometheus_compose_folder }}/{{ item }}"
     state: directory
+  loop:
+    - "{{ prometheus_config_folder }}"
+    - "{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}"
+    - "{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}"
 
-- name: Generate Prometheus configuration
+# PROMETHEUS
+- name: Generate Prometheus configuration file
   delegate_to: localhost
   template:
     src: "{{ prometheus_config_file }}.j2"
     dest: "{{ prometheus_compose_folder }}/{{ prometheus_config_folder }}/{{ prometheus_config_file }}"
 
-- name: Generate docker copmose
+# COMPOSE
+- name: Generate docker compose file
   delegate_to: localhost
   template:
     src: "docker-compose.yml.j2"
     dest: "{{ prometheus_compose_folder }}/docker-compose.yml"
 
+# GRAFANA
+- name: Generate grafana dashboard provisioning
+  delegate_to: localhost
+  template:
+    src: "grafana_dashboard_provisioning.yml.j2"
+    dest: "{{ prometheus_compose_folder }}/grafana/provisioning/dashboards/grafana_dashboard_provisioning.yml"
+
+- name: Generate grafana datasource
+  delegate_to: localhost
+  template:
+    src: "grafana_datasource_provisioning.yml.j2"
+    dest: "{{ prometheus_compose_folder }}/grafana/provisioning/datasources/grafana_datasource_provisioning.yml"
+
+- name: Copy dashboards
+  delegate_to: localhost
+  file:
+    src: "{{ item }}"
+    dest: "{{ prometheus_compose_folder }}/grafana/dashboards/{{ item }}"
+  with_fileglob:
+    - "dashboards/*.j2"
 
 - name: Bring up Prometheus and Grafana with Docker Compose
   delegate_to: localhost

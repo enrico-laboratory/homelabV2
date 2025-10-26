@@ -31,6 +31,8 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./{{ grafana_config_folder }}/provisioning:/etc/grafana/provisioning
+      - ./{{ grafana_config_folder }}/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
     networks:
