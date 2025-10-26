@@ -4,5 +4,5 @@ prometheus_config_file: "prometheus.yml"
 
 grafana_config_folder: "grafana"
 grafana_dashboards_folder: "dashboards"
-grafana_dashboard_provisioning_folder:  "provisioning/dashboard"
+grafana_dashboard_provisioning_folder:  "provisioning/dashboards"
 grafana_datasources_provisioning_folder:  "provisioning/datasources"
