@@ -41,9 +41,7 @@
   copy:
     src: "{{ item }}"
     dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item | basename }}"
-    mode: "0644"
-  with_fileglob:
-    - "dashboards/*"
+  loop: "{{ lookup('fileglob', role_path + '/files/dashboards/*.json', wantlist=True) }}"
 
 - name: Bring up Prometheus and Grafana with Docker Compose
   delegate_to: localhost
