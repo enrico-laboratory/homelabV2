@@ -14,7 +14,7 @@
   delegate_to: localhost
   template:
     src: "docker-compose.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/docker-compose.yml.j2"
+    dest: "{{ prometheus_compose_folder }}/docker-compose.yml"
 
 
 - name: Bring up Prometheus and Grafana with Docker Compose
