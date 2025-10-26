@@ -40,7 +40,7 @@
   delegate_to: localhost
   copy:
     src: "{{ item }}"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item }}"
+    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item | basename }}"
     mode: "0644"
   with_fileglob:
     - "dashboards/*"
