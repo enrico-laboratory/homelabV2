@@ -11,7 +11,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - "./{{{ prometheus_config_folder }}/{{ prometheus_config_file }}:/etc/prometheus/{{ prometheus_config_file }}:ro"
+      - ./{{ prometheus_config_folder }}/{{ prometheus_config_file }}:/etc/prometheus/{{ prometheus_config_file }}:ro"
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/{{ prometheus_config_file }}'
