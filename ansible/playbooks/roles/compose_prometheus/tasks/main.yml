@@ -13,6 +13,6 @@
 
 - name: Bring up Prometheus and Grafana with Docker Compose
   delegate_to: localhost
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ prometheus_compose_folder }}/"
     state: "{{ state }}"

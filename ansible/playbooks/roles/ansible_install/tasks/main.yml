@@ -14,6 +14,7 @@
   loop:
     - ansible
     - docker
+    - docker-compose
 
 - name: Copy collection requirements file
   become: false

@@ -1,7 +1,7 @@
 ansible_inventory_path = inventories/hosts.yaml
 playbooks_path = playbooks
-sops_key_path_env_var = export SOPS_AGE_KEY_FILE=/Users/$$USER/.sops/age_key.txt &&
-bin_path = /Users/$$USER/.local/bin/ansible-playbook
+sops_key_path_env_var = SOPS_AGE_KEY_FILE=/home/$$USER/.config/sops/age/keys.txt
+bin_path = /home/$$USER/.local/bin/ansible-playbook
 
 sops_test:
 	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/sops_test.yaml
@@ -18,5 +18,8 @@ update_hosts:
 k3s_config:
 	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/k3s_1_config.yaml
 
+ops:
+	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ops.yaml
+
 ops_compose:
-	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ops_config.yaml
+	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ops_compose.yaml

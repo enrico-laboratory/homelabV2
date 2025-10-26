@@ -2,4 +2,4 @@
   hosts: localhost
   gather_facts: true
   roles:
-    - prometheus_compose
+    - compose_prometheus
