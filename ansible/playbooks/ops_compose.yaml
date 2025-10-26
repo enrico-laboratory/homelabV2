@@ -1,5 +1,6 @@
 - name: Deploy Prometheus and Grafana with dynamic config
   hosts: localhost
   gather_facts: true
+  become: false
   roles:
     - compose_prometheus
