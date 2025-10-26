@@ -17,3 +17,6 @@ update_hosts:
 
 k3s_config:
 	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/k3s_1_config.yaml
+
+ops_compose:
+	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ops_config.yaml
