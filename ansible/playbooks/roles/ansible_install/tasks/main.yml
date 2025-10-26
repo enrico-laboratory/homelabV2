@@ -7,7 +7,7 @@
     - python3-pip
 
 - name: Install Ansible with pip
-  become: false
+  become: true
   pip:
     name: ansible
     executable: pip3
@@ -19,9 +19,9 @@
     dest: /tmp/requirements.yml
 
 - name: Install Ansible collections from requirements.yml
-  become: false
+  become: true
   ansible.builtin.command:
-    cmd: ansible-galaxy collection install -r /tmp/requirements.yml
+    cmd: ansible-galaxy install -r /tmp/requirements.yml
   args:
     chdir: /tmp
   register: out

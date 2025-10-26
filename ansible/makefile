@@ -14,3 +14,6 @@ cronjob:
 
 update_hosts:
 	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/update_hosts.yaml | tee ansible.log
+
+k3s_config:
+	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/k3s_1_config.yaml

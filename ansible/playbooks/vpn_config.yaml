@@ -1,0 +1,13 @@
+- name: Configure VPN
+  hosts: vpn
+  become: true
+  vars:
+    subnet: "192.168.100.0"
+  tasks:
+    - name: Run Tailscale
+      ansible.builtin.include_role:
+        name: dns_tailscale
+
+    - name: Install node exporter
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter

@@ -1,3 +1,6 @@
 [submodule "ansible/playbooks/k3s-ansible"]
 	path = ansible/playbooks/k3s-ansible
 	url = https://github.com/k3s-io/k3s-ansible
+[submodule "ansible/playbooks/roles/geerlingguy.docker"]
+	path = ansible/playbooks/roles/geerlingguy.docker
+	url = https://github.com/geerlingguy/ansible-role-docker.git

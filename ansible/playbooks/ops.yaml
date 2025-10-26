@@ -1,0 +1,29 @@
+- name: Configure OPS
+  hosts: ops
+  become: true
+
+  tasks:
+
+    - name: Install ansible
+      ansible.builtin.include_role:
+        name: ansible_install
+
+    - name: Copy ssh keys
+      ansible.builtin.include_role:
+        name: ssh_key_copy
+
+    - name: Install sops and age
+      ansible.builtin.include_role:
+        name: sops_age_install
+
+    - name: Clone homelabV2 repo
+      ansible.builtin.include_role:
+        name: git_clone
+
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: geerlingguy.docker
+
+    - name: Install node exporter
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter

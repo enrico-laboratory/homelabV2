@@ -1,5 +1,5 @@
-- name: Set up a cron job on dns
-  hosts: dns
+- name: Set up cron jobs
+  hosts: ops
   gather_facts: true
 
   tasks:
@@ -10,7 +10,7 @@
         job: "{{ bin_path }}"
         state: present
 
-    - name: Create a cron job for current user
+    - name: Update host cronjob
       cron:
         name: "Update hosts"
         minute: "0"
