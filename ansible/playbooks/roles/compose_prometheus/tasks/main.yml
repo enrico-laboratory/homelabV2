@@ -1,0 +1,18 @@
+- name: Ensure Prometheus output directory exists locally
+  delegate_to: localhost
+  file:
+    path: "{{ prometheus_compose_folder }}/{{ prometheus_config_folder }}"
+    state: directory
+
+- name: Generate Prometheus configuration from inventory
+  delegate_to: localhost
+  template:
+    src: "{{ prometheus_config_file }}.j2"
+    dest: "{{ prometheus_compose_folder }}/{{ prometheus_config_folder }}/{{ prometheus_config_file }}"
+
+
+- name: Bring up Prometheus and Grafana with Docker Compose
+  delegate_to: localhost
+  community.docker.docker_compose:
+    project_src: "{{ prometheus_compose_folder }}/"
+    state: "{{ state }}"

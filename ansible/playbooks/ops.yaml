@@ -21,6 +21,9 @@
         name: git_clone
 
     - name: Install Docker
+      vars:
+        docker_users:
+          - "{{ main_user }}"
       ansible.builtin.include_role:
         name: geerlingguy.docker
 
