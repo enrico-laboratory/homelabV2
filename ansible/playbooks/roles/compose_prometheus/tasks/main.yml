@@ -27,13 +27,13 @@
   delegate_to: localhost
   template:
     src: "grafana_dashboard_provisioning.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}/grafana_dashboard_provisioning.yml"
+    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}/dashboard.yml"
 
 - name: Generate grafana datasource
   delegate_to: localhost
   template:
     src: "grafana_datasource_provisioning.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}/grafana_datasource_provisioning.yml"
+    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}/datasource.yml"
 
 - name: Copy dashboards
   delegate_to: localhost
@@ -41,7 +41,7 @@
     src: "{{ item }}"
     dest: "{{ prometheus_compose_folder }}/grafana/dashboards/{{ item }}"
   with_fileglob:
-    - "dashboards/*.j2"
+    - "dashboards/*"
 
 - name: Bring up Prometheus and Grafana with Docker Compose
   delegate_to: localhost
