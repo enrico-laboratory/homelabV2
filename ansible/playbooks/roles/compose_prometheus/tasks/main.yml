@@ -5,6 +5,7 @@
     state: directory
   loop:
     - "{{ prometheus_config_folder }}"
+    - "{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}"
     - "{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}"
     - "{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}"
 
@@ -39,7 +40,7 @@
   delegate_to: localhost
   copy:
     src: "{{ item }}"
-    dest: "{{ prometheus_compose_folder }}/grafana/dashboards/{{ item }}"
+    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item }}"
     mode: "0644"
   with_fileglob:
     - "dashboards/*"
