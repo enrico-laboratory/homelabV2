@@ -22,3 +22,5 @@
   community.docker.docker_compose_v2:
     project_src: "{{ prometheus_compose_folder }}/"
     state: "{{ prometheus_state | default('present') }}"
+    recreate: always
+    remove_orphans: true
