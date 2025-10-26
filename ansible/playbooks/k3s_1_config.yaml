@@ -35,6 +35,11 @@
       ansible.builtin.include_role:
         name: k3s_proxy
 
+    - name: Install node exporter
+      when: group_names is contains('proxy')
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter
+
     - name: Configure gpu passthrough
 # To install in the pve with intel alder lake cpu
 # https://www.derekseaman.com/2024/07/proxmox-ve-8-2-windows-11-vgpu-vt-d-passthrough-with-intel-alder-lake.html

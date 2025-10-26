@@ -12,5 +12,6 @@ terraform.tfstate*
 terraform.tfvars.decrypted
 
 secret*
+/compose
 
 update_hosts_last_run.log
