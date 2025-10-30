@@ -13,3 +13,88 @@ scrape_configs:
 {% for host in groups['all'] %}
           - '{{ hostvars[host]['ansible_host'] | default(host) }}:9100'
 {% endfor %}
+  - job_name: serviceMonitor/tooling/prometheus-prometheus-node-exporter/0
+    honor_labels: false
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - tooling
+        attach_metadata:
+          node: false
+    scheme: http
+    relabel_configs:
+      - source_labels:
+          - job
+        target_label: __tmp_prometheus_job_name
+      - action: keep
+        source_labels:
+          - __meta_kubernetes_service_label_app_kubernetes_io_instance
+          - __meta_kubernetes_service_labelpresent_app_kubernetes_io_instance
+        regex: (prometheus);true
+      - action: keep
+        source_labels:
+          - __meta_kubernetes_service_label_app_kubernetes_io_name
+          - __meta_kubernetes_service_labelpresent_app_kubernetes_io_name
+        regex: (prometheus-node-exporter);true
+      - action: keep
+        source_labels:
+          - __meta_kubernetes_endpoint_port_name
+        regex: http-metrics
+      - source_labels:
+          - __meta_kubernetes_endpoint_address_target_kind
+          - __meta_kubernetes_endpoint_address_target_name
+        separator: ;
+        regex: Node;(.*)
+        replacement: ${1}
+        target_label: node
+      - source_labels:
+          - __meta_kubernetes_endpoint_address_target_kind
+          - __meta_kubernetes_endpoint_address_target_name
+        separator: ;
+        regex: Pod;(.*)
+        replacement: ${1}
+        target_label: pod
+      - source_labels:
+          - __meta_kubernetes_namespace
+        target_label: namespace
+      - source_labels:
+          - __meta_kubernetes_service_name
+        target_label: service
+      - source_labels:
+          - __meta_kubernetes_pod_name
+        target_label: pod
+      - source_labels:
+          - __meta_kubernetes_pod_container_name
+        target_label: container
+      - action: drop
+        source_labels:
+          - __meta_kubernetes_pod_phase
+        regex: (Failed|Succeeded)
+      - source_labels:
+          - __meta_kubernetes_service_name
+        target_label: job
+        replacement: ${1}
+      - source_labels:
+          - __meta_kubernetes_service_label_jobLabel
+        target_label: job
+        regex: (.+)
+        replacement: ${1}
+      - target_label: endpoint
+        replacement: http-metrics
+      - source_labels:
+          - __address__
+          - __tmp_hash
+        target_label: __tmp_hash
+        regex: (.+);
+        replacement: $1
+        action: replace
+      - source_labels:
+          - __tmp_hash
+        target_label: __tmp_hash
+        modulus: 1
+        action: hashmod
+      - source_labels:
+          - __tmp_hash
+        regex: 0
+        action: keep
