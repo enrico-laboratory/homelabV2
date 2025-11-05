@@ -7,7 +7,6 @@
       vars:
         docker_users:
           - "{{ main_user }}"
-          - "{{ ansible_user }}"
       ansible.builtin.include_role:
         name: geerlingguy.docker
 
