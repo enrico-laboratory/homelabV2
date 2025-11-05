@@ -23,3 +23,6 @@ ops:
 
 ops_compose:
 	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ops_compose.yaml
+
+ai:
+	$(sops_key_path_env_var) $(bin_path) -i $(ansible_inventory_path) $(playbooks_path)/ai_config.yaml

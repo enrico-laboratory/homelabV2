@@ -5,6 +5,26 @@ pvenodes:
     pve_node2:
       ansible_host: 192.168.100.21
 
+ai:
+  hosts:
+    192.168.100.60:
+
+home_assistant:
+  hosts:
+    192.168.100.65:
+
+ops:
+  hosts:
+    192.168.100.78:
+
+vpn:
+  hosts:
+    192.168.100.79:
+
+pihole:
+  hosts:
+    192.168.100.80:
+
 k3s_cluster:
   children:
     server:
@@ -29,19 +49,3 @@ k3s_cluster:
 proxy:
   hosts:
     192.168.100.140:
-
-pihole:
-  hosts:
-    192.168.100.80:
-
-vpn:
-  hosts:
-    192.168.100.79:
-
-ops:
-  hosts:
-    192.168.100.78:
-
-home_assistant:
-  hosts:
-    192.168.100.65:

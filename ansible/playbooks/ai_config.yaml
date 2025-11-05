@@ -1,0 +1,15 @@
+- name: Configure OPS
+  hosts: ai
+  become: true
+  tasks:
+
+    - name: Install Docker
+      vars:
+        docker_users:
+          - "{{ main_user }}"
+      ansible.builtin.include_role:
+        name: geerlingguy.docker
+
+    - name: Install node exporter
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter
