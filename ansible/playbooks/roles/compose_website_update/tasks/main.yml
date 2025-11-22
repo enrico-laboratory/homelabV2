@@ -35,7 +35,8 @@
     body_format: json
     body:
       chat_id: "{{ telegram_chat_id }}"
-      text: "Website update was: {{ result_container }}"
+      text: "From Ansible: Website Update App did not run!"
+    when: result_container == 'fail'
 
 - name: Delete repo folder
   ansible.builtin.file:
