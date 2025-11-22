@@ -23,9 +23,9 @@
     - name: update website cronjob
       cron:
         name: "Update website"
-        minute: "30"
-        hour: "17"
-#        weekday: "5"
-        job: 'cd {{ homelab_repo_dest }}/ansible && ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/compose_website_update.yaml > compose_website_update_last_run.log'
+        minute: "0"
+        hour: "9"
+        weekday: "6"
+        job: 'cd {{ homelab_repo_dest }}/ansible && /usr/bin/make website_update > compose_website_update_last_run.log 2>&1'
         state: present
         user: "{{ main_user }}"
