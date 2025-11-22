@@ -1,0 +1,43 @@
+- name: Clone repo
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ dest }}"
+    version: "main"
+    force: yes
+
+- name: Run makefile compose up
+  ansible.builtin.command: |
+    /usr/bin/make compose-up
+  args:
+    chdir: "{{ dest }}"
+  register: output
+
+- name: Get infos on container
+  community.docker.docker_container_info:
+    name: enricoruggieri-website-posts-update-app-1
+  register: output
+
+- debug:
+    msg: "{{ output.container.State }}"
+
+- name: save container exit status
+  ansible.builtin.set_fact:
+    result_container: "{{ 'success' if output.container.State.Status == 'exited' and output.container.State.ExitCode == 0 else 'fail' }}"
+
+- debug:
+    msg: "{{ result_container }}"
+
+- name: Send Telegram message based on play result
+  become: false
+  uri:
+    url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+    method: POST
+    body_format: json
+    body:
+      chat_id: "{{ telegram_chat_id }}"
+      text: "Website update was: {{ result_container }}"
+
+- name: Delete repo folder
+  ansible.builtin.file:
+    path: "{{ dest }}"
+    state: absent
