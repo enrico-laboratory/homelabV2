@@ -19,3 +19,13 @@
         job: 'cd {{ homelab_repo_dest }}/ansible && ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/update_hosts.yaml > update_hosts_last_run.log'
         state: present
         user: "{{ main_user }}"
+
+    - name: update website cronjob
+      cron:
+        name: "Update website"
+        minute: "30"
+        hour: "17"
+#        weekday: "5"
+        job: 'cd {{ homelab_repo_dest }}/ansible && ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/compose_website_update.yaml > compose_website_update_last_run.log'
+        state: present
+        user: "{{ main_user }}"
