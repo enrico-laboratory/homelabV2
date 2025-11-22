@@ -1,6 +1,22 @@
-- name: Deploy Update Website
+- name: Update Website
   hosts: ops
   gather_facts: true
   become: false
-  roles:
-    - compose_website_update
+  tasks:
+  - name: update Website
+    block:
+      - name: update website role
+        register: result
+        ansible.builtin.include_role:
+          name: compose_website_update
+    rescue:
+      - name: Send Telegram message based on play result
+        become: false
+        uri:
+          url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+          method: POST
+          body_format: json
+          body:
+            chat_id: "{{ telegram_chat_id }}"
+            text: "From Ansible: [ERROR] Update website playbook failed."
+        delegate_to: localhost
