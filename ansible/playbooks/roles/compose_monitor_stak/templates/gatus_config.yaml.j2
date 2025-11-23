@@ -25,18 +25,18 @@ endpoints:
 
   - name: vpn
     group: "servers"
-    url: tcp://vpn.enricoruggieri.com:22
+    url: ssh://vpn.enricoruggieri.com:22
     conditions:
-      - "[ CONNECTED ] == true"
+      - "[CONNECTED] == true"
     alerts:
       - type: telegram
         send-on-resolved: true
 
   - name: ops
     group: "servers"
-    url: tcp://ops.enricoruggieri.com:22
+    url: ssh://ops.enricoruggieri.com:22
     conditions:
-      - "[ CONNECTED ] == true"
+      - "[CONNECTED] == true"
     alerts:
       - type: telegram
         send-on-resolved: true
