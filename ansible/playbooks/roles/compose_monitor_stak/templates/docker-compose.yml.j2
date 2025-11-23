@@ -38,3 +38,10 @@ services:
     networks:
       - monitoring
     restart: unless-stopped
+
+  gatus:
+    image: twinproduction/gatus:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - ./{{ gatus_config_folder }}:/config

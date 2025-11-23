@@ -1,7 +1,7 @@
 - name: Ensure Prometheus output directory exists locally
   delegate_to: localhost
   file:
-    path: "{{ prometheus_compose_folder }}/{{ item }}"
+    path: "{{ compose_folder }}/{{ item }}"
     state: directory
   loop:
     - "{{ prometheus_config_folder }}"
@@ -14,39 +14,46 @@
   delegate_to: localhost
   template:
     src: "{{ prometheus_config_file }}.j2"
-    dest: "{{ prometheus_compose_folder }}/{{ prometheus_config_folder }}/{{ prometheus_config_file }}"
+    dest: "{{ compose_folder }}/{{ prometheus_config_folder }}/{{ prometheus_config_file }}"
+
+# GATUS
+- name: Generate Gatus Config File
+  delegate_to: localhost
+  template:
+    src: "{{ gatus_config_file_template }}.j2"
+    dest: "{{ compose_folder }}/{{ gatus_config_folder }}/{{ gatus_config_file }}"
 
 # COMPOSE
 - name: Generate docker compose file
   delegate_to: localhost
   template:
     src: "docker-compose.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/docker-compose.yml"
+    dest: "{{ compose_folder }}/docker-compose.yml"
 
 # GRAFANA
 - name: Generate grafana dashboard provisioning
   delegate_to: localhost
   template:
     src: "grafana_dashboard_provisioning.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}/dashboard.yml"
+    dest: "{{ compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboard_provisioning_folder }}/dashboard.yml"
 
 - name: Generate grafana datasource
   delegate_to: localhost
   template:
     src: "grafana_datasource_provisioning.yml.j2"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}/datasource.yml"
+    dest: "{{ compose_folder }}/{{ grafana_config_folder }}/{{ grafana_datasources_provisioning_folder }}/datasource.yml"
 
 - name: Copy dashboards
   delegate_to: localhost
   copy:
     src: "{{ item }}"
-    dest: "{{ prometheus_compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item | basename }}"
+    dest: "{{ compose_folder }}/{{ grafana_config_folder }}/{{ grafana_dashboards_folder }}/{{ item | basename }}"
   loop: "{{ lookup('fileglob', role_path + '/files/dashboards/*.json', wantlist=True) }}"
 
 - name: Bring up Prometheus and Grafana with Docker Compose
   delegate_to: localhost
   community.docker.docker_compose_v2:
-    project_src: "{{ prometheus_compose_folder }}/"
+    project_src: "{{ compose_folder }}/"
     state: "{{ prometheus_state | default('present') }}"
     recreate: always
     remove_orphans: true

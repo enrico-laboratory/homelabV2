@@ -1,6 +1,11 @@
-prometheus_compose_folder: "../../compose/prometheus-grafana"
+compose_folder: "../../compose/monitor-stack"
+
 prometheus_config_folder: "prometheus"
 prometheus_config_file: "prometheus.yml"
+
+gatus_config_folder: "gatus"
+gatus_config_file: "config.yaml"
+gatus_config_file_template: "gatus_config.yaml"
 
 grafana_config_folder: "grafana"
 grafana_dashboards_folder: "dashboards"

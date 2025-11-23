@@ -1,0 +1,15 @@
+alerting:
+  telegram:
+    token: "{{ telegram_bot_token }}"
+    id: "{{ telegram_chat_id }}"
+    topic-id: "7"
+
+endpoints:
+  - name: enricoruggieri.com
+    url: https://enricoruggieri.com
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true

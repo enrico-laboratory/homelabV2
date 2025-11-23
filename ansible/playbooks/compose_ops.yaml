@@ -3,4 +3,4 @@
   gather_facts: true
   become: false
   roles:
-    - compose_prometheus
+    - compose_monitor_stak
