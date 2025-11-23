@@ -41,11 +41,3 @@ endpoints:
       - type: telegram
         send-on-resolved: true
 
-  - name: pihole
-    group: "dns"
-    url: dns://192.168.100.80
-    conditions:
-      - "[ CONNECTED ] == true"
-    alerts:
-      - type: telegram
-        send-on-resolved: true
