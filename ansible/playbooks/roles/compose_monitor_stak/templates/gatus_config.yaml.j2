@@ -9,7 +9,7 @@ storage:
 
 endpoints:
   - name: enrico ruggieri
-    group: "website"
+    group: "websites"
     url: https://enricoruggieri.com
     interval: 30s
     conditions:
@@ -19,7 +19,7 @@ endpoints:
         send-on-resolved: true
 
   - name: madrigale den haag
-    group: "website"
+    group: "websites"
     url: https://madrigaledenhaag.nl/
     interval: 30s
     conditions:
@@ -97,23 +97,14 @@ endpoints:
     conditions:
       - "[CONNECTED] == true"
 
-  - name: ha
-    group: "servers"
-    url: ssh://ha.enricoruggieri.com:22
-    conditions:
-      - "[CONNECTED] == true"
-    alerts:
-      - type: telegram
-        send-on-resolved: true
-
   - name: truenas
-    group: "vm"
+    group: "vms"
     url: ssh://truenas.enricoruggieri.com:22
     conditions:
       - "[CONNECTED] == true"
 
   - name: truenas backup
-    group: "vm"
+    group: "vms"
     url: ssh://truenas-backup.enricoruggieri.com:22
     conditions:
       - "[CONNECTED] == true"
