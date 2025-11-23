@@ -5,6 +5,7 @@ alerting:
 
 endpoints:
   - name: enricoruggieri.com
+    group: "external"
     url: https://enricoruggieri.com
     interval: 30s
     conditions:
@@ -14,6 +15,7 @@ endpoints:
         send-on-resolved: true
 
   - name: dns
+    group: "servers"
     url: ssh://pihole.enricoruggieri.com:22
     conditions:
       - "[CONNECTED] == true"
@@ -22,6 +24,7 @@ endpoints:
         send-on-resolved: true
 
   - name: vpn
+    group: "servers"
     url: tcp://vpn.enricoruggieri.com:22
     conditions:
       - "[ CONNECTED ] == true"
@@ -30,7 +33,17 @@ endpoints:
         send-on-resolved: true
 
   - name: ops
+    group: "servers"
     url: tcp://ops.enricoruggieri.com:22
+    conditions:
+      - "[ CONNECTED ] == true"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: pihole
+    group: "dns"
+    url: dns://192.168.100.80
     conditions:
       - "[ CONNECTED ] == true"
     alerts:
