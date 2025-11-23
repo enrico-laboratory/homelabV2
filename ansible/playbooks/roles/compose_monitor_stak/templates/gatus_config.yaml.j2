@@ -17,7 +17,7 @@ endpoints:
   - name: 192.168.100.78
     target: ssh://192.168.100.78:22
     conditions:
-      - [CONNECTED] == true
+      - "[CONNECTED] == true"
     alerts:
       - type: telegram
         send-on-resolved: true
@@ -25,7 +25,7 @@ endpoints:
   - name: 192.168.100.79
     target: ssh://192.168.100.79:22
     conditions:
-      - [ CONNECTED ] == true
+      - "[ CONNECTED ] == true"
     alerts:
       - type: telegram
         send-on-resolved: true
@@ -33,7 +33,7 @@ endpoints:
   - name: 192.168.100.80
     target: ssh://192.168.100.80:22
     conditions:
-      - [ CONNECTED ] == true
+      - "[ CONNECTED ] == true"
     alerts:
       - type: telegram
         send-on-resolved: true
