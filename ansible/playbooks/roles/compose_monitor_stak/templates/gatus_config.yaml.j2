@@ -15,7 +15,7 @@ endpoints:
         send-on-resolved: true
 
   - name: dns
-    target: ssh://pihole.enricoruggieri.com:22
+    url: ssh://pihole.enricoruggieri.com:22
     conditions:
       - "[CONNECTED] == true"
     alerts:
@@ -23,7 +23,7 @@ endpoints:
         send-on-resolved: true
 
   - name: vpn
-    target: ssh://vpn.enricoruggieri.com:22
+    url: ssh://vpn.enricoruggieri.com:22
     conditions:
       - "[ CONNECTED ] == true"
     alerts:
@@ -31,7 +31,7 @@ endpoints:
         send-on-resolved: true
 
   - name: ops
-    target: ssh://ops.enricoruggieri.com:22
+    url: ssh://ops.enricoruggieri.com:22
     conditions:
       - "[ CONNECTED ] == true"
     alerts:
