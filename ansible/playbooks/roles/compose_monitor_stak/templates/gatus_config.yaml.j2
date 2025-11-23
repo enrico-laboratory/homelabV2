@@ -6,11 +6,46 @@ alerting:
 storage:
   type: sqlite
   path: "/data/gatus.db"
+
 endpoints:
-  - name: enricoruggieri.com
-    group: "external"
+  - name: enrico ruggieri
+    group: "website"
     url: https://enricoruggieri.com
     interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: madrigale den haag
+    group: "website"
+    url: https://madrigaledenhaag.nl/
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: ha
+    group: "apps"
+    url: http://ha.enricoruggieri.com:8123
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: truenas
+    group: "apps"
+    url: http://truenas.enricoruggieri.com
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: truenas-backup
+    group: "apps"
+    url: http://truenas-backup.enricoruggieri.com
     conditions:
       - "[STATUS] == 200"
     alerts:
@@ -44,3 +79,41 @@ endpoints:
       - type: telegram
         send-on-resolved: true
 
+  - name: proxmox 1
+    group: "servers"
+    url: ssh://proxmox1.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: proxmox 2
+    group: "servers"
+    url: ssh://proxmox2.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: truenas backup
+    group: "servers"
+    url: ssh://truenas-backup.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: ha
+    group: "servers"
+    url: ssh://ha.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: truenas
+    group: "vm"
+    url: ssh://truenas.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: truenas backup
+    group: "vm"
+    url: ssh://truenas-backup.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
