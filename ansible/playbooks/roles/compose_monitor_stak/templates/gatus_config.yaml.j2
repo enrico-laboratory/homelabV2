@@ -3,6 +3,9 @@ alerting:
     token: "{{ telegram_bot_token }}"
     id: "{{ telegram_chat_id }}"
 
+storage:
+  type: sqlite
+  path: "/data/gatus.db"
 endpoints:
   - name: enricoruggieri.com
     group: "external"

@@ -1,6 +1,7 @@
 volumes:
   prometheus_data:
   grafana_data:
+  gatus_db:
 
 networks:
   monitoring:
@@ -45,3 +46,4 @@ services:
       - 8080:8080
     volumes:
       - ./{{ gatus_config_folder }}:/config
+      - gatus_db:/data
