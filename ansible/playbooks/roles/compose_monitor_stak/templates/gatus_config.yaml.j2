@@ -22,7 +22,7 @@ endpoints:
         send-on-resolved: true
 
   - name: vpn
-    url: ssh://vpn.enricoruggieri.com:22
+    url: tcp://vpn.enricoruggieri.com:22
     conditions:
       - "[ CONNECTED ] == true"
     alerts:
@@ -30,7 +30,7 @@ endpoints:
         send-on-resolved: true
 
   - name: ops
-    url: ssh://ops.enricoruggieri.com:22
+    url: tcp://ops.enricoruggieri.com:22
     conditions:
       - "[ CONNECTED ] == true"
     alerts:
