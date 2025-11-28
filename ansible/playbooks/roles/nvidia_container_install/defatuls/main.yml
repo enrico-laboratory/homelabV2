@@ -1,0 +1,3 @@
+---
+nvidia_driver_required: true   # Set to false if already installed
+cuda_version: "12.2"

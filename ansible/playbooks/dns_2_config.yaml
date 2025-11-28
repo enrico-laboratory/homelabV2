@@ -2,8 +2,6 @@
   hosts: dns
   become: true
   vars:
-
-
     docker_gpg_keyring: "/etc/apt/keyrings/docker.asc"
     docker_gpg_key_url: "{{ docker_repo_url }}/gpg"
     docker_repo_url: "https://download.docker.com/linux/ubuntu"

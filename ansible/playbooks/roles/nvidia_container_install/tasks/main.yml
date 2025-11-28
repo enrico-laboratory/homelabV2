@@ -1,0 +1,41 @@
+---
+- name: Ensure prerequisites are installed
+  apt:
+    name:
+      - curl
+      - gnupg
+      - lsb-release
+      - nvidia-driver-535
+    state: present
+    update_cache: yes
+
+- name: Add NVIDIA GPG key
+  ansible.builtin.apt_key:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    keyring: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    state: present
+  become: true
+
+- name: Add NVIDIA container toolkit repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
+    state: present
+    filename: nvidia-container-toolkit
+    update_cache: yes
+  become: true
+  notify: restart docker
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install NVIDIA container toolkit
+  apt:
+    name:
+      - nvidia-container-toolkit
+      - nvidia-container-toolkit-base
+      - libnvidia-container-tools
+      - libnvidia-container1
+    state: present
+  notify: restart docker
+
