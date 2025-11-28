@@ -1,6 +1,6 @@
 - name: Check folders exists
   file:
-    path: "{{ items }}"
+    path: "{{ item }}"
     state: directory
   loop:
     - "{{ compose_folder_path }}/{{ data_folder_path }}"
