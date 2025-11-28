@@ -1,0 +1,17 @@
+---
+- name: Ensure mount points exist
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ owner }}"
+  loop: "{{ nfs_mounts }}"
+
+- name: Mount NFS shares
+  mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype | default('nfs') }}"
+    opts: "{{ item.opts | default('defaults') }}"
+    state: mounted
+  loop: "{{ nfs_mounts }}"
