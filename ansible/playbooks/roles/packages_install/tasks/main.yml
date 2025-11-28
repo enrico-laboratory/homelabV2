@@ -1,0 +1,10 @@
+---
+- name: Ensure apt cache is updated if older than specified time
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name: "{{ packages_to_install }}"
+    state: present

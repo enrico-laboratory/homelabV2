@@ -1,0 +1,6 @@
+---
+# List of packages to install
+packages_to_install: []
+
+# Time in seconds for apt cache validity
+apt_cache_valid_time: 3600
