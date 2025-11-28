@@ -1,0 +1,5 @@
+compose_folder_path: "../../compose/nginx"
+data_folder_path: "data"
+letsencrypt_folder_path: "letsencrypt"
+
+state: "present"

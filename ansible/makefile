@@ -19,3 +19,4 @@ ops_compose:    ; $(MAKE) run play=compose_ops
 ai_config:      ; $(MAKE) run play=ai_config
 ai_compose:     ; $(MAKE) run play=compose_personal_ai
 website_update: ; $(MAKE) run play=compose_website_update
+compose_nginx:  ; $(MAKE) run play=compose_nginx
