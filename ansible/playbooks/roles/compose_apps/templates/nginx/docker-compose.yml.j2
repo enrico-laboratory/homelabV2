@@ -1,0 +1,20 @@
+networks:
+  main:
+    external: true
+    name: main
+
+services:
+  app:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    networks:
+      - main
+    restart: unless-stopped
+    ports:
+{% for port in ports %}
+      - "{{ port }}"
+{% endfor %}
+    volumes:
+{% for folder in application_folders %}
+      - ./{{ folder.name }}:/{{ folder.container_mount }}
+{% endfor %}

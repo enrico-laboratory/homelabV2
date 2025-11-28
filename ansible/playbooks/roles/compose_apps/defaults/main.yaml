@@ -1,0 +1,3 @@
+docker_folder_path: "/opt/docker"
+compose_folder_name: "compose"
+stack_folder: "{{ docker_folder_path }}/{{ compose_folder_name }}/{{ stack_name }}"

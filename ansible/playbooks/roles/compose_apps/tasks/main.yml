@@ -1,0 +1,79 @@
+- name: Check main folder exists
+  ansible.builtin.stat:
+    path: "{{ docker_folder_path }}/{{ compose_folder_name }}"
+  register: main_folder
+
+- name: Fail if not a directory
+  fail:
+    msg: "The path {{ docker_folder_path }}/{{ compose_folder_name }} does not exist or it is not a directory"
+  when: not main_folder.stat.isdir
+
+- name: Deploy only if requested
+  when: state == 'present'
+  block:
+  - name: Create stack folder
+    become: True
+    file:
+      path: "{{ stack_folder }}"
+      state: directory
+      owner: "{{ main_user }}"
+      group: "{{ main_user }}"
+      mode: "0755"
+
+  - name: Create data folders folder
+    when: application_folders is defined
+    become: True
+    file:
+      path: "{{ stack_folder }}/{{ item.name }}"
+      state: directory
+      owner: "{{ item.owner }}"
+      group: "{{ item.group }}"
+      mode: "{{ item.mode }}"
+    loop: "{{ application_folders }}"
+
+  - name: Create extra folders
+    when: extra_folders is defined
+    file:
+      path: "{{ stack_folder }}{{ item.name }}"
+      state: directory
+      owner: "{{ item.owner }}"
+      group: "{{ item.group }}"
+      mode: "{{ item.mode }}"
+    loop: "{{ extra_folders }}"
+
+  - name: Generate templates
+    when: templates is defined
+    template:
+      src: "{{ stack_name }}/{{ item.src }}.j2"
+      dest: "{{ stack_folder }}/{{ item.dest }}"
+    loop: "{{ templates }}"
+
+  - name: Copy all files in a folder
+    when: copy_folder_content is defined
+    copy:
+      src: "{{ item }}"
+      dest: "{{ stack_folder }}/{{ copy_folder_content.name }}/{{ item | basename }}"
+    loop: "{{ lookup('fileglob', role_path + '/files/' + stack_name + '/' + copy_folder_content.glob, wantlist=True) }}"
+
+  - name: Generate docker compose file
+    template:
+      src: "{{ stack_name }}/docker-compose.yml.j2"
+      dest: "{{ stack_folder }}/docker-compose.yml"
+    register: result
+
+  - name: Set recreate for docker compose when changed
+    set_fact:
+      recreate: "always"
+    when: result.changed
+
+  - name: Set recreate for docker compose when not changed
+    set_fact:
+      recreate: "auto"
+    when: not result.changed
+
+- name: Bring up compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ stack_folder }}/"
+    state: "{{ state | default('present') }}"
+    recreate: "{{ recreate | default('auto')}}"
+    remove_orphans: true

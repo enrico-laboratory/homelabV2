@@ -1,0 +1,44 @@
+- name: Deploy Compose Applications
+  hosts: ops
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Nginx
+      vars:
+        deploy: True
+        stack_name: "nginx"
+        state: "present"
+        application_folders:
+          - {"name": 'data', "owner": "root", "group": "root", "mode": "0755", "container_mount": "data"}
+          - {"name": 'letsencrypt', "owner": "root", "group": "root", "mode": "0755", container_mount: "etc/letsencrypt"}
+        ports:
+          - "80:80"
+          - "81:81"
+          - "443:443"
+      ansible.builtin.include_role:
+        name: compose_apps
+
+    - name: Monitoring Stack
+      vars:
+        deploy: True
+        stack_name: "monitor-stack"
+        state: "present"
+        application_folders:
+          - { "name": 'prometheus', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'gatus', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'grafana/dashboards', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'grafana/provisioning/dashboards', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'grafana/provisioning/datasources', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'netalertx/config/', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'netalertx/db/', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+        templates:
+          - { "src": "prometheus/prometheus.yml", "dest": "prometheus/prometheus.yml" }
+          - { "src": "gatus/config.yaml", "dest": "gatus/config.yaml" }
+          - { "src": 'grafana/grafana_dashboard_provisioning.yml', "dest": 'grafana/provisioning/dashboards/dashboard.yml' }
+          - { "src": 'grafana/grafana_datasource_provisioning.yml', "dest": 'grafana/provisioning/datasources/datasource.yml' }
+        copy_folder_content:
+          name: "grafana/dashboards"
+          glob: "grafana/dashboards/*.json"
+      ansible.builtin.include_role:
+        name: compose_apps

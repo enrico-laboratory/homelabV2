@@ -1,6 +1,0 @@
-- name: Deploy Prometheus and Grafana with dynamic config
-  hosts: ops
-  gather_facts: true
-  become: false
-  roles:
-    - compose_nginx
