@@ -20,9 +20,9 @@ spec:
         deviceIDStrategy: uuid
         gfd:
           enabled: true
-        nodeSelector:
-        # It needs a label added to a node  kubectl label nodes k3s-113 gpu=true
-          gpu: "true"
+#        nodeSelector:
+#        # It needs a label added to a node  kubectl label nodes k3s-113 gpu=true
+#          gpu: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: nvidia-device-plugin
