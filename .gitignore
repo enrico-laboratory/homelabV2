@@ -3,6 +3,7 @@
 api_token
 ssh_keys
 *.local
+auth.yaml
 
 .terraform
 .terraform.lock.hcl
