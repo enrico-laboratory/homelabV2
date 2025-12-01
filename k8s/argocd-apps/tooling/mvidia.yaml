@@ -12,14 +12,14 @@ spec:
     targetRevision: 0.17.0
     helm:
       releaseName: nvidia-device-plugin
-      values: |
-        migStrategy: "none"
-        failOnInitError: true
-        nvidiaDriverRoot: "/"
-        deviceListStrategy: envvar
-        deviceIDStrategy: uuid
-        gfd:
-          enabled: true
+#      values: |
+#        migStrategy: "none"
+#        failOnInitError: true
+#        nvidiaDriverRoot: "/"
+#        deviceListStrategy: envvar
+#        deviceIDStrategy: uuid
+#        gfd:
+#          enabled: true
 #        nodeSelector:
 #        # It needs a label added to a node  kubectl label nodes k3s-113 gpu=true
 #          gpu: "true"
