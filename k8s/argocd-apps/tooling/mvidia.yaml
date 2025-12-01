@@ -1,31 +1,31 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nvidia
-  namespace: argocd
-spec:
-  project: tooling
-
-  source:
-    repoURL: https://nvidia.github.io/k8s-device-plugin
-    chart: nvidia-device-plugin
-    targetRevision: 0.17.1
-    helm:
-      releaseName: nvidia-device-plugin
-      values: |
-        migStrategy: "none"
-        failOnInitError: "true"
-        nvidiaDriverRoot: "/"
-        deviceListStrategy: envvar
-        deviceIDStrategy: uuid
-        passDeviceSpecs: "false"
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: nvidia-device-plugin
-
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: nvidia
+#  namespace: argocd
+#spec:
+#  project: tooling
+#
+#  source:
+#    repoURL: https://nvidia.github.io/k8s-device-plugin
+#    chart: nvidia-device-plugin
+#    targetRevision: 0.17.1
+#    helm:
+#      releaseName: nvidia-device-plugin
+#      values: |
+#        migStrategy: "none"
+#        failOnInitError: "true"
+#        nvidiaDriverRoot: "/"
+#        deviceListStrategy: envvar
+#        deviceIDStrategy: uuid
+#        passDeviceSpecs: "false"
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: nvidia-device-plugin
+#
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
