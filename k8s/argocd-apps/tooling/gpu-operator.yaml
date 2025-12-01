@@ -26,8 +26,6 @@ spec:
               value: "/run/k3s/containerd/containerd.sock"
             - name: CONTAINERD_CONFIG
               value: "/var/lib/rancher/k3s/agent/etc/containerd/config.toml"
-    directory:
-      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: gpu-operator
