@@ -14,11 +14,11 @@ spec:
       releaseName: nvidia-device-plugin
       values: |
         migStrategy: "none"
-        failOnInitError: true
+        failOnInitError: "true"
         nvidiaDriverRoot: "/"
         deviceListStrategy: envvar
         deviceIDStrategy: uuid
-        passDeviceSpecs: false
+        passDeviceSpecs: "false"
   destination:
     server: https://kubernetes.default.svc
     namespace: nvidia-device-plugin
