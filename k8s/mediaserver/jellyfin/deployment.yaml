@@ -6,7 +6,7 @@ metadata:
   labels:
     app: jellyfin
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: jellyfin
@@ -24,7 +24,7 @@ spec:
           image: ghcr.io/linuxserver/jellyfin:10.11.0
           resources:
             limits:
-              nvidia.com/gpu: "1"
+#              nvidia.com/gpu: "1"
               cpu: "2"
               # memory: "1536Mi"
             requests:
