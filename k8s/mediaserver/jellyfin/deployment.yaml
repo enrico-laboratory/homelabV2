@@ -15,16 +15,16 @@ spec:
       labels:
         app: jellyfin
     spec:
-      tolerations:
-        - key: nvidia.com/gpu
-          operator: Exists
-          effect: NoSchedule
+#      tolerations:
+#        - key: nvidia.com/gpu
+#          operator: Exists
+#          effect: NoSchedule
       containers:
         - name: jellyfin
           image: ghcr.io/linuxserver/jellyfin:10.11.0
           resources:
             limits:
-#              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "1"
               cpu: "2"
               # memory: "1536Mi"
             requests:
@@ -42,8 +42,8 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
-            - name: dri
-              mountPath: /dev/dri
+#            - name: dri
+#              mountPath: /dev/dri
             - mountPath: /config
               name: config
             - mountPath: /data/tvshows
@@ -58,9 +58,9 @@ spec:
             - mountPath: /data/video
               name: videos
       volumes:
-        - name: dri
-          hostPath:
-            path: /dev/dri
+#        - name: dri
+#          hostPath:
+#            path: /dev/dri
         - name: config
           persistentVolumeClaim:
             claimName: jellyfin-pvc    
