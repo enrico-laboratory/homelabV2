@@ -5,7 +5,7 @@ metadata:
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 parameters:
-  numberOfReplicas: "2"
+  numberOfReplicas: "1"
   staleReplicaTimeout: "480"
   fsType: "ext4"
   nodeSelector: "gpu"
@@ -21,3 +21,4 @@ parameters:
   staleReplicaTimeout: "480"
   fsType: "ext4"
   nodeSelector: "sonoff"
+
