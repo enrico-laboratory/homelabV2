@@ -24,7 +24,7 @@ spec:
           enabled: false
         
         podDnsConfig:
-          enabled: false
+          enabled: enable
           policy: "None"
           nameservers:
             - 127.0.0.1
