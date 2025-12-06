@@ -1,0 +1,22 @@
+PROXMOX_VE_USERNAME: ENC[AES256_GCM,data:GraGL6PKJIY=,iv:UgaAnLJLYbF0SAK5D22aof7S+dNxHhmW991c/ePGAQY=,tag:dI8yWf5vkmig4V50vQiF+g==,type:str]
+PROXMOX_VE_PASSWORD: ENC[AES256_GCM,data:WHmm4/Og3cLrZv8=,iv:dBktgHbAudXVwjiI4viPxXMmC1K/PnbpgljezBzTqxw=,tag:L8Qv34WiJCQRpEKpB850pQ==,type:str]
+TF_VAR_cf_account_id: ENC[AES256_GCM,data:6YtYj18kFmi9sdmNtUC0ENgzuDQYYQXkSTq8RYTSqzg=,iv:VHGCgLK30Kd5jo4/l+F8eitTb8P0htwOUbxU9M0IbL8=,tag:gDlrjW4j2mXf+CVkHNTEJQ==,type:str]
+TF_VAR_cf_token: ENC[AES256_GCM,data:lLXfx+1LHLoTtdr7dX0Ua3X9xcdZ/6J9GhKcJzS2Vt4hU+pzqrOxNA==,iv:bPh/Kz2GA8N5+qs+OU1qBKxUBg68Ti/VZvfrkSFI4b8=,tag:n/KPL1wPqrnAU/VcHRxpPg==,type:str]
+TF_VAR_cf_zone_id: ENC[AES256_GCM,data:rei7dB5k5Kp/txhvdFPlFsl9R5cEcn2JRNR60wkpL6w=,iv:j6HYds+ze3e6r9euxq9mvxnP3BSGIZ8RWIzWIvh40JY=,tag:O6+s+KGdx2FRwTwgAk2TrA==,type:str]
+TF_VAR_acme_email: ENC[AES256_GCM,data:4YSZZzB7/AfBHpDswMptEjWN2FaKTWVFdLPG,iv:I9C2KQDi+wO6IjlcF9wmVfbQ21KwdhS/WjPorADx+JQ=,tag:zvktO9XuunQoR+mVP982ig==,type:str]
+TF_VAR_user_name: ENC[AES256_GCM,data:4PJTAuqdWmC4,iv:+3tdTY1aBOlCcQdGC3Ry9gkSGhjNx0fCJPA8FuWM0rk=,tag:Mp6teB/z4EDUQVYEPY2DLg==,type:str]
+sops:
+    age:
+        - recipient: age1gdp9htuaff9js8n4vl5y2z9nq39cctn9v2dae2v98hfh5fxs23cscu987d
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA1NDdOcHpINjNrYmM4ZERz
+            ejZNTGF2MnkvVmczckdVam5YTkpjUEkzUjNVCmxMUG4xdmU5QlBkL0k2NHhnb3Q4
+            RTB4TmM2S3F5NWxlNDJwZnhMeVZzOFkKLS0tIDhUZzN5elVna1JtMjZ3N3IvTFp3
+            TGR1OXF2ZHBLd0Z3QkIvTFByUUhOa1EK5WNx4Ouv3sAKmhDL+VFwsB59Y3oK4+J8
+            ftkw0XzLcemA0EavUTWoxvmRv8w60Xoy1KqhIB/vRHk1eEQDghRYMQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-11-29T14:23:20Z"
+    mac: ENC[AES256_GCM,data:62fejKBXpFZjJlV3q+2xrtSuRihwXaOfAUc4CR0LkxRsC1WURFKvL+/Sc/+q+fIA20QviOowKc929YiGX1zjMk90TvtHAMKgSQHordbdOcMUXOcG/cbRQSmJnlR49B+W/u8GemPEjXu1ntvSWtEkn4e8Ke35ZRG3JlUEW7kGlNU=,iv:ngBZSKB0q3IXo1Ll23qtvOxL1gwA1v+XPFBU7vE8Ob8=,tag:/xTuh1i379kM4/Vcd3Zf0A==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.10.2
