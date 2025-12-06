@@ -1,0 +1,18 @@
+# This to be run as root
+# FIRST TIME ONLY use -k for input password and install sshpass "brew install hudochenkov/sshpass/sshpass"
+
+- name: Bootstrap PVE servers
+  hosts: pve_node3
+  vars:
+    ssh_pub_key_path: "~/.ssh/id_rsa.pub"
+    zpool_name: "tank"
+    zfs_dataset_name: "images"
+    zpool_device: "/dev/sdb"
+    storage_config_file_template: "pve_storage_config_node3"
+    pve_image_storage_name: "vmimages"
+  roles:
+    - pve_bootstrap_user
+    - pve_manage_repositories
+    - update_host
+    - pve_create_storage
+    - prometheus.prometheus.node_exporter

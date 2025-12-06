@@ -1,0 +1,8 @@
+- name: Check if the file exists
+  stat:
+    path: "{{ item }}"
+  register: file
+
+- name: Rename file to *.bak if it exists
+  command: "mv {{ item }} {{ item }}.bak"
+  when: file.stat.exists

@@ -44,7 +44,10 @@
 # To install in the pve with intel alder lake cpu
 # https://www.derekseaman.com/2024/07/proxmox-ve-8-2-windows-11-vgpu-vt-d-passthrough-with-intel-alder-lake.html
 # To install in the host https://dgpu-docs.intel.com/driver/installation.html#ubuntu
+# The above is NOT VALID anymore, using Nvidia gpu
       when: group_names is contains('gpu')
+      vars:
+        nvidia_driver_version: "580"
       ansible.builtin.include_role:
         name: k3s_gpu
 

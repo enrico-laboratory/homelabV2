@@ -1,0 +1,11 @@
+- name: Read local SSH public key
+  delegate_to: localhost
+  slurp:
+    src: "{{ ssh_pub_key_path }}"
+  register: pubkey_content
+
+- name: Add public key to root authorized_keys
+  authorized_key:
+    user: root
+    key: "{{ pubkey_content.content | b64decode }}"
+    state: "present"

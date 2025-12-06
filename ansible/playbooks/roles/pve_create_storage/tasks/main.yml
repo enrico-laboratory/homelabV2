@@ -19,14 +19,14 @@
   tags:
     - skip_ansible_lint
 
-- name: Create vmimages2 dataset
+- name: Create dataset
   community.general.zfs:
     name: "{{ zpool_name }}/{{ zfs_dataset_name }}"
     state: present
 
 - name: Copy storage config file
   ansible.builtin.template:
-    src: pve_storage_config.cfg
+    src: "{{ storage_config_file_template | default('pve_storage_config') }}.cfg"
     dest: "/etc/pve/storage.cfg"
     owner: root
     group: www-data
