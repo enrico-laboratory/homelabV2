@@ -26,7 +26,7 @@ module "k3s-workers" {
   source = "./modules/vms"
   count  = var.k3s_workers_count
 
-  cpu              = 3
+  cpu              = 4
   hostname         = "k3s-${var.k3s_worker_first_host + count.index}"
   memory           = 4096
   node_name        = var.node_name
