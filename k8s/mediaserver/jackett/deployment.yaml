@@ -22,7 +22,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: jackett
-          image: ghcr.io/linuxserver/jackett
+          image: ghcr.io/linuxserver/jackett:0.24.436
           env:
             - name: PUID
               value: "1000"
