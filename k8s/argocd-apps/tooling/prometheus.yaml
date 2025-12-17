@@ -1,50 +1,50 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: "prometheus"
-  namespace: argocd
-spec:
-  project: "tooling"
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: "tooling"
-  syncPolicy:
-    automated:
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-  source:
-    chart: kube-prometheus-stack
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 72.9.1
-    helm:
-      values: |
-        crds:
-          enabled: false
-        grafana:
-          ingress:
-            ingressClassName: nginx
-            enabled: true
-            hosts:
-              - grafana.enricoruggieri.com
-        alertmanager:
-          ingress:
-            enabled: true
-            ingressClassName: nginx
-            hosts:
-              - alertmanager.enricoruggieri.com    
-        prometheus:
-          ingress:
-            enabled: true
-            ingressClassName: nginx
-            hosts:
-              - prometheus.enricoruggieri.com
-          prometheusSpec:
-            additionalScrapeConfigs:
-              - job_name: node-exporter
-                static_configs:
-                  - targets:
-                    - '192.168.100.20:9100'
-                    - '192.168.100.21:9100'
-                    - '192.168.100.80:9100'
-                    - '192.168.100.149:9100'
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: "prometheus"
+#  namespace: argocd
+#spec:
+#  project: "tooling"
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: "tooling"
+#  syncPolicy:
+#    automated:
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
+#  source:
+#    chart: kube-prometheus-stack
+#    repoURL: https://prometheus-community.github.io/helm-charts
+#    targetRevision: 72.9.1
+#    helm:
+#      values: |
+#        crds:
+#          enabled: false
+#        grafana:
+#          ingress:
+#            ingressClassName: nginx
+#            enabled: true
+#            hosts:
+#              - grafana.enricoruggieri.com
+#        alertmanager:
+#          ingress:
+#            enabled: true
+#            ingressClassName: nginx
+#            hosts:
+#              - alertmanager.enricoruggieri.com
+#        prometheus:
+#          ingress:
+#            enabled: true
+#            ingressClassName: nginx
+#            hosts:
+#              - prometheus.enricoruggieri.com
+#          prometheusSpec:
+#            additionalScrapeConfigs:
+#              - job_name: node-exporter
+#                static_configs:
+#                  - targets:
+#                    - '192.168.100.20:9100'
+#                    - '192.168.100.21:9100'
+#                    - '192.168.100.80:9100'
+#                    - '192.168.100.149:9100'

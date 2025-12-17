@@ -1,51 +1,51 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: docker-registry-ui
-  namespace: argocd
-spec:
-  project: tooling
-  source:
-    repoURL: https://helm.joxit.dev
-    chart: docker-registry-ui
-    targetRevision: 1.1.3
-    helm:
-      values: |
-        global:
-          name: reg
-        ui:
-          title: "Docker Registry UI"
-          deleteImages: true
-          proxy: true
-          service:
-            type: LoadBalancer
-            targetPort: 80
-            port: 8789
-          ingress:
-            enabled: true
-            ingressClassName: nginx
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-cloudflare
-            host: registry.enricoruggieri.com
-            tls:
-              - secretName: registry-ui-tls
-                hosts:
-                  - registry.enricoruggieri.com
-        registry:
-          enabled: true
-          image: registry:2.8.2
-          dataVolume:
-            persistentVolumeClaim:
-              claimName: registry-ui-pvc
-          auth:
-            basic:
-              enabled: false
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: registry-ui
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: docker-registry-ui
+#  namespace: argocd
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: https://helm.joxit.dev
+#    chart: docker-registry-ui
+#    targetRevision: 1.1.3
+#    helm:
+#      values: |
+#        global:
+#          name: reg
+#        ui:
+#          title: "Docker Registry UI"
+#          deleteImages: true
+#          proxy: true
+#          service:
+#            type: LoadBalancer
+#            targetPort: 80
+#            port: 8789
+#          ingress:
+#            enabled: true
+#            ingressClassName: nginx
+#            annotations:
+#              cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+#            host: registry.enricoruggieri.com
+#            tls:
+#              - secretName: registry-ui-tls
+#                hosts:
+#                  - registry.enricoruggieri.com
+#        registry:
+#          enabled: true
+#          image: registry:2.8.2
+#          dataVolume:
+#            persistentVolumeClaim:
+#              claimName: registry-ui-pvc
+#          auth:
+#            basic:
+#              enabled: false
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: registry-ui
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
