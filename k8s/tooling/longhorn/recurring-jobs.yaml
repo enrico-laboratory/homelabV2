@@ -1,4 +1,4 @@
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io
 kind: RecurringJob
 metadata:
   name: snapshot-every-day
@@ -11,7 +11,7 @@ spec:
   groups:
     - every-day
 ---
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io
 kind: RecurringJob
 metadata:
   name: snapshot-every-week
@@ -24,7 +24,7 @@ spec:
   groups:
   - every-week
 ---
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io
 kind: RecurringJob
 metadata:
   name: trim-every-week
@@ -38,7 +38,7 @@ spec:
     - every-week
     - default
 ---
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io
 kind: RecurringJob
 metadata:
   name: backup-every-week
