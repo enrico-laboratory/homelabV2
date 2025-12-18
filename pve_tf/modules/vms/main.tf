@@ -20,7 +20,9 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     for_each = var.cloud_init_enabled ? [1] : []
     content {
       datastore_id = var.cloud_init_datastore_id
-
+      dns {
+        servers = var.dns.servers
+      }
       ip_config {
         ipv4 {
           address = "${var.ip_subnet}.${var.vm_id}/24"

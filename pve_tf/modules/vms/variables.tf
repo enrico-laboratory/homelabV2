@@ -105,3 +105,14 @@ variable "cloud_init_enabled" {
   default = true
   description = "Enable the initialization block for cloud-init"
 }
+
+variable "dns" {
+    type = object({
+        domain  = string
+        servers = list(string)
+    })
+    default = {
+        domain  = "enricoruggeri.com"
+        servers = ["8.8.8.8", "8.8.4.4"]
+    }
+}
