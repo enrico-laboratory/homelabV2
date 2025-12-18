@@ -7,7 +7,7 @@ spec:
   project: tooling
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: tooling
+    namespace: nfd
   source:
     chart: node-feature-discovery
     repoURL: https://kubernetes-sigs.github.io/node-feature-discovery/charts
