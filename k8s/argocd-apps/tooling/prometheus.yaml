@@ -1,26 +1,52 @@
-#apiVersion: argoproj.io/v1alpha1
-#kind: Application
-#metadata:
-#  name: "prometheus"
-#  namespace: argocd
-#spec:
-#  project: "tooling"
-#  destination:
-#    server: https://kubernetes.default.svc
-#    namespace: "tooling"
-#  syncPolicy:
-#    automated:
-#      selfHeal: true
-#    syncOptions:
-#      - CreateNamespace=true
-#  source:
-#    chart: kube-prometheus-stack
-#    repoURL: https://prometheus-community.github.io/helm-charts
-#    targetRevision: 72.9.1
-#    helm:
-#      values: |
-#        crds:
-#          enabled: false
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "prometheus"
+  namespace: argocd
+spec:
+  project: "tooling"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "tooling"
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    chart: kube-prometheus-stack
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 80.5.0
+    helm:
+      values: |
+        crds:
+          enabled: false
+        
+        # Disable main storage and UI components
+        prometheus:
+          enabled: false
+        alertmanager:
+          enabled: false
+        grafana:
+          enabled: false
+        
+        # Keep exporters enabled
+        nodeExporter:
+          enabled: true
+        kubeStateMetrics:
+          enabled: true
+        
+        # Optional: Disable other cluster-level scrapers if not needed
+        kubeApiServer:
+          enabled: false
+        kubelet:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeProxy:
+          enabled: false
 #        grafana:
 #          ingress:
 #            ingressClassName: nginx

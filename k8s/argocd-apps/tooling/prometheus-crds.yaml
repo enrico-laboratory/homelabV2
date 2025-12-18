@@ -1,19 +1,19 @@
-#apiVersion: argoproj.io/v1alpha1
-#kind: Application
-#metadata:
-#  name: "prometheus-crds"
-#  namespace: argocd
-#spec:
-#  project: "tooling"
-#  destination:
-#    server: https://kubernetes.default.svc
-#    namespace: "tooling"
-#  syncPolicy:
-#    automated:
-#      selfHeal: true
-#    syncOptions:
-#      - Replace=true
-#  source:
-#    chart: prometheus-operator-crds
-#    repoURL: https://prometheus-community.github.io/helm-charts
-#    targetRevision: 20.0.1
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "prometheus-crds"
+  namespace: argocd
+spec:
+  project: "tooling"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "tooling"
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - Replace=true
+  source:
+    chart: prometheus-operator-crds
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 25.0.1
