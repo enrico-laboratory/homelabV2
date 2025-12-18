@@ -25,3 +25,9 @@ spec:
               operator: "Equal"
               value: "true"
               effect: "NoSchedule"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
