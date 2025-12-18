@@ -15,13 +15,13 @@ spec:
       labels:
         app: jellyfin
     spec:
-      runtimeClassName: nvidia
+#      runtimeClassName: nvidia
       containers:
         - name: jellyfin
           image: ghcr.io/linuxserver/jellyfin:10.11.0
           resources:
             limits:
-              nvidia.com/gpu: "1"
+#              nvidia.com/gpu: "1"
               cpu: "2"
               # memory: "1536Mi"
             requests:
