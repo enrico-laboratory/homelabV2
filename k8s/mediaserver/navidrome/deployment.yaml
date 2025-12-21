@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: navidrome
-          image: deluan/navidrome:0.55.2
+          image: deluan/navidrome:0.59.0
           env:
             - name: ND_BASEURL
               value: "https://navidrome.enricoruggieri.com"
