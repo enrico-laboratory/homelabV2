@@ -1,0 +1,6 @@
+- name: Deploy AI
+  hosts: ai
+  gather_facts: true
+  become: false
+  roles:
+    - compose_ai

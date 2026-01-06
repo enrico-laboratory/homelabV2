@@ -1,0 +1,52 @@
+---
+- name: Ensure LVM packages are installed
+  package:
+    name: lvm2
+    state: present
+
+- name: Create physical volume
+  community.general.lvg:
+    pvs: "{{ lvm_ai_device }}"
+    vg: "{{ lvm_ai_vg }}"
+    pesize: 4M
+
+- name: Check existing logical volumes
+  command: lvs --noheadings -o lv_name,lv_size --units g --nosuffix {{ lvm_ai_vg }}
+  register: lvs_info
+  changed_when: false
+
+- name: Create or grow logical volumes
+  community.general.lvol:
+    vg: "{{ lvm_ai_vg }}"
+    lv: "{{ item.name }}"
+    size: "{{ item.size }}"
+    resizefs: no
+    state: present
+  loop: "{{ lvm_ai_lvs }}"
+
+- name: Create filesystem on logical volumes if missing
+  community.general.filesystem:
+    fstype: "{{ lvm_ai_fs_type }}"
+    dev: "/dev/{{ lvm_ai_vg }}/{{ item.name }}"
+  loop: "{{ lvm_ai_lvs }}"
+
+- name: Resize filesystem after LV grow (ext4)
+  command: resize2fs /dev/{{ lvm_ai_vg }}/{{ item.name }}
+  when: lvm_ai_fs_type == "ext4"
+  loop: "{{ lvm_ai_lvs }}"
+
+- name: Create mount points
+  file:
+    path: "{{ item.mount }}"
+    state: directory
+    owner: "{{ main_user }}"
+    mode: '0755'
+  loop: "{{ lvm_ai_lvs }}"
+
+- name: Mount logical volumes and ensure persistence
+  ansible.posix.mount:
+    path: "{{ item.mount }}"
+    src: "/dev/{{ lvm_ai_vg }}/{{ item.name }}"
+    fstype: "{{ lvm_ai_fs_type }}"
+    state: mounted
+  loop: "{{ lvm_ai_lvs }}"

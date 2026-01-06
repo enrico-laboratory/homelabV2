@@ -4,21 +4,6 @@
   become: false
   tasks:
 
-    - name: Nginx
-      vars:
-        deploy: True
-        stack_name: "nginx"
-        state: "present"
-        application_folders:
-          - {"name": 'data', "owner": "root", "group": "root", "mode": "0755", "container_mount": "data"}
-          - {"name": 'letsencrypt', "owner": "root", "group": "root", "mode": "0755", container_mount: "etc/letsencrypt"}
-        ports:
-          - "80:80"
-          - "81:81"
-          - "443:443"
-      ansible.builtin.include_role:
-        name: compose_apps
-
     - name: Monitoring Stack
       vars:
         deploy: True
@@ -42,3 +27,40 @@
           glob: "grafana/dashboards/*.json"
       ansible.builtin.include_role:
         name: compose_apps
+
+    - name: Pi-hole
+      vars:
+        deploy: True
+        stack_name: "pihole"
+        state: "present"
+        application_folders:
+          - { "name": 'pihole',"owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+      ansible.builtin.include_role:
+        name: compose_apps
+
+    - name: Nginx
+      vars:
+        deploy: True
+        stack_name: "nginx"
+        state: "present"
+        application_folders:
+          - {"name": 'data', "owner": "root", "group": "root", "mode": "0755", "container_mount": "data"}
+          - {"name": 'letsencrypt', "owner": "root", "group": "root", "mode": "0755", container_mount: "etc/letsencrypt"}
+        ports:
+          - "80:80"
+          - "81:81"
+          - "443:443"
+      ansible.builtin.include_role:
+        name: compose_apps
+
+    - name: Tailscale
+      vars:
+        deploy: True
+        stack_name: "tailscale"
+        state: "present"
+        application_folders:
+        - { "name": 'tailscale', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+      ansible.builtin.include_role:
+          name: compose_apps
+
+

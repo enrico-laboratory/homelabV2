@@ -1,15 +1,23 @@
 - name: Configure OPS
   hosts: ai
   become: true
-  tasks:
-
-    - name: Install Docker
-      vars:
-        docker_users:
-          - "{{ main_user }}"
-      ansible.builtin.include_role:
-        name: geerlingguy.docker
-
-    - name: Install node exporter
-      ansible.builtin.include_role:
-        name: prometheus.prometheus.node_exporter
+  vars:
+    packages_to_install:
+      - "nfs-common"
+    # mount nfs
+    owner: "{{ main_user }}"
+    nfs_mounts:
+      - src: "192.168.100.62:/mnt/tank/media/library/books"
+        path: "/data/nfs/books"
+        fstype: "nfs"
+        opts: "defaults"
+    # Install Docker
+    docker_users:
+      - "{{ main_user }}"
+  roles:
+    - packages_install
+    - ai_volumes
+    - nfs_mount
+    - geerlingguy.docker
+    - nvidia_container_install
+    - prometheus.prometheus.node_exporter

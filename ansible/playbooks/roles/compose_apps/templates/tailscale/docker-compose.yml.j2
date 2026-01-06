@@ -1,0 +1,21 @@
+services:
+  tailscale-nginx:
+    image: tailscale/tailscale:latest
+    hostname: tailscale-docker
+    network_mode: host
+    environment:
+      - TS_AUTHKEY={{ taiscale_auth_token }}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_ENABLE_HEALTH_CHECK=true
+      - TS_ENABLE_METRICS=true
+      - TS_ROUTES=192.168.100.0/24
+    volumes:
+      - tailscale:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+
+volumes:
+  tailscale:
