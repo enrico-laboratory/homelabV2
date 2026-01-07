@@ -4,7 +4,7 @@ metadata:
   name: proxmox-cloud-controller-manager
   namespace: argocd
 spec:
-  project: default
+  project: tooling
   source:
     repoURL: 'https://sergelogvinov.github.io/proxmox-csi-plugin'
     chart: proxmox-cloud-controller-manager
@@ -28,7 +28,7 @@ spec:
           - --cloud-config=/etc/cloud/config.yaml
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: kube-system
+    namespace: proxmox-csi
   syncPolicy:
     automated:
       prune: true
