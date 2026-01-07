@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: proxmox-cloud-controller-manager
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://sergelogvinov.github.io/proxmox-csi-plugin'
+    chart: proxmox-cloud-controller-manager
+    targetRevision: 0.6.0
+    helm:
+      releaseName: proxmox-ccm
+      values: |
+        # Reuse your Sealed Secret
+        configSecretName: "proxmox-csi-config"
+        
+        # Scheduling: Run on the control plane
+        nodeSelector:
+          node-role.kubernetes.io/control-plane: ""
+        
+        # Important for k3s: CCM needs to be able to talk to the API server
+        hostNetwork: true
+        
+        # CCM needs to run with specific arguments for k3s compatibility
+        extraArgs:
+          - --v=2
+          - --cloud-config=/etc/cloud/config.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
