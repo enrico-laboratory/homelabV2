@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: ghcr.io/sergelogvinov/charts
     chart: proxmox-csi-plugin
-    targetRevision: 0.14.0
+    targetRevision: 0.5.4
     helm:
       releaseName: proxmox-csi
       values: |
