@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: proxmox-cloud-controller-manager
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: tooling
   source:
