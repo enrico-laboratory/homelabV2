@@ -6,7 +6,7 @@ metadata:
 spec:
   project: tooling
   source:
-    repoURL: 'ghcr.io/sergelogvinov/charts/proxmox-cloud-controller-manager'
+    repoURL: 'https://github.com/sergelogvinov/proxmox-cloud-controller-manager'
     chart: proxmox-cloud-controller-manager
     targetRevision: 0.2.24
     helm:
