@@ -6,7 +6,7 @@ metadata:
 spec:
   project: tooling
   source:
-    repoURL: 'https://github.com/sergelogvinov/proxmox-cloud-controller-manager'
+    repoURL: 'ghcr.io/sergelogvinov/charts/proxmox-cloud-controller-manager'
     chart: proxmox-cloud-controller-manager
     targetRevision: 0.2.24
     helm:
@@ -28,7 +28,7 @@ spec:
           - --cloud-config=/etc/cloud/config.yaml
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: proxmox-csi
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true
