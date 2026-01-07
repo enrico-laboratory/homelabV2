@@ -11,6 +11,8 @@ run:
 	$(bin_path) -i $(ansible_inventory_path)/$(ansible_inventory) $(playbooks_path)/$(play).yaml --private-key ~/.ssh/id_rsa $(ansible_user)
 	# Convenience wrappers
 sops_test:      ; $(MAKE) run play=sops_test
+k8s_argocd_deploy:      ; $(MAKE) run play=k8s_argocd_deploy
+k8s_argocd_admin_pass:      ; $(MAKE) run play=k8s_argocd_admin_pass
 dns_config:     ; $(MAKE) run play=dns_2_config
 cronjob:        ; $(MAKE) run play=cronjob
 update_hosts:   ; $(MAKE) run play=update_hosts
@@ -20,7 +22,7 @@ compose_apps:   ; $(MAKE) run play=compose_apps
 ai_config:      ; $(MAKE) run play=ai_config
 ai_compose:     ; $(MAKE) run play=compose_personal_ai
 website_update: ; $(MAKE) run play=compose_website_update
-pve_bootstrap:  ; $(MAKE) run play=pve_1_bootstrap_node3 ansible_inventory=hosts_bare_metal.yaml ansible_user="--user root"
+pve_bootstrap:  ; $(MAKE) run play=pve_1_bootstrap_node3 ansible_user="--user root"
 
 # Fails if run from makefile
 #k3s_ansible:

@@ -2,14 +2,16 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   name      = var.vm_name
   node_name = var.node_name
   vm_id     = var.vm_id
-
+  started   = var.started
+  on_boot   = var.on_boot
+  machine = var.machine_type
   agent {
     enabled = true
   }
 
   cpu {
     cores = var.cpu
-    type = var.cpu_type
+    type  = var.cpu_type
   }
 
   memory {
@@ -42,7 +44,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       interface    = disk.value.interface
       iothread     = lookup(disk.value, "iothread", null)
       import_from  = lookup(disk.value, "import_from", null)
-      file_id =  lookup(disk.value, "file_id", null)
+      file_id      = lookup(disk.value, "file_id", null)
     }
   }
 
@@ -57,8 +59,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   dynamic "hostpci" {
     for_each = (var.vm_id == var.worker_vm_id_with_gpu && var.hostpci != null) ? [var.hostpci] : []
     content {
-      device = var.hostpci.device
-      id = var.hostpci.id
+      device   = var.hostpci.device
+      id       = var.hostpci.id
+      pcie     = var.hostpci.pcie
+      rom_file = var.hostpci.rom_file
+      xvga     = var.hostpci.xvga
+      rombar   = var.hostpci.rombar
     }
   }
 

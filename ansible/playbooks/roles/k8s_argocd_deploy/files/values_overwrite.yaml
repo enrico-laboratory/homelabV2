@@ -2,7 +2,7 @@ global:
   domain: "argocd.enricoruggieri.com"
 config:
   params:
-    server.insecure: true
+    server.insecure: "true"
 server:
   # ingress:
   #   enabled: true
@@ -32,26 +32,6 @@ configs:
     private-repo:
       url: https://github.com/enrico-laboratory/homelabV2.git
 extraObjects:
-  - apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      name: argocd-server-http-ingress
-      namespace: argocd
-      annotations:
-        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    spec:
-      ingressClassName: nginx
-      rules:
-      - http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  name: http
-        host: argocd.enricoruggieri.com
   - apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -92,7 +72,7 @@ extraObjects:
       syncPolicy:
         automated:
           selfHeal: true
-        prune: true
+          prune: true
   - apiVersion: argoproj.io/v1alpha1
     kind: AppProject
     metadata:
@@ -110,41 +90,4 @@ extraObjects:
           kind: '*'
       orphanedResources:
         warn: false
-  # - apiVersion: argoproj.io/v1alpha1
-  #   kind: Application
-  #   metadata:
-  #     name: argocd
-  #     namespace: argocd
-  #   spec:
-  #     project: argocd
-  #     destination:
-  #       namespace: argocd
-  #       server: https://kubernetes.default.svc
-  #     syncPolicy:
-  #       automated:
-  #         selfHeal: true
-  #         prune: true
-  #       syncOptions:
-  #         - CreateNamespace=true
-  #     sources:
-  #       - repoURL: 'https://argoproj.github.io/argo-helm'
-  #         chart: argo-cd
-  #         targetRevision: 7.7.10
-  #         helm:
-  #           values: |
-  #             server:
-  #               configEnabled: true
-  #               ingress:
-  #                 enabled: true
-  #                 hosts:
-  #                   - "argocd.enricoruggieri.com"
-  #                 paths:
-  #                   - /
-  #               service:
-  #                 type: LoadBalancer
-  #                 annotations:
-  #                   metallb.universe.tf/loadBalancerIPs: 192.168.100.150
-  #             configs:
-  #               repositories:
-  #                 private-repo:
-  #                   url: https://github.com/enrico-laboratory/homelabV2.git
+

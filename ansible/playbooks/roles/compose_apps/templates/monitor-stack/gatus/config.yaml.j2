@@ -52,20 +52,33 @@ endpoints:
       - type: telegram
         send-on-resolved: true
 
-  - name: dns
-    group: "servers"
-    url: ssh://pihole.enricoruggieri.com:22
+  - name: taiscale
+    group: "apps"
+    url: http://ops.enricoruggieri.com:9002/healthz
     conditions:
-      - "[CONNECTED] == true"
+      - "[STATUS] == 200"
     alerts:
       - type: telegram
         send-on-resolved: true
 
-  - name: vpn
-    group: "servers"
-    url: ssh://vpn.enricoruggieri.com:22
+  - name: pihole-ui
+    group: "apps"
+    url: http://pihole.enricoruggieri.com:8083/admin
     conditions:
-      - "[CONNECTED] == true"
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: pihole-dns
+    group: "dns"
+    url: "192.168.100.78" # Address of the DNS server to use
+    dns:
+      query-name: "example.com"
+      query-type: "A"
+    conditions:
+      - "[BODY] == pat(*.*.*.*)"
+      - "[DNS_RCODE] == NOERROR"
     alerts:
       - type: telegram
         send-on-resolved: true
@@ -78,18 +91,6 @@ endpoints:
     alerts:
       - type: telegram
         send-on-resolved: true
-
-  - name: proxmox 1
-    group: "servers"
-    url: ssh://proxmox1.enricoruggieri.com:22
-    conditions:
-      - "[CONNECTED] == true"
-
-  - name: proxmox 2
-    group: "servers"
-    url: ssh://proxmox2.enricoruggieri.com:22
-    conditions:
-      - "[CONNECTED] == true"
 
   - name: truenas backup
     group: "servers"

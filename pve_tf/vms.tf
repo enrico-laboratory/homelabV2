@@ -1,6 +1,6 @@
 module "k3s-masters" {
-  source           = "./modules/vms"
-  count            = var.k3s_masters_count
+  source = "./modules/vms"
+  count  = var.k3s_masters_count
 
   cpu              = 4
   hostname         = "k3s-${var.k3s_master_first_host + count.index}"
@@ -111,4 +111,90 @@ module "truenas" {
     file_id = "none" # "local:iso/TrueNAS-SCALE-25.10.0.1.iso"
     enabled = false
   }
+}
+
+# module "ai" {
+#   source = "./modules/vms"
+#
+#   cpu                   = 4
+#   hostname              = "ai"
+#   memory                = 3052
+#   node_name             = var.node_name
+#   user_name             = var.user_name
+#   vm_id                 = 150
+#   vm_name               = "ai"
+#   ssh_pub_key_path      = "${var.home_folder}/.ssh/id_rsa.pub"
+#   worker_vm_id_with_gpu = 150
+#   machine_type          = "q35"
+#   hostpci = {
+#     device   = "hostpci0"
+#     id       = "0000:0b:00.0"
+#     pcie     = true
+#     rom_file = "patched_gpu.rom"
+#     xvga     = false
+#     rombar   = true
+#   }
+#   disks = [
+#     {
+#       datastore_id = var.vm_images_datastore
+#       size         = 32
+#       interface    = "${var.disk_interface}0"
+#       iothread     = true
+#       import_from  = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
+#     }
+#   ]
+# }
+
+resource "proxmox_virtual_environment_vm" "win_11" {
+  node_name = var.node_name
+  vm_id     = 201
+  name      = "win-11"
+  started   = false
+  cpu {
+    cores   = 6
+    type    = "x86-64-v3"
+    sockets = 1
+    flags   = ["+aes"]
+  }
+  memory {
+    dedicated = 12288
+    floating  = 0
+  }
+  bios = "ovmf"
+  vga {
+    type = "none"
+  }
+  machine = "q35"
+  efi_disk {
+    datastore_id      = var.vm_images_datastore
+    type              = "4m"
+    pre_enrolled_keys = true
+  }
+  tpm_state {
+    datastore_id = var.vm_images_datastore
+    version      = "v2.0"
+  }
+  hostpci {
+    device   = "hostpci0"
+    id       = "0000:0b:00.0"
+    pcie     = true
+    rom_file = "patched_gpu.rom"
+    xvga     = true
+    rombar   = true
+  }
+  hostpci {
+    device = "hostpci1"
+    id     = "0000:01:00.0"
+    rombar = true
+  }
+  hostpci {
+    device = "hostpci2"
+    id     = "0000:08:00.1"
+    rombar = true
+  }
+  network_device {
+    bridge = "vmbr0"
+    model  = "e1000"
+  }
+  scsi_hardware = "virtio-scsi-single"
 }

@@ -39,3 +39,7 @@
     state: present
   notify: restart docker
 
+- name: Configure NVIDIA Container Toolkit for Docker
+  command: nvidia-ctk runtime configure --runtime=docker
+  become: true
+  notify: restart docker

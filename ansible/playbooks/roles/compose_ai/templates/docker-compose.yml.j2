@@ -1,26 +1,59 @@
 services:
+
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
     ports:
       - "11434:11434"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
     volumes:
       - /data/models/ollama/models:/root/.ollama
       - /data/models/ollama/config/config:/etc/ollama
     environment:
       - OLLAMA_MODELS=/root/.ollama
+      - OLLAMA_HOST=0.0.0.0:11434
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     runtime: nvidia
-    entrypoint: ["/bin/bash", "-c"]
-    command: >
-      "ollama serve & sleep 3 && ollama pull llama3.1:8b && ollama pull nomic-embed-text && tail -f /dev/null"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  ollama-provisioner:
+    image: curlimages/curl:latest
+    container_name: ollama-provisioner
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - MODELS=qwen2.5-coder:32b-instruct-q4_K_M llama3.1:8b nomic-embed-text
+    volumes:
+      - /data/models/ollama/models:/root/.ollama
+    entrypoint: ""
+    command: |
+      /bin/sh <<'EOF'
+      for model in $$MODELS; do
+        echo "Checking if model '$$model' is present..."
+        EXISTS=$$(curl -s "$$OLLAMA_HOST/api/tags" | grep -c "$$model")
+        if [ "$$EXISTS" -eq 0 ]; then
+          echo "Model '$$model' not found. Pulling..."
+          curl -s -X POST "$$OLLAMA_HOST/api/pull" -d "{\"name\": \"$$model\"}" | grep -v "digest"
+        else
+          echo "Model '$$model' already exists. Skipping."
+        fi
+      done
+      echo "Provisioning complete. Sidecar exiting."
+      EOF
 
   qdrant:
     image: qdrant/qdrant:latest

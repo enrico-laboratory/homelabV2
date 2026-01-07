@@ -5,14 +5,35 @@
   hosts: pve_node3
   vars:
     ssh_pub_key_path: "~/.ssh/id_rsa.pub"
-    zpool_name: "tank"
-    zfs_dataset_name: "images"
-    zpool_device: "/dev/sdb"
+    zfs_pools:
+      - name: "tank"
+        disks:
+          - "/dev/sdb"
+        dataset_name: "images"
+        storage:
+          name: "vmimages"
+          content: "images,rootdir"
+      - name: "kube-pool"
+        disks:
+          - "/dev/nvme1n1"
+        dataset_name: "kube-data"
+        storage:
+          name: "kubedata"
+          content: "images,rootdir"
+
     storage_config_file_template: "pve_storage_config_node3"
-    pve_image_storage_name: "vmimages"
+    cpu_vendor: "amd"
+    gpu_ids: "10de:2504,10de:228e"
+    nfs_mounts:
+      truenas-backup-vms:
+        export: /mnt/backup-pool-1/proxmox-vms
+        path: /mnt/pve/truenas-backup-vms
+        server: "192.168.100.60"
+        content: "iso,backup,images"
   roles:
-    - pve_bootstrap_user
-    - pve_manage_repositories
-    - update_host
+#    - pve_bootstrap_user
+#    - pve_manage_repositories
+#    - update_host
     - pve_create_storage
-    - prometheus.prometheus.node_exporter
+#    - pve_gpu_passthrough
+#    - prometheus.prometheus.node_exporter

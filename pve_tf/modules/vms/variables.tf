@@ -87,10 +87,19 @@ variable "memory" {
   type = number
 }
 
+variable "machine_type" {
+  type    = string
+  default = null
+}
+
 variable "hostpci" {
   type = object({
-    device = string
-    id     = string
+    device   = string
+    id       = string
+    pcie     = optional(bool)
+    rom_file = optional(string)
+    xvga     = optional(bool)
+    rombar   = optional(bool)
   })
   default = null
 }
@@ -101,18 +110,28 @@ variable "worker_vm_id_with_gpu" {
 }
 
 variable "cloud_init_enabled" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Enable the initialization block for cloud-init"
 }
 
 variable "dns" {
-    type = object({
-        domain  = string
-        servers = list(string)
-    })
-    default = {
-        domain  = "enricoruggeri.com"
-        servers = ["8.8.8.8", "8.8.4.4"]
-    }
+  type = object({
+    domain  = string
+    servers = list(string)
+  })
+  default = {
+    domain  = "enricoruggeri.com"
+    servers = ["8.8.8.8", "8.8.4.4"]
+  }
+}
+
+variable "started" {
+  type    = bool
+  default = true
+}
+
+variable "on_boot" {
+  type    = bool
+  default = false
 }

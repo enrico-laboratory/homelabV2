@@ -1,7 +1,11 @@
 - name: Ensure Prometheus output directory exists locally
+  become: true
   file:
     path: "{{ ai_compose_folder }}"
     state: directory
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    mode: '0755'
 
 - name: Generate docker compose file
   template:

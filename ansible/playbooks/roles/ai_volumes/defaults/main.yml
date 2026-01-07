@@ -3,6 +3,6 @@
 lvm_ai_device: "/dev/sdb"
 lvm_ai_vg: "vg_ai"
 lvm_ai_lvs:
-  - { name: "lv_models", size: "300G", mount: "/data/models" }
-  - { name: "lv_vector", size: "300G", mount: "/data/vector" }
+  - { name: "lv_models", size: "200G", mount: "/data/models" }
+  - { name: "lv_vector", size: "10G", mount: "/data/vector" }
 lvm_ai_fs_type: "ext4"
