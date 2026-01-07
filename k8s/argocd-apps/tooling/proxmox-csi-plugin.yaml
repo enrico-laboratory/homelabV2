@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://sergelogvinov.github.io/proxmox-csi-plugin'
+    repoURL: ghcr.io/sergelogvinov/charts
     chart: proxmox-csi-plugin
     targetRevision: 0.14.0
     helm:
