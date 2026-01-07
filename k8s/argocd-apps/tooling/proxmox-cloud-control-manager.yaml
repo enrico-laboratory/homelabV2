@@ -1,38 +1,38 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: proxmox-cloud-controller-manager
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: tooling
-  source:
-    repoURL: 'ghcr.io/sergelogvinov/charts'
-    chart: proxmox-cloud-controller-manager
-    targetRevision: 0.2.24
-    helm:
-      releaseName: proxmox-ccm
-      values: |
-        # Reuse your Sealed Secret
-        configSecretName: "proxmox-csi-config"
-        useDaemonSet: true
-
-        # Scheduling: Run on the control plane
-        nodeSelector:
-          node-role.kubernetes.io/control-plane: ""
-
-        # Important for k3s: CCM needs to be able to talk to the API server
-        hostNetwork: true
-
-        # CCM needs to run with specific arguments for k3s compatibility
-        extraArgs:
-          - --v=2
-          - --cloud-config=/etc/cloud/config.yaml
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: kube-system
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: proxmox-cloud-controller-manager
+#  namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: 'ghcr.io/sergelogvinov/charts'
+#    chart: proxmox-cloud-controller-manager
+#    targetRevision: 0.2.24
+#    helm:
+#      releaseName: proxmox-ccm
+#      values: |
+#        # Reuse your Sealed Secret
+#        configSecretName: "proxmox-csi-config"
+#        useDaemonSet: true
+#
+#        # Scheduling: Run on the control plane
+#        nodeSelector:
+#          node-role.kubernetes.io/control-plane: ""
+#
+#        # Important for k3s: CCM needs to be able to talk to the API server
+#        hostNetwork: true
+#
+#        # CCM needs to run with specific arguments for k3s compatibility
+#        extraArgs:
+#          - --v=2
+#          - --cloud-config=/etc/cloud/config.yaml
+#  destination:
+#    server: 'https://kubernetes.default.svc'
+#    namespace: kube-system
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
