@@ -1,54 +1,54 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: proxmox-csi-plugin
-  namespace: argocd
-spec:
-  project: tooling
-  source:
-    repoURL: ghcr.io/sergelogvinov/charts
-    chart: proxmox-csi-plugin
-    targetRevision: 0.5.4
-    helm:
-      releaseName: proxmox-csi
-      values: |
-        configSecretName: "proxmox-csi-config"
-        
-        # Optional: Adjust the log level if you are troubleshooting
-        # logLevel: 2
-        
-        controller:
-          # Since no taints exist, this selector is enough to 
-          # place the controller on your master node.
-          nodeSelector:
-            node-role.kubernetes.io/control-plane: ""
-          
-        node:
-          # The node driver (DaemonSet) will automatically run 
-          # on all nodes (master + workers) to handle disk mounting.
-          nodeSelector:
-            kubernetes.io/os: linux
-        
-        storageClass:
-          - name: proxmox-zfs-nvme
-            storage: kubedata
-            reclaimPolicy: Delete
-            fstype: ext4
-            ssd: true
-            mountOptions:
-              - discard
-            # Define the storage class as default
-            annotations:
-              storageclass.kubernetes.io/is-default-class: "true"
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: proxmox-csi
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    managedNamespaceMetadata:
-      labels:
-        pod-security.kubernetes.io/enforce: privileged
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: proxmox-csi-plugin
+#  namespace: argocd
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: ghcr.io/sergelogvinov/charts
+#    chart: proxmox-csi-plugin
+#    targetRevision: 0.5.4
+#    helm:
+#      releaseName: proxmox-csi
+#      values: |
+#        configSecretName: "proxmox-csi-config"
+#
+#        # Optional: Adjust the log level if you are troubleshooting
+#        # logLevel: 2
+#
+#        controller:
+#          # Since no taints exist, this selector is enough to
+#          # place the controller on your master node.
+#          nodeSelector:
+#            node-role.kubernetes.io/control-plane: ""
+#
+#        node:
+#          # The node driver (DaemonSet) will automatically run
+#          # on all nodes (master + workers) to handle disk mounting.
+#          nodeSelector:
+#            kubernetes.io/os: linux
+#
+#        storageClass:
+#          - name: proxmox-zfs-nvme
+#            storage: kubedata
+#            reclaimPolicy: Delete
+#            fstype: ext4
+#            ssd: true
+#            mountOptions:
+#              - discard
+#            # Define the storage class as default
+#            annotations:
+#              storageclass.kubernetes.io/is-default-class: "true"
+#  destination:
+#    server: 'https://kubernetes.default.svc'
+#    namespace: proxmox-csi
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    managedNamespaceMetadata:
+#      labels:
+#        pod-security.kubernetes.io/enforce: privileged
+#    syncOptions:
+#      - CreateNamespace=true
