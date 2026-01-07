@@ -4,7 +4,7 @@ metadata:
   name: proxmox-csi-plugin
   namespace: argocd
 spec:
-  project: default
+  project: tooling
   source:
     repoURL: ghcr.io/sergelogvinov/charts
     chart: proxmox-csi-plugin
