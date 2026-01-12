@@ -37,6 +37,7 @@ spec:
             reclaimPolicy: Delete
             fstype: ext4
             ssd: true
+            backup: true
             mountOptions:
               - discard
             # Define the storage class as default
