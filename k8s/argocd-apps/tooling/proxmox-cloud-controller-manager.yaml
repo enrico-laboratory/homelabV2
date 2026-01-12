@@ -23,7 +23,13 @@ spec:
           node-role.kubernetes.io/control-plane: "true"
         # Important for k3s: CCM needs to be able to talk to the API server
         hostNetwork: true
-
+        tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/control-plane
+            operator: Exists
+          - effect: NoSchedule
+            key: node.cloudprovider.kubernetes.io/uninitialized
+            operator: Exists
         # CCM needs to run with specific arguments for k3s compatibility
         extraArgs:
           - --v=2
