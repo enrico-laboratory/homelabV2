@@ -13,3 +13,16 @@ spec:
   resources:
     requests:
       storage: 50Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: calibre-web-pvc-pve
+  namespace: mediaserver
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: proxmox-zfs-nvme
+  resources:
+    requests:
+      storage: 50Mi
