@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: sonarr-pvc        
+            claimName: sonarr-pvc-pve
         - name: tvshows
           nfs:
             server: 192.168.100.62
