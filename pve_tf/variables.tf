@@ -6,7 +6,7 @@ variable "node_name" {
 ### VMS
 variable "k3s_masters_count" {
   type = number
-  default = 3
+  default = 1
 }
 
 variable "k3s_master_first_host" {
