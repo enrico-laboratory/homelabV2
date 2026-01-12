@@ -35,4 +35,4 @@ spec:
   storageClassName: proxmox-zfs-nvme
   resources:
     requests:
-      storage: 2Gi
+      storage: 5Gi
