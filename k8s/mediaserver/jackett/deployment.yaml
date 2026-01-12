@@ -33,12 +33,17 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
+            - mountPath: /config-temp
+              name: config-temp
             - mountPath: /downloads
               name: downloads
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: jackett-pvc    
+            claimName: jackett-pvc
+        - name: config-temp
+          persistentVolumeClaim:
+            claimName: jackett-pvc-pve
         - name: downloads
           nfs:
             server: 192.168.100.62

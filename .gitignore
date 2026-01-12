@@ -17,4 +17,4 @@ secret*
 
 update_hosts_last_run.log
 age_key.txt
-proxmox-csi-plugin-secret.yaml
+proxmox-config-raw.yaml

@@ -2,7 +2,7 @@ ansible_port: 22
 ansible_user: eruggieri
 k3s_version: v1.33.5+k3s1
 api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
-#extra_server_args: "--disable=traefik --tls-san 192.168.100.140 --disable=coredns --disable-cloud-controller"
-extra_server_args: "--disable=traefik --tls-san 192.168.100.140 --disable=coredns"
+extra_server_args: "--disable=traefik --tls-san 192.168.100.140 --disable=coredns --disable-cloud-controller"
+#extra_server_args: "--disable=traefik --tls-san 192.168.100.140 --disable=coredns"
 extra_agent_args: "--server https://192.168.100.140:6443"
 token: l4p5JJ6iUvPlHLLPs1mYcEDn7Mer5j4UfpWJQyy1tGfq2U632XGc7b3h9Js9yiX5vgc4GMd4KoLzvKtU43OmxQ==

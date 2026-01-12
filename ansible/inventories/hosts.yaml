@@ -15,21 +15,26 @@ k3s_cluster:
   children:
     server:
       hosts:
-        192.168.100.101:
-        192.168.100.102:
-        192.168.100.103:
+        k3s-101:
+          ansible_host: 192.168.100.101
+        k3s-102:
+          ansible_host: 192.168.100.102
+        k3s-103:
+          ansible_host: 192.168.100.103
     master_server:
       hosts:
-        192.168.100.101:
+        k3s-101:
     agent:
       hosts:
-        192.168.100.111:
-        192.168.100.112:
-        192.168.100.113:
-
+        k3s-111:
+          ansible_host: 192.168.100.111
+        k3s-112:
+          ansible_host: 192.168.100.112
+        k3s-113:
+          ansible_host: 192.168.100.113
     gpu:
       hosts:
-        192.168.100.113:
+        k3s-113:
 
 proxy:
   hosts:
