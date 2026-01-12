@@ -14,12 +14,20 @@ spec:
     helm:
       releaseName: nvidia-gpu-operator
       values: |
+        gfd:
+          enabled: "false"
+        dcgmExporter:
+          enabled: "false"
         toolkit:
           enabled: "true"
         driver:
           enabled: "true"
         nfd:
           enabled: "false"
+        driver:
+          resource:
+            limits:
+              memory: "1Gi"
         toolkit:
           env:
             - name: CONTAINERD_RUNTIME_CLASS
