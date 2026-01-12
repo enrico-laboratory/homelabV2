@@ -1,37 +1,37 @@
-#apiVersion: argoproj.io/v1alpha1
-#kind: Application
-#metadata:
-#  name: nvidia-gpu-operator
-#  namespace: argocd
-#spec:
-#  project: default
-#  source:
-#    repoURL: https://helm.ngc.nvidia.com/nvidia
-#    chart: gpu-operator
-#    targetRevision: v24.9.0
-#    helm:
-#      releaseName: nvidia-gpu-operator
-#      values: |
-#        toolkit:
-#          enabled: "false"
-#        driver:
-#          enabled: "false"
-#        nfd:
-#          enabled: "false"
-#        toolkit:
-#          env:
-#            - name: CONTAINERD_RUNTIME_CLASS
-#              value: "nvidia"
-#            - name: CONTAINERD_SOCKET
-#              value: "/run/k3s/containerd/containerd.sock"
-#            - name: CONTAINERD_CONFIG
-#              value: "/var/lib/rancher/k3s/agent/etc/containerd/config.toml"
-#  destination:
-#    server: https://kubernetes.default.svc
-#    namespace: gpu-operator
-#  syncPolicy:
-#    automated:
-#      prune: true
-#      selfHeal: true
-#    syncOptions:
-#      - CreateNamespace=true
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvidia-gpu-operator
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://helm.ngc.nvidia.com/nvidia
+    chart: gpu-operator
+    targetRevision: v24.9.0
+    helm:
+      releaseName: nvidia-gpu-operator
+      values: |
+        toolkit:
+          enabled: "true"
+        driver:
+          enabled: "true"
+        nfd:
+          enabled: "false"
+        toolkit:
+          env:
+            - name: CONTAINERD_RUNTIME_CLASS
+              value: "nvidia"
+            - name: CONTAINERD_SOCKET
+              value: "/run/k3s/containerd/containerd.sock"
+            - name: CONTAINERD_CONFIG
+              value: "/var/lib/rancher/k3s/agent/etc/containerd/config.toml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gpu-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
