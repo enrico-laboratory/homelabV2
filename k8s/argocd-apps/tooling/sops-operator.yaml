@@ -1,31 +1,31 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: sops-operator
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: tooling
-  source:
-    repoURL: https://isindir.github.io/sops-secrets-operator
-    chart: sops-secrets-operator
-    targetRevision: 0.22.0
-    helm:
-      values: |
-        secretsAsFiles:
-          - mountPath: /etc/sops-age-key
-            name: sops-age-key
-            secretName: age-key
-        extraEnv:
-          - name: SOPS_AGE_KEY_FILE
-            value: /etc/sops-age-key/key.txt
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: sops-secrets-operator
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: sops-operator
+#  namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: https://isindir.github.io/sops-secrets-operator
+#    chart: sops-secrets-operator
+#    targetRevision: 0.22.0
+#    helm:
+#      values: |
+#        secretsAsFiles:
+#          - mountPath: /etc/sops-age-key
+#            name: sops-age-key
+#            secretName: age-key
+#        extraEnv:
+#          - name: SOPS_AGE_KEY_FILE
+#            value: /etc/sops-age-key/key.txt
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: sops-secrets-operator
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
