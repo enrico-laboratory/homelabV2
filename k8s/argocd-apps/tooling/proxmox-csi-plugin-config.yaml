@@ -13,7 +13,7 @@ spec:
     path: k8s/tooling/csi-config/
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: csi-proxmox
+    namespace: proxmox-csi
   syncPolicy:
     automated:
       prune: true
