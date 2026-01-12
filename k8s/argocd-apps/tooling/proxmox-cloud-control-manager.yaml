@@ -15,8 +15,8 @@ spec:
       releaseName: proxmox-ccm
       values: |
         # Reuse your Sealed Secret
-        configSecretName: "proxmox-csi-config"
-        useDaemonSet: true
+        existingConfigSecret: "proxmox-csi-config"
+        useDaemonSet: false
 
         # Scheduling: Run on the control plane
         nodeSelector:
