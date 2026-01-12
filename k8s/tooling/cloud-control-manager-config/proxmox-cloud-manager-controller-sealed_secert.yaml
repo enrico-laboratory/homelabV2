@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: proxmox-csi-config
+  namespace: kube-system
+spec:
+  encryptedData:
+    config.yaml: AgCnPnj79+7vOWqVv9F/guU41FMBK1ebaRAKRGHI9lfG4j7/ZcFESW3DUfbvlOq+U5N8S6JpDHENPBcAjr9PbmmB3WHeildlpHx4R1JVNBlHWwc1c7l3xNl8yAGuqNF0n4sVSv5+cEVrCP09Cij/9hoT2rhP3kiEjwCM/ZpfWE5d41vIpgWpa8OylHfp079vScs8nGRrTL8EDpyiag1grNpaN/11mgb+5rUSG9AD3GczdZGfBeqXdrMf1Eu4fPwIoVqQ19grKyi51zTm6prFr+JaVlCs/DtG0ARAChE01BbHLukZE9WAok5igdgIw8LJNQbNlOaDRrFcSv7DPjE43q2OGwVcJDFSrs51TECYiiSoaLLymADqZejTeEOy+kV3DxQyspNRrjIaOuMA2Om3p58hi19dtMWmktYqs6yCnrXrrEc1rxV1kLcT1/1kTo2VYAGseVYX7ESRH9Vhf/j1n2HICj+m8M1k1Om7W9M6JtjQm9jVrP5yHUOj5sU3uypqwq/Mvy8Ntay1z1CnAk+rWBeEeq1H8ya3rDNgDsNwIvcnR6uqFo8y68zj7jjnfCBsKRfXChJ4Um6AU86xoPMwUw3BXSxAv5vpAosc/y4dvRV9uKpCtVUZlKJ4JcCzB81O1veZOYRDlq09KGizRsQ7iQwOzhjv4jv15/Iwl6rm9jb997CpKRwVZIzb4cG0kaDwSeFv3o4D5ue8GufsNwLZwGRkEHGf8uwwrOGnp1ENvMGXjJ09XLB5PmhXG+3vYC+a89LHCkPe6dbsZRQeOPlYwk16Qf6H/XgtWQdY0gMPY8F0NQ2f5j5W/FjsxR0Jn1FUTl0tK3xihjnM+XaHURVqxAiOiPQU8OO+/5wC0ZDYCSO6Nz2dIrKOAGhiQ1Sl7DhDPoFDKsvYeCiHqxudIfVOLzezHOPAbvejCJrw/F77lvEr8zsJT6jC58jvXMW/1Oxxks+C4SsvFPGSGQQW7C8QutM=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: proxmox-csi-config
+      namespace: kube-system
