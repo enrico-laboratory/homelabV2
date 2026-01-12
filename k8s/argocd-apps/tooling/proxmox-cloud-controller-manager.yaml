@@ -14,21 +14,20 @@ spec:
     helm:
       releaseName: proxmox-ccm
       values: |
-        # Reuse your Sealed Secret
-        existingConfigSecret: "proxmox-csi-config"
         useDaemonSet: false
-
+        existingConfigSecret: "proxmox-csi-config"
+        existingConfigSecretKey: "config.yaml"
+        
         # Scheduling: Run on the control plane
         nodeSelector:
           node-role.kubernetes.io/control-plane: "true"
-
         # Important for k3s: CCM needs to be able to talk to the API server
         hostNetwork: true
 
         # CCM needs to run with specific arguments for k3s compatibility
         extraArgs:
           - --v=2
-          - --cloud-config=/etc/cloud/config.yaml
+          - --cloud-config=/etc/kubernetes/cloud-config/config.yaml
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kube-system
