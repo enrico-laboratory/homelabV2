@@ -37,10 +37,12 @@ spec:
             - name: JELLYFIN_PublishedServerUrl
               value: "192.168.56.30"
           volumeMounts:
-#            - name: dri
-#              mountPath: /dev/dri
             - mountPath: /config
               name: config
+            - mountPath: /config/data
+              name: data
+            - mountPath: /config/cache
+              name: cache
             - mountPath: /data/tvshows
               name: tv-shows
               readOnly: false
@@ -53,12 +55,15 @@ spec:
             - mountPath: /data/video
               name: videos
       volumes:
-#        - name: dri
-#          hostPath:
-#            path: /dev/dri
         - name: config
           persistentVolumeClaim:
-            claimName: jellyfin-pvc    
+            claimName: jellyfin-pvc-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: jellyfin-pvc-data
+        - name: cache
+          persistentVolumeClaim:
+            claimName: jellyfin-pvc-cache
         - name: tv-shows
           nfs:
             server: 192.168.100.62
