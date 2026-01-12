@@ -1,0 +1,42 @@
+---
+- name: Configure IOMMU in GRUB
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet {{ cpu_vendor }}_iommu=on iommu=pt video=efifb:off"'
+  notify:
+    - update-grub
+    - reboot-server
+
+- name: Load VFIO kernel modules
+  copy:
+    dest: /etc/modules-load.d/vfio.conf
+    content: |
+      vfio
+      vfio_iommu_type1
+      vfio_pci
+      vfio_virqfd
+  notify:
+    - update-initramfs
+    - reboot-server
+
+- name: Blacklist host GPU drivers
+  copy:
+    dest: /etc/modprobe.d/blacklist.conf
+    content: |
+      blacklist nouveau
+      blacklist nvidia
+      blacklist nvidiafb
+      blacklist radeon
+      blacklist amdgpu
+  notify:
+    - update-initramfs
+    - reboot-server
+
+- name: Assign GPU IDs to VFIO-PCI
+  template:
+    src: vfio.conf.j2
+    dest: /etc/modprobe.d/vfio.conf
+  notify:
+    - update-initramfs
+    - reboot-server

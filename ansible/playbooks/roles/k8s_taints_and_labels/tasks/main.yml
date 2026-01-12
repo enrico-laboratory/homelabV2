@@ -1,0 +1,33 @@
+- name: Apply Proxmox Topology Labels to ALL nodes
+  kubernetes.core.k8s:
+    state: patched
+    kind: Node
+    name: "{{ item }}"
+    definition:
+      metadata:
+        labels:
+          topology.kubernetes.io/zone: "{{ dynamic_zone }}"
+          topology.kubernetes.io/region: "{{ region }}"
+  loop: "{{ groups['k3s_cluster'] }}"
+
+- name: Apply Proxmox Topology Labels to ALL nodes
+  kubernetes.core.k8s:
+    state: patched
+    kind: Node
+    name: "k3s-113"
+    definition:
+      metadata:
+        labels:
+          nvidia.com/gpu.present: "true"
+
+- name: Taint Server (Master) Nodes
+  kubernetes.core.k8s_taint:
+    state: present
+    name: "{{ item }}"
+    taints:
+      - key: "node-role.kubernetes.io/control-plane"
+        effect: "NoSchedule"
+      - key: "node-role.kubernetes.io/master"
+        effect: "NoSchedule"
+  # Targets your HA masters (101, 102, 103)
+  loop: "{{ groups['server'] }}"

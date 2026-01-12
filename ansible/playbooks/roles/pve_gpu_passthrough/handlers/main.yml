@@ -1,0 +1,10 @@
+---
+- name: update-grub
+  command: update-grub
+
+- name: update-initramfs
+  command: update-initramfs -u -k all
+
+- name: reboot-server
+  reboot:
+    msg: "Rebooting to apply IOMMU kernel settings"
