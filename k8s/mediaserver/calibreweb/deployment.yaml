@@ -30,15 +30,10 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
-            - mountPath: /config-temp
-              name: config2
             - mountPath: /data/books
               name: books
       volumes:
         - name: config
-          persistentVolumeClaim:
-            claimName: calibre-web-pvc
-        - name: config2
           persistentVolumeClaim:
             claimName: calibre-web-pvc-pve
         - name: books
