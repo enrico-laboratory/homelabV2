@@ -20,7 +20,7 @@ spec:
 
         # Scheduling: Run on the control plane
         nodeSelector:
-          node-role.kubernetes.io/control-plane: ""
+          node-role.kubernetes.io/control-plane: "true"
 
         # Important for k3s: CCM needs to be able to talk to the API server
         hostNetwork: true
