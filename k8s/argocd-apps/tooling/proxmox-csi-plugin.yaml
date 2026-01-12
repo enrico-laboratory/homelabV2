@@ -14,7 +14,7 @@ spec:
     helm:
       releaseName: proxmox-csi
       values: |
-        configSecretName: "proxmox-csi-config"
+        existingConfigSecret: "proxmox-csi-config"
 
         # Optional: Adjust the log level if you are troubleshooting
         # logLevel: 2
