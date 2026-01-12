@@ -1,36 +1,36 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: longhorn
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  syncPolicy:
-    automated:
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-  project: tooling
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: longhorn-system
-  sources:
-    - chart: longhorn
-      repoURL: https://charts.longhorn.io/
-      targetRevision: v1.10.1
-      helm:
-        values: |
-          preUpgradeChecker:
-            jobEnabled: false
-          service:
-            ui: 
-              type: NodePort
-              nodePort: "30123"
-          defaultSettings:
-            backupTarget: "nfs://192.168.100.60:/mnt/backup-pool-1/longhorn-backup"
-            defaultDataPath: "/var/lib/longhorn/"
-      #     ingress:
-      #       enabled: true
-      #       ingressClassName: nginx
-
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: longhorn
+#  namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
+#spec:
+#  syncPolicy:
+#    automated:
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
+#  project: tooling
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: longhorn-system
+#  sources:
+#    - chart: longhorn
+#      repoURL: https://charts.longhorn.io/
+#      targetRevision: v1.10.1
+#      helm:
+#        values: |
+#          preUpgradeChecker:
+#            jobEnabled: false
+#          service:
+#            ui:
+#              type: NodePort
+#              nodePort: "30123"
+#          defaultSettings:
+#            backupTarget: "nfs://192.168.100.60:/mnt/backup-pool-1/longhorn-backup"
+#            defaultDataPath: "/var/lib/longhorn/"
+#      #     ingress:
+#      #       enabled: true
+#      #       ingressClassName: nginx
+#
