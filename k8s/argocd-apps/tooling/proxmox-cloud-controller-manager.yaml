@@ -28,7 +28,7 @@ spec:
             key: node-role.kubernetes.io/control-plane
             operator: Exists
           - effect: NoSchedule
-            key: node.cloudprovider.kubernetes.io/uninitialized
+            key: node-role.kubernetes.io/master
             operator: Exists
         # CCM needs to run with specific arguments for k3s compatibility
         extraArgs:
