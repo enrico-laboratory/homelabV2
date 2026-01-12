@@ -1,0 +1,8 @@
+- name: Create custom k3s resolv.conf without search domains
+  copy:
+    dest: "{{ k3s_resolv_path }}"
+    content: |
+      {% for server in custom_dns_servers %}
+      nameserver {{ server }}
+      {% endfor %}
+    mode: '0644'

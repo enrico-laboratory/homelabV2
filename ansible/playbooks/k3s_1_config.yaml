@@ -50,7 +50,8 @@
       ansible.builtin.include_role:
         name: k3s_resolve_conf
 
-    - name: Add longhorn volumes to worker
-      when: group_names is contains('agent') and group_names is not contains('bare_metal')
-      ansible.builtin.include_role:
-        name: k3s_volumes
+#   Solution with Longhorn volumes is not anymore in use
+#    - name: Add longhorn volumes to worker
+#      when: group_names is contains('agent') and group_names is not contains('bare_metal')
+#      ansible.builtin.include_role:
+#        name: k3s_volumes

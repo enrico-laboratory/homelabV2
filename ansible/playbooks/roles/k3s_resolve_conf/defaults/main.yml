@@ -1,0 +1,4 @@
+custom_dns_servers:
+  - 8.8.8.8
+  - 1.1.1.1
+k3s_resolv_path: "/etc/k3s-resolv.conf"
