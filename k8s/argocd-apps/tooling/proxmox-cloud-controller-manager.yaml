@@ -27,7 +27,7 @@ spec:
         # CCM needs to run with specific arguments for k3s compatibility
         extraArgs:
           - --v=2
-          - --cloud-config=/etc/kubernetes/cloud-config/config.yaml
+          - --cloud-config=/etc/proxmox/config.yaml
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kube-system
