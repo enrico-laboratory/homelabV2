@@ -30,6 +30,8 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
+            - mountPath: /config-temp
+              name: config-temp
             - mountPath: /data/books
               name: books
       volumes:
