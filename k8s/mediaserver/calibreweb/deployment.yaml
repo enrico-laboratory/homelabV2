@@ -40,7 +40,7 @@ spec:
             claimName: calibre-web-pvc
         - name: config2
           persistentVolumeClaim:
-            claimName: calibre-web-pvc
+            claimName: calibre-web-pvc-pve
         - name: books
           nfs:
             server: 192.168.100.62
