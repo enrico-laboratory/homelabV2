@@ -18,14 +18,16 @@ spec:
           enabled: "true"
         dcgmExporter:
           enabled: "true"
-        toolkit:
-          enabled: "true"
         driver:
           enabled: "true"
         nfd:
           enabled: "false"
         toolkit:
+          enabled: "true"
+          installDir: "/usr/bin"
           env:
+            - name: RUNTIME_PATH
+              value: "/usr/bin/nvidia-container-runtime"
             - name: CONTAINERD_RUNTIME_CLASS
               value: "nvidia"
             - name: CONTAINERD_SOCKET
