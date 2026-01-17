@@ -12,7 +12,7 @@ spec:
         - prowlarr.enricoruggieri.com
       secretName: prowlarr-tls
   rules:
-    - host: prowlarr.yourdomain.com
+    - host: prowlarr.enricoruggieri.com
       http:
         paths:
           - path: /
