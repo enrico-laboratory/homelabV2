@@ -14,6 +14,8 @@ spec:
     helm:
       releaseName: nvidia-gpu-operator
       values: |
+        operator:
+          defaultRuntime: containerd
         gfd:
           enabled: "true"
         dcgmExporter:
@@ -23,17 +25,17 @@ spec:
         nfd:
           enabled: "false"
         toolkit:
-          enabled: "false"
-          installDir: "/usr/bin"
+          enabled: "true"
+          installDir: "/usr/bin/nvidia-toolkit"
           env:
-            - name: RUNTIME_PATH
-              value: "/usr/bin/nvidia-container-runtime"
             - name: CONTAINERD_RUNTIME_CLASS
               value: "nvidia"
             - name: CONTAINERD_SOCKET
               value: "/run/k3s/containerd/containerd.sock"
             - name: CONTAINERD_CONFIG
               value: "/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl"
+        devicePlugin:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: gpu-operator
