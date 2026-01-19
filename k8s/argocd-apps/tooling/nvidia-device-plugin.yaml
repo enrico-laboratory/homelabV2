@@ -1,0 +1,29 @@
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: nvidia-device-plugin
+#  namespace: argocd
+#spec:
+#  project: tooling
+#  source:
+#    repoURL: 'https://nvidia.github.io/k8s-device-plugin'
+#    chart: nvidia-device-plugin
+#    targetRevision: 0.18.0  # Current stable as of 2026
+#    helm:
+#      values: |
+#        runtimeClassName: nvidia
+#
+#        priorityClassName: system-node-critical
+#
+#        # Only deploy to nodes that actually have the NVIDIA driver
+#        nodeSelector:
+#          nvidia.com/gpu.present: "true"
+#  destination:
+#    server: 'https://kubernetes.default.svc'
+#    namespace: nvidia-device-plugin
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
