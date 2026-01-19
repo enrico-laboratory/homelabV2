@@ -50,16 +50,48 @@
     repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
     state: present
 
-- name: Install the Packages
+- name: Install nvidia Drivers
   ansible.builtin.apt:
     name:
-      - "nvidia-driver-{{ nvidia_driver_version }}"
-#      - "nvidia-container-toolkit"
+    - "nvidia-driver-{{ nvidia_driver_version }}"
+    - "nvidia-utils-{{ nvidia_driver_version }}"
+    state: present
+    update_cache: yes
+  notify:
+    - reboot-node
+
+- name: Install the Nvidia toolkit Packages
+  ansible.builtin.apt:
+    name:
+      - "nvidia-container-toolkit"
 #      - "nvidia-container-toolkit={{ nvidia_container_toolkit_version }}"
 #      - "nvidia-container-toolkit-base={{ nvidia_container_toolkit_version }}"
 #      - "libnvidia-container-tools={{ nvidia_container_toolkit_version }}"
 #      - "libnvidia-container1={{ nvidia_container_toolkit_version }}"
     state: present
-    update_cache: yes
+    update_cache: no
   notify:
     - restart-k3s
+
+- name: Setup K3s Template
+  block:
+  - name: Create K3s containerd config directory
+    ansible.builtin.file:
+      path: /var/lib/rancher/k3s/agent/etc/containerd
+      state: directory
+      mode: '0755'
+
+  - name: Create config.toml.tmpl with base template
+    ansible.builtin.copy:
+      dest: /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
+      content: |
+        {{ "{{" }}template "base" .{{ "}}" }}
+        
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+          runtime_type = "io.containerd.runc.v2"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+          BinaryName = "/usr/bin/nvidia-container-runtime"
+            mode: '0644'
+      force: no
+    notify:
+      - restart-k3s
