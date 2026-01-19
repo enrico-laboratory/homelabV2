@@ -1,69 +1,69 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nvidia-gpu-operator
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  source:
-    repoURL: https://helm.ngc.nvidia.com/nvidia
-    chart: gpu-operator
-    targetRevision: v24.9.0
-    helm:
-      releaseName: nvidia-gpu-operator
-      values: |
-        hostPaths:
-          driverInstallDir: "/"
-
-        operator:
-          defaultRuntime: containerd
-
-        driver:
-          enabled: false
-
-        toolkit:
-          enabled: false
-
-        devicePlugin:
-          enabled: true
-        
-        dcgmExporter:
-          enabled: true
-
-        gfd:
-          enabled: true
-
-        migManager:
-          enabled: true
-
-        nodeStatusExporter:
-          enabled: false
-
-        gds:
-          enabled: false
-
-        vgpuManager:
-          enabled: false
-
-        vgpuDeviceManager:
-          enabled: false
-
-        sandboxWorkloads:
-          enabled: false
-
-        vfioManager:
-          enabled: false
-
-        nfd:
-          enabled: false
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: gpu-operator
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: nvidia-gpu-operator
+#  namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
+#spec:
+#  project: default
+#  source:
+#    repoURL: https://helm.ngc.nvidia.com/nvidia
+#    chart: gpu-operator
+#    targetRevision: v24.9.0
+#    helm:
+#      releaseName: nvidia-gpu-operator
+#      values: |
+#        hostPaths:
+#          driverInstallDir: "/"
+#
+#        operator:
+#          defaultRuntime: containerd
+#
+#        driver:
+#          enabled: false
+#
+#        toolkit:
+#          enabled: false
+#
+#        devicePlugin:
+#          enabled: true
+#
+#        dcgmExporter:
+#          enabled: true
+#
+#        gfd:
+#          enabled: true
+#
+#        migManager:
+#          enabled: true
+#
+#        nodeStatusExporter:
+#          enabled: false
+#
+#        gds:
+#          enabled: false
+#
+#        vgpuManager:
+#          enabled: false
+#
+#        vgpuDeviceManager:
+#          enabled: false
+#
+#        sandboxWorkloads:
+#          enabled: false
+#
+#        vfioManager:
+#          enabled: false
+#
+#        nfd:
+#          enabled: false
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: gpu-operator
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
