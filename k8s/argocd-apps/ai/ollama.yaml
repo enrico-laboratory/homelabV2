@@ -21,18 +21,8 @@ spec:
           size: 50Gi
           storageClass: proxmox-zfs-nvme 
         
-        # Resource limits
-        # resources:
-        #   requests:
-        #     memory: 4Gi
-        #     cpu: 2
-        #   limits:
-        #     memory: 8Gi
-        #     cpu: 4
-        
         # Ollama configuration
         ollama:
-           GPU support (uncomment if using GPU)
            gpu:
              enabled: true
              type: nvidia
@@ -43,16 +33,7 @@ spec:
             pull:
               - llama3.2:3b
               - nomic-embed-text
-        
-          # Optional: Custom models with specific parameters
-          # models:
-          #   create:
-          #     - name: llama3.1-ctx16384
-          #       template: |
-          #         FROM llama3.1:8b
-          #         PARAMETER num_ctx 16384
-          #   run:
-          #     - llama3.1-ctx16384
+              - qwen3-coder:30b
         
           # Environment variables
           extraEnv:
