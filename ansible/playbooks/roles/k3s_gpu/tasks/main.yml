@@ -1,12 +1,37 @@
-- name: Install prerequisite for quick sync
-  ansible.builtin.apt:
-    name:
-      - "nvidia-driver-{{ nvidia_driver_version }}"
-      - "nvidia-utils-{{ nvidia_driver_version }}"
-      - curl
-      - gnupg2
-    state: present
-    update_cache: yes
+#- name: Install prerequisite for quick sync
+#  ansible.builtin.apt:
+#    name:
+#      - "nvidia-driver-{{ nvidia_driver_version }}"
+#      - "nvidia-utils-{{ nvidia_driver_version }}"
+#      - curl
+#      - gnupg2
+#    state: present
+#    update_cache: yes
+#
+
+- name: Blacklist Nouveau driver
+  copy:
+    dest: /etc/modprobe.d/blacklist-nouveau.conf
+    content: |
+      blacklist nouveau
+      options nouveau modeset=0
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - update-initramfs
+    - reboot-node
+
+- name: Ensure IPMI handler is loaded
+  copy:
+    dest: /etc/modules-load.d/ipmi.conf
+    content: "ipmi_msghandler"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - update-initramfs
+    - reboot-node
 
 - name: Download NVIDIA GPG key (ASCII)
   ansible.builtin.get_url:
@@ -25,14 +50,16 @@
     repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
     state: present
 
-- name: Install the NVIDIA Container Toolkit packages
+- name: Install the Packages
   ansible.builtin.apt:
     name:
-      - "nvidia-container-toolkit={{ nvidia_container_toolkit_version }}"
-      - "nvidia-container-toolkit-base={{ nvidia_container_toolkit_version }}"
-      - "libnvidia-container-tools={{ nvidia_container_toolkit_version }}"
-      - "libnvidia-container1={{ nvidia_container_toolkit_version }}"
+      - "nvidia-driver-{{ nvidia_driver_version }}"
+#      - "nvidia-container-toolkit"
+#      - "nvidia-container-toolkit={{ nvidia_container_toolkit_version }}"
+#      - "nvidia-container-toolkit-base={{ nvidia_container_toolkit_version }}"
+#      - "libnvidia-container-tools={{ nvidia_container_toolkit_version }}"
+#      - "libnvidia-container1={{ nvidia_container_toolkit_version }}"
     state: present
     update_cache: yes
-
-
+  notify:
+    - restart-k3s

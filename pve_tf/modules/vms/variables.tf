@@ -75,16 +75,9 @@ variable "user_name" {
   type = string
 }
 
-variable "cpu" {
-  type = number
-}
 variable "cpu_type" {
   type    = string
   default = "x86-64-v2-AES"
-}
-
-variable "memory" {
-  type = number
 }
 
 variable "machine_type" {
@@ -134,4 +127,27 @@ variable "started" {
 variable "on_boot" {
   type    = bool
   default = false
+}
+
+variable "vm_gpu" {
+  type = object({
+    id = number
+    memory = number
+    cpu = number
+  })
+  default = {
+    id     = 0
+    memory = 0
+    cpu    = 0
+  }
+}
+
+variable "memory_default" {
+    type    = number
+    default = 2048
+}
+
+variable "cpu_default" {
+    type    = number
+    default = 4
 }

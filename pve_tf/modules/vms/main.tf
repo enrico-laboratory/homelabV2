@@ -10,12 +10,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   }
 
   cpu {
-    cores = var.cpu
+    cores = var.vm_id == var.vm_gpu.id ? var.vm_gpu.cpu : var.cpu_default
     type  = var.cpu_type
   }
 
   memory {
-    dedicated = var.memory
+    dedicated = var.vm_id == var.vm_gpu.id ? var.vm_gpu.memory : var.memory_default
   }
 
   dynamic "initialization" {

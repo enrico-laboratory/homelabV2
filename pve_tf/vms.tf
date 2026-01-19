@@ -4,9 +4,9 @@ module "k3s-masters" {
 
   on_boot          = true
   started          = true
-  cpu              = 4
+  cpu_default      = 4
   hostname         = "k3s-${var.k3s_master_first_host + count.index}"
-  memory           = 3052
+  memory_default   = 3052
   node_name        = var.node_name
   user_name        = var.user_name
   vm_id            = var.k3s_master_first_host + count.index
@@ -28,11 +28,16 @@ module "k3s-workers" {
   source = "./modules/vms"
   count  = var.k3s_workers_count
 
-  on_boot          = true
-  started          = true
-  cpu              = 4
-  hostname         = "k3s-${var.k3s_worker_first_host + count.index}"
-  memory           = 4096
+  on_boot        = true
+  started        = true
+  cpu_default    = 4
+  hostname       = "k3s-${var.k3s_worker_first_host + count.index}"
+  memory_default = 4096
+  vm_gpu = {
+    id     = 113
+    memory = 8192
+    cpu    = 6
+  }
   node_name        = var.node_name
   user_name        = var.user_name
   vm_id            = var.k3s_worker_first_host + count.index
@@ -58,9 +63,9 @@ module "proxy" {
 
   on_boot          = true
   started          = true
-  cpu              = 2
+  cpu_default      = 2
   hostname         = "k3s-proxy"
-  memory           = 2048
+  memory_default   = 2048
   node_name        = var.node_name
   user_name        = var.user_name
   vm_id            = 140
@@ -83,9 +88,9 @@ module "truenas" {
 
   on_boot            = true
   started            = true
-  cpu                = 2
+  cpu_default        = 2
   hostname           = "truenas"
-  memory             = 6144
+  memory_default     = 6144
   node_name          = var.node_name
   user_name          = var.user_name
   vm_id              = 160
