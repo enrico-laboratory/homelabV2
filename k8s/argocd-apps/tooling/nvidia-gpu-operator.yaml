@@ -23,7 +23,7 @@ spec:
         nfd:
           enabled: "false"
         toolkit:
-          enabled: "true"
+          enabled: "false"
           installDir: "/usr/bin"
           env:
             - name: RUNTIME_PATH
