@@ -8,7 +8,7 @@ metadata:
 spec:
   description: Project for the AI workloads
   sourceRepos:
-    - 'https://github.com/enrico-laboratory/homelabV2'
+    - '*'
   destinations:
     - namespace: "ai"
       server: https://kubernetes.default.svc
