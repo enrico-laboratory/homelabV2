@@ -19,6 +19,13 @@ spec:
         
         driver:
           enabled: true
+          resources:
+            limits:
+              cpu: "2"       # Limit to 2 cores to prevent node lockup
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
         
         toolkit:
           enabled: true
