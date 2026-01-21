@@ -6,9 +6,9 @@ ssh_keys
 auth.yaml
 
 .terraform
-.terraform.lock.hcl
+.terraform.lock.*
 pve_credentials
-terraform.tfstate*
+*terraform.tfstate*
 /dns/terraform.tfvars
 terraform.tfvars.decrypted
 
