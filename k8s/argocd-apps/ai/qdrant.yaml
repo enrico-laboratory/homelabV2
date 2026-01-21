@@ -26,14 +26,15 @@ spec:
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-cloudflare
           hosts:
-          - host: ollama.enricoruggieri.com
+          - host: qdrant.enricoruggieri.com
             paths:
               - path: /
                 pathType: Prefix
+                servicePort: 6333
           tls:
-            - secretName: ollama-tls
+            - secretName: qdrant-tls
               hosts:
-                - ollama.enricoruggieri.com
+                - qdrant.enricoruggieri.com
   destination:
     server: https://kubernetes.default.svc
     namespace: ai
