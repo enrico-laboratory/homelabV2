@@ -19,8 +19,11 @@ spec:
           enabled: true
           size: 50Gi
           storageClass: "proxmox-zfs-nvme"
-        
-        # Ollama configuration
+
+        service:
+          type: NodePort
+          nodePort: 31434
+
         ollama:
           gpu:
             enabled: true
