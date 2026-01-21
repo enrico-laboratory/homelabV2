@@ -20,10 +20,6 @@ spec:
           size: 50Gi
           storageClass: "proxmox-zfs-nvme"
 
-        service:
-          type: NodePort
-          nodePort: 31434
-
         ollama:
           gpu:
             enabled: true
@@ -44,22 +40,20 @@ spec:
             - name: OLLAMA_HOST
               value: "0.0.0.0"
         
-        # Ingress (optional)
         ingress:
-          enabled: false
-          # enabled: true
-          # className: nginx
-          # annotations:
-          #   cert-manager.io/cluster-issuer: letsencrypt-prod
-          # hosts:
-          #   - host: ollama.yourdomain.com
-          #     paths:
-          #       - path: /
-          #         pathType: Prefix
-          # tls:
-          #   - secretName: ollama-tls
-          #     hosts:
-          #       - ollama.yourdomain.com
+          enabled: true
+          className: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+          hosts:
+          - host: ollama.enricoruggieri.com
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: ollama-tls
+            hosts:
+              - ollama.enricoruggieri.com
 
   destination:
     server: https://kubernetes.default.svc

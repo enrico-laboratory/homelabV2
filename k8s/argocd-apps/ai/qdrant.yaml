@@ -19,6 +19,21 @@ spec:
         config:
           service:
             enable_tls: false
+
+        ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+          hosts:
+          - host: ollama.enricoruggieri.com
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: ollama-tls
+            hosts:
+              - ollama.enricoruggieri.com
   destination:
     server: https://kubernetes.default.svc
     namespace: ai
