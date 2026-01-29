@@ -38,10 +38,10 @@ spec:
             claimName: sonarr-pvc-pve
         - name: tvshows
           nfs:
-            server: 192.168.100.160
+            server: nas.enricoruggieri.com
             path: /tank-data/media/tv-shows
             readOnly: false
         - name: downloads
           nfs:
-            server: 192.168.100.160
+            server: nas.enricoruggieri.com
             path: /tank-data/media/torrents/

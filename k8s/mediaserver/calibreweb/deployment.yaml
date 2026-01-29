@@ -38,5 +38,5 @@ spec:
             claimName: calibre-web-pvc-pve
         - name: books
           nfs:
-            server: 192.168.100.160
+            server: nas.enricoruggieri.com
             path: /tank-data/media/library/books
