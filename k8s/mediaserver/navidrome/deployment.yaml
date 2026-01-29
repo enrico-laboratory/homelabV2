@@ -44,6 +44,6 @@ spec:
             claimName: navidrome-pvc
         - name: music
           nfs:
-            server: nas.enricoruggieri.com
+            server: 192.168.100.160
             path: /tank-data/media/music/music
             readOnly: true

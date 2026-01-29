@@ -45,11 +45,11 @@ spec:
             path: /fast-pool1/docker-configs/audiobookshelf/metadata
         - name: audiobooks
           nfs:
-            server: nas.enricoruggieri.com
+            server: 192.168.100.160
             path: /tank-data/media/audiobooks
             readOnly: false
         - name: podcast
           nfs:
-            server: nas.enricoruggieri.com
+            server: 192.168.100.160
             path: /tank-data/media/podcast
             readOnly: false

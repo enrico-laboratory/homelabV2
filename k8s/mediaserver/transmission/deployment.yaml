@@ -53,9 +53,9 @@ spec:
             claimName: transmission-pvc-pve
         - name: downloads
           nfs:
-            server: nas.enricoruggieri.com
+            server: 192.168.100.160
             path: /tank-data/media/torrents/
         - name: watch
           nfs:
-            server: nas.enricoruggieri.com
+            server: 192.168.100.160
             path: /tank-data/media/torrent-watch/
