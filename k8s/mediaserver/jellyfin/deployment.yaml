@@ -66,21 +66,21 @@ spec:
             claimName: jellyfin-pvc-cache
         - name: tv-shows
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/tv-shows
+            server: nas.enricoruggieri.com
+            path: /tank/media/tv-shows
             readOnly: false
         - name: movies
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/movies
+            server: nas.enricoruggieri.com
+            path: /tank/media/movies
             readOnly: false
         - name: music
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/music
+            server: nas.enricoruggieri.com
+            path: /tank/media/music
             readOnly: false
         - name: videos
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/videos
+            server: nas.enricoruggieri.com
+            path: /tank/media/videos
             readOnly: false

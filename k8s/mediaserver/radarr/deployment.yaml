@@ -38,9 +38,9 @@ spec:
             claimName: radarr-pvc-pve
         - name: movies
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/movies
+            server: nas.enricoruggieri.com
+            path: /tank/media/movies
         - name: downloads
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/torrents/
+            server: nas.enricoruggieri.com
+            path: /tank/media/torrents/

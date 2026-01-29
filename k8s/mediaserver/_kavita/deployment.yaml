@@ -34,12 +34,12 @@ spec:
         - name: config
           nfs:
             server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/kavita
+            path: /fast-pool1/docker-configs/kavita
         - name: books
           nfs:
             server: 192.168.100.61
-            path: /mnt/slow-pool/library/books
+            path: /slow-pool/library/books
         - name: books-kavita
           nfs:
             server: 192.168.100.61
-            path: /mnt/slow-pool/library-kavita
+            path: /slow-pool/library-kavita

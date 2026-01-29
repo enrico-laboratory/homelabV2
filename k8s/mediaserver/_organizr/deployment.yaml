@@ -40,5 +40,5 @@ spec:
         - name: config
           nfs:
             server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/organizr
+            path: /fast-pool1/docker-configs/organizr
 

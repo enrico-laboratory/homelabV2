@@ -38,18 +38,18 @@ spec:
         - name: config
           nfs:
             server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/audiobookshelf/config
+            path: /fast-pool1/docker-configs/audiobookshelf/config
         - name: metadata
           nfs:
             server: 192.168.100.61
-            path: /mnt/fast-pool1/docker-configs/audiobookshelf/metadata
+            path: /fast-pool1/docker-configs/audiobookshelf/metadata
         - name: audiobooks
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/audiobooks
+            server: nas.enricoruggieri.com
+            path: /tank/media/audiobooks
             readOnly: false
         - name: podcast
           nfs:
-            server: 192.168.100.62
-            path: /mnt/tank/media/podcast
+            server: nas.enricoruggieri.com
+            path: /tank/media/podcast
             readOnly: false

@@ -36,6 +36,6 @@
 #       volumes:
 #         - name: data
 #           nfs:
-#             server: 192.168.100.62
-#             path: /mnt/fast-pool1/docker-configs/postgres/data
+#             server: nas.enricoruggieri.com
+#             path: /fast-pool1/docker-configs/postgres/data
 
