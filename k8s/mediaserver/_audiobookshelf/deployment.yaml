@@ -46,10 +46,10 @@ spec:
         - name: audiobooks
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/audiobooks
+            path: /tank-data/media/audiobooks
             readOnly: false
         - name: podcast
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/podcast
+            path: /tank-data/media/podcast
             readOnly: false

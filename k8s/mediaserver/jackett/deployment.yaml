@@ -42,4 +42,4 @@ spec:
         - name: downloads
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/torrents/
+            path: /tank-data/media/torrents/

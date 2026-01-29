@@ -39,4 +39,4 @@ spec:
         - name: books
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/library/books
+            path: /tank-data/media/library/books

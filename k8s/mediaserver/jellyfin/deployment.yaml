@@ -67,20 +67,20 @@ spec:
         - name: tv-shows
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/tv-shows
+            path: /tank-data/media/tv-shows
             readOnly: false
         - name: movies
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/movies
+            path: /tank-data/media/movies
             readOnly: false
         - name: music
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/music
+            path: /tank-data/media/music
             readOnly: false
         - name: videos
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/videos
+            path: /tank-data/media/videos
             readOnly: false

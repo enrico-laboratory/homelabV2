@@ -39,8 +39,8 @@ spec:
         - name: movies
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/movies
+            path: /tank-data/media/movies
         - name: downloads
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/torrents/
+            path: /tank-data/media/torrents/

@@ -45,5 +45,5 @@ spec:
         - name: music
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/music/music
+            path: /tank-data/media/music/music
             readOnly: true

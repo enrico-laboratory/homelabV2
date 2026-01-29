@@ -39,9 +39,9 @@ spec:
         - name: tvshows
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/tv-shows
+            path: /tank-data/media/tv-shows
             readOnly: false
         - name: downloads
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank/media/torrents/
+            path: /tank-data/media/torrents/
