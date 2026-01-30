@@ -3,13 +3,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: navidrome-pvc
   namespace: mediaserver
-  labels:
-    recurring-job-group.longhorn.io/every-week: enabled
-    recurring-job.longhorn.io/source: enabled 
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn-gpu
+  storageClassName: proxmox-zfs-nvme
   resources:
     requests:
       storage: 1Gi
