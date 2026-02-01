@@ -22,7 +22,10 @@ spec:
           enabled: true
           size: 50Gi
           storageClass: "proxmox-zfs-nvme"
-
+        tolerations:
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
         ollama:
           gpu:
             enabled: true

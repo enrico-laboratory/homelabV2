@@ -15,7 +15,12 @@ spec:
           enabled: true
           storageClassName: "proxmox-zfs-nvme"
           size: 30Gi
-
+        
+        tolerations:
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+        
         service:
           type: NodePort
           ports:
