@@ -1,68 +1,68 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: ollama
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: ai
-
-  source:
-    chart: ollama
-    repoURL: https://helm.otwld.com/
-    targetRevision: 1.40.0
-    helm:
-      releaseName: ollama
-      values: |
-        image:
-          repository: ollama/ollama
-          tag: "0.15.0"
-        persistentVolume:
-          enabled: true
-          size: 50Gi
-          storageClass: "proxmox-zfs-nvme"
-
-        ollama:
-          gpu:
-            enabled: true
-            type: nvidia
-            number: 1
-
-          # Models to pull at startup
-          models:
-            pull:
-              - llama3.2:3b
-              - nomic-embed-text
-              - qwen3-coder:30b
-
-          # Environment variables
-          extraEnv:
-            - name: OLLAMA_KEEP_ALIVE
-              value: "24h"
-            - name: OLLAMA_HOST
-              value: "0.0.0.0"
-
-        ingress:
-          enabled: true
-          className: nginx
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
-          hosts:
-          - host: ollama.enricoruggieri.com
-            paths:
-              - path: /
-                pathType: Prefix
-          tls:
-            - secretName: ollama-tls
-              hosts:
-                - ollama.enricoruggieri.com
-
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: ai
-
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: ollama
+#  namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
+#spec:
+#  project: ai
+#
+#  source:
+#    chart: ollama
+#    repoURL: https://helm.otwld.com/
+#    targetRevision: 1.40.0
+#    helm:
+#      releaseName: ollama
+#      values: |
+#        image:
+#          repository: ollama/ollama
+#          tag: "0.15.0"
+#        persistentVolume:
+#          enabled: true
+#          size: 50Gi
+#          storageClass: "proxmox-zfs-nvme"
+#
+#        ollama:
+#          gpu:
+#            enabled: true
+#            type: nvidia
+#            number: 1
+#
+#          # Models to pull at startup
+#          models:
+#            pull:
+#              - llama3.2:3b
+#              - nomic-embed-text
+#              - qwen3-coder:30b
+#
+#          # Environment variables
+#          extraEnv:
+#            - name: OLLAMA_KEEP_ALIVE
+#              value: "24h"
+#            - name: OLLAMA_HOST
+#              value: "0.0.0.0"
+#
+#        ingress:
+#          enabled: true
+#          className: nginx
+#          annotations:
+#            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+#          hosts:
+#          - host: ollama.enricoruggieri.com
+#            paths:
+#              - path: /
+#                pathType: Prefix
+#          tls:
+#            - secretName: ollama-tls
+#              hosts:
+#                - ollama.enricoruggieri.com
+#
+#  destination:
+#    server: https://kubernetes.default.svc
+#    namespace: ai
+#
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
