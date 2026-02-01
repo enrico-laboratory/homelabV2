@@ -3,11 +3,13 @@
   vars:
     argocd_repo: "https://argoproj.github.io/argo-helm"
     chart_ref: "argocd/argo-cd"
-    chart_version: "9.1.8"
+    chart_version: "9.3.7"
     state: "present"
     dynamic_zone: "pve-node3"
     region: "region-1"
   roles:
-#    - k8s_core_dns
+    - k8s_core_dns
     - k8s_taints_and_labels
-#    - k8s_argocd_deploy
+    - k8s_argocd_deploy
+    - k8s_argocd_base_projects_and_apps
+

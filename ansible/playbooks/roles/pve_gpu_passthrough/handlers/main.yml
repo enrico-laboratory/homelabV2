@@ -1,10 +1,11 @@
 ---
+- name: update-initramfs
+  command: update-initramfs -u
+
 - name: update-grub
   command: update-grub
+  notify: reboot-hypervisor
 
-- name: update-initramfs
-  command: update-initramfs -u -k all
-
-- name: reboot-server
+- name: reboot-hypervisor
   reboot:
-    msg: "Rebooting to apply IOMMU kernel settings"
+    msg: "Rebooting Hypervisor to apply IOMMU and VFIO settings"

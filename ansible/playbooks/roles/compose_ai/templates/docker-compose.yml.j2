@@ -36,7 +36,7 @@ services:
         condition: service_healthy
     environment:
       - OLLAMA_HOST=http://ollama:11434
-      - MODELS=qwen2.5-coder:32b-instruct-q4_K_M llama3.1:8b nomic-embed-text
+      - MODELS=qwen3-coder:30b llama3.1:8b nomic-embed-text
     volumes:
       - /data/models/ollama/models:/root/.ollama
     entrypoint: ""

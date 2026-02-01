@@ -1,0 +1,15 @@
+---
+- name: Deploy ArgoCD app_projects
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'app_projects.yml') | from_yaml }}"
+
+- name: Deploy ArgoCD argocd_app_of_apps
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'argocd_app_of_apps.yml') | from_yaml }}"
+
+- name: Deploy ArgoCD argocd_project
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'argocd_project.yml') | from_yaml }}"

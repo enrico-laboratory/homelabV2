@@ -6,16 +6,16 @@
   vars:
     ssh_pub_key_path: "~/.ssh/id_rsa.pub"
     zfs_pools:
-      - name: "tank"
+      - name: "vmimages"
         disks:
-          - "/dev/sdb"
+          - "/dev/nvme0n1"
         dataset_name: "images"
         storage:
           name: "vmimages"
           content: "images,rootdir"
       - name: "kube-pool"
         disks:
-          - "/dev/nvme1n1"
+          - "/dev/sdb"
         dataset_name: "kube-data"
         storage:
           name: "kubedata"
@@ -23,17 +23,24 @@
 
     storage_config_file_template: "pve_storage_config_node3"
     cpu_vendor: "amd"
-    gpu_ids: "10de:2504,10de:228e"
+    gpu_pci_ids:
+     - "10de:2504" # NVIDIA Corporation GA106 [GeForce RTX 3060 Lite Hash Rate]
+     - "10de:228e" # NVIDIA Corporation GA106 High Definition Audio Controller
+     - "10de:13c2" # NVIDIA Corporation GM204 [GeForce GTX 970]
+     - "10de:0fbb" # NVIDIA Corporation GM204 High Definition Audio Controller
     nfs_mounts:
       truenas-backup-vms:
         export: /mnt/backup-pool-1/proxmox-vms
         path: /mnt/pve/truenas-backup-vms
         server: "192.168.100.60"
         content: "iso,backup,images"
+    vmid: 201 # win11 vm vmid
+    pinned_cores: [21,22,23,24]
   roles:
 #    - pve_bootstrap_user
 #    - pve_manage_repositories
 #    - update_host
-    - pve_create_storage
-#    - pve_gpu_passthrough
+#    - pve_create_storage
+    - pve_gpu_passthrough
 #    - prometheus.prometheus.node_exporter
+#    - pve_cpu_pinning

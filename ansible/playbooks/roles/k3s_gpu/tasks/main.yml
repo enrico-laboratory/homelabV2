@@ -7,31 +7,30 @@
 #      - gnupg2
 #    state: present
 #    update_cache: yes
-#
 
-- name: Blacklist Nouveau driver
-  copy:
-    dest: /etc/modprobe.d/blacklist-nouveau.conf
-    content: |
-      blacklist nouveau
-      options nouveau modeset=0
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-    - update-initramfs
-    - reboot-node
+#- name: Blacklist Nouveau driver
+#  copy:
+#    dest: /etc/modprobe.d/blacklist-nouveau.conf
+#    content: |
+#      blacklist nouveau
+#      options nouveau modeset=0
+#    owner: root
+#    group: root
+#    mode: '0644'
+#  notify:
+#    - update-initramfs
+#    - reboot-node
 
-- name: Ensure IPMI handler is loaded
-  copy:
-    dest: /etc/modules-load.d/ipmi.conf
-    content: "ipmi_msghandler"
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-    - update-initramfs
-    - reboot-node
+#- name: Ensure IPMI handler is loaded
+#  copy:
+#    dest: /etc/modules-load.d/ipmi.conf
+#    content: "ipmi_msghandler"
+#    owner: root
+#    group: root
+#    mode: '0644'
+#  notify:
+#    - update-initramfs
+#    - reboot-node
 
 - name: Download NVIDIA GPG key (ASCII)
   ansible.builtin.get_url:
@@ -73,25 +72,21 @@
   notify:
     - restart-k3s
 
-- name: Setup K3s Template
-  block:
-  - name: Create K3s containerd config directory
-    ansible.builtin.file:
-      path: /var/lib/rancher/k3s/agent/etc/containerd
-      state: directory
-      mode: '0755'
+#- name: Setup K3s Template
+#  block:
+#  - name: Create K3s containerd config directory
+#    ansible.builtin.file:
+#      path: /var/lib/rancher/k3s/agent/etc/containerd
+#      state: directory
+#      mode: '0755'
 
-  - name: Create config.toml.tmpl with base template
-    ansible.builtin.copy:
-      dest: /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
-      content: |
-        {{ "{{" }}template "base" .{{ "}}" }}
-        
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
-          runtime_type = "io.containerd.runc.v2"
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
-          BinaryName = "/usr/bin/nvidia-container-runtime"
-            mode: '0644'
-      force: no
-    notify:
-      - restart-k3s
+#  - name: Create config.toml.tmpl with base template
+#    ansible.builtin.copy:
+#      dest: /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
+#      content: |
+#        {{ "{{" }}template "base" .{{ "}}" }}
+#
+#      mode: '0644'
+#      force: yes
+#    notify:
+#      - restart-k3s

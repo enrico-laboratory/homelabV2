@@ -1,12 +1,29 @@
 ---
-- name: Configure IOMMU in GRUB
-  lineinfile:
-    path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet {{ cpu_vendor }}_iommu=on iommu=pt video=efifb:off"'
-  notify:
-    - update-grub
-    - reboot-server
+- name: Copy the rom over
+  include_tasks: rom.yml
+
+- name: Ensure Nouveau is blacklisted on host
+  copy:
+    dest: /etc/modprobe.d/blacklist-nouveau.conf
+    content: |
+      blacklist nouveau
+      blacklist nvidia
+      blacklist nvidiafb
+      options nouveau modeset=0
+    owner: root
+    group: root
+    mode: '0644'
+  notify: update-initramfs
+
+- name: Isolate GPUs using VFIO
+  copy:
+    dest: /etc/modprobe.d/vfio.conf
+    # Replace the IDs below with the actual IDs from your lspci output
+    content: "options vfio-pci ids={{ gpu_pci_ids | join(',') }} disable_vga=1"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: update-initramfs
 
 - name: Load VFIO kernel modules
   copy:
@@ -16,27 +33,16 @@
       vfio_iommu_type1
       vfio_pci
       vfio_virqfd
-  notify:
-    - update-initramfs
-    - reboot-server
+    owner: root
+    group: root
+    mode: '0644'
+  notify: update-initramfs
 
-- name: Blacklist host GPU drivers
-  copy:
-    dest: /etc/modprobe.d/blacklist.conf
-    content: |
-      blacklist nouveau
-      blacklist nvidia
-      blacklist nvidiafb
-      blacklist radeon
-      blacklist amdgpu
-  notify:
-    - update-initramfs
-    - reboot-server
+- name: Configure IOMMU in GRUB
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet {{ cpu_vendor }}_iommu=on iommu=pt video=efifb:off video=vesafb:off video=simplefb:off initcall_blacklist=sysfb_init vfio-pci.ids=10de:2504,10de:228e"'
+  notify: update-grub
 
-- name: Assign GPU IDs to VFIO-PCI
-  template:
-    src: vfio.conf.j2
-    dest: /etc/modprobe.d/vfio.conf
-  notify:
-    - update-initramfs
-    - reboot-server
+

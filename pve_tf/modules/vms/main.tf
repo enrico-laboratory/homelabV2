@@ -39,6 +39,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   dynamic "disk" {
     for_each = var.disks
     content {
+
       datastore_id = disk.value.datastore_id
       size         = disk.value.size
       interface    = disk.value.interface

@@ -82,7 +82,7 @@ variable "cpu_type" {
 
 variable "machine_type" {
   type    = string
-  default = null
+  default = "q35"
 }
 
 variable "hostpci" {

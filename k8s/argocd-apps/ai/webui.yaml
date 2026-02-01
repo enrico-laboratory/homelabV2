@@ -1,64 +1,64 @@
-#apiVersion: argoproj.io/v1alpha1
-#kind: Application
-#metadata:
-#  name: open-webui
-#  namespace: argocd
-#spec:
-#  project: ai
-#  source:
-#    chart: open-webui
-#    repoURL: https://helm.openwebui.com/
-#    targetRevision: 10.2.0
-#    helm:
-#      values: |
-#        ollama:
-#          enabled: false
-#
-#        ollamaUrls:
-#          - "http://ollama.ai.svc.cluster.local:11434"
-#
-#        pipelines:
-#          enabled: false
-#
-#        db:
-#          engine: postgres
-#          # This creates a postgres sub-chart deployment
-#          postgres:
-#            enabled: true
-#            persistence:
-#              enabled: true
-#              storageClass: "proxmox-zfs-nvme"
-#              size: 5Gi
-#
-#        persistence:
-#          enabled: true
-#          size: 2Gi
-#          storageClass: "proxmox-zfs-nvme"
-#
-#        ingress:
-#          enabled: true
-#          class: "nginx"
-#          host: "webui.enricoruggieri.com"
-#          annotations:
-#            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
-#          tls:
-#          - secretName: open-webui-tls
-#            hosts:
-#              - webui.enricoruggieri.com
-#        extraEnvVars:
-#          - name: VECTOR_DB
-#            value: "qdrant"
-#          - name: QDRANT_URI
-#            value: "http://qdrant.ai.svc.cluster.local:6333"
-#          - name: QDRANT_API_KEY
-#            value: "a1b2c3d4e5f67890abcdef1234567890"
-#
-#  destination:
-#    server: https://kubernetes.default.svc
-#    namespace: ai
-#  syncPolicy:
-#    automated:
-#      prune: true
-#      selfHeal: true
-#    syncOptions:
-#      - CreateNamespace=true
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: open-webui
+  namespace: argocd
+spec:
+  project: ai
+  source:
+    chart: open-webui
+    repoURL: https://helm.openwebui.com/
+    targetRevision: 10.2.0
+    helm:
+      values: |
+        ollama:
+          enabled: false
+
+        ollamaUrls:
+          - "http://ollama.ai.svc.cluster.local:11434"
+
+        pipelines:
+          enabled: false
+
+        db:
+          engine: postgres
+          # This creates a postgres sub-chart deployment
+          postgres:
+            enabled: true
+            persistence:
+              enabled: true
+              storageClass: "proxmox-zfs-nvme"
+              size: 5Gi
+
+        persistence:
+          enabled: true
+          size: 2Gi
+          storageClass: "proxmox-zfs-nvme"
+
+        ingress:
+          enabled: true
+          class: "nginx"
+          host: "webui.enricoruggieri.com"
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+          tls:
+          - secretName: open-webui-tls
+            hosts:
+              - webui.enricoruggieri.com
+        extraEnvVars:
+          - name: VECTOR_DB
+            value: "qdrant"
+          - name: QDRANT_URI
+            value: "http://qdrant.ai.svc.cluster.local:6333"
+          - name: QDRANT_API_KEY
+            value: "a1b2c3d4e5f67890abcdef1234567890"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ai
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

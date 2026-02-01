@@ -16,24 +16,24 @@
     device: "/dev/sdb"
     lh_folder: "/var/lib/longhorn"
   tasks:
-#    - name: Packages common
-#      ansible.builtin.include_role:
-#        name: k3s_common
-#
-#    - name: Configure Ansible kubernetes
-#      when: group_names is contains('master_server')
-#      ansible.builtin.include_role:
-#        name: k3s_ansible_kubernetes
-#
-#    - name: Configure proxy
-#      when: group_names is contains('proxy')
-#      ansible.builtin.include_role:
-#        name: k3s_proxy
-#
-#    - name: Install node exporter
-#      when: group_names is contains('proxy')
-#      ansible.builtin.include_role:
-#        name: prometheus.prometheus.node_exporter
+    - name: Packages common
+      ansible.builtin.include_role:
+        name: k3s_common
+
+    - name: Configure Ansible kubernetes
+      when: group_names is contains('master_server')
+      ansible.builtin.include_role:
+        name: k3s_ansible_kubernetes
+
+    - name: Configure proxy
+      when: group_names is contains('proxy')
+      ansible.builtin.include_role:
+        name: k3s_proxy
+
+    - name: Install node exporter
+      when: group_names is contains('proxy')
+      ansible.builtin.include_role:
+        name: prometheus.prometheus.node_exporter
 
     - name: Configure gpu passthrough
 ## To install in the pve with intel alder lake cpu
