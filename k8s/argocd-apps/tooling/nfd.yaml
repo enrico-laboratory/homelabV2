@@ -1,33 +1,33 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nfd
-  namespace: argocd
-spec:
-  project: tooling
-  destination:
-    server: "https://kubernetes.default.svc"
-    namespace: nfd
-  source:
-    chart: node-feature-discovery
-    repoURL: https://kubernetes-sigs.github.io/node-feature-discovery/charts
-    targetRevision: 0.18.3
-    helm:
-      releaseName: node-feature-discovery
-      values: |
-        worker:
-          tolerations:
-            - key: "arm"
-              operator: "Equal"
-              value: "true"
-              effect: "NoSchedule"
-            - key: "gpu"
-              operator: "Equal"
-              value: "true"
-              effect: "NoSchedule"
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: nfd
+#  namespace: argocd
+#spec:
+#  project: tooling
+#  destination:
+#    server: "https://kubernetes.default.svc"
+#    namespace: nfd
+#  source:
+#    chart: node-feature-discovery
+#    repoURL: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+#    targetRevision: 0.18.3
+#    helm:
+#      releaseName: node-feature-discovery
+#      values: |
+#        worker:
+#          tolerations:
+#            - key: "arm"
+#              operator: "Equal"
+#              value: "true"
+#              effect: "NoSchedule"
+#            - key: "gpu"
+#              operator: "Equal"
+#              value: "true"
+#              effect: "NoSchedule"
+#  syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#    syncOptions:
+#      - CreateNamespace=true
