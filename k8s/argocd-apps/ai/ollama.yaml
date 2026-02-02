@@ -21,7 +21,7 @@ spec:
         persistentVolume:
           enabled: true
           size: 50Gi
-          storageClass: "proxmox-zfs-nvme"
+          storageClass: "proxmox-zfs-nvme-xfs"
         tolerations:
             - key: "nvidia.com/gpu"
               operator: "Exists"
