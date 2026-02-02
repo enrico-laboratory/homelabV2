@@ -49,6 +49,12 @@ spec:
             fstype: xfs
             ssd: true
             backup: false
+          - name: proxmox-zfs-vmimages-xfs
+            storage: vmimages
+            reclaimPolicy: Delete
+            fstype: xfs
+            ssd: true
+            backup: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: proxmox-csi
