@@ -30,7 +30,7 @@
      - "10de:0fbb" # NVIDIA Corporation GM204 High Definition Audio Controller
     nfs_mounts:
       truenas-backup-vms:
-        export: /mnt/backup-pool-1/proxmox-vms
+        export: /mnt/backup-pool-2/pve-vms-backup
         path: /mnt/pve/truenas-backup-vms
         server: "192.168.100.60"
         content: "iso,backup,images"
@@ -40,7 +40,7 @@
 #    - pve_bootstrap_user
 #    - pve_manage_repositories
 #    - update_host
-#    - pve_create_storage
-    - pve_gpu_passthrough
+    - pve_create_storage
+#    - pve_gpu_passthrough
 #    - prometheus.prometheus.node_exporter
 #    - pve_cpu_pinning

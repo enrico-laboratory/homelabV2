@@ -1,0 +1,19 @@
+{% for template in zfs_templates %}
+    [template_{{ template.name }}]
+    hourly = {{ template.hourly | default(24) }}
+    daily = {{ template.daily | default(30) }}
+    autosnap = yes
+    autoprune = yes
+{% endfor %}
+
+{% for dataset in zfs_datasets %}
+    [{{ dataset.pool }}/{{ dataset.name }}]
+    autosnap = {{ 'yes' if dataset.snapshot.enabled | default(true) else 'no' }}
+    autoprune = {{ 'yes' if dataset.snapshot.enabled | default(true) else 'no' }}
+    use_template = {{ dataset.snapshot.template | default('default') }}
+    recursive = {{ dataset.snapshot.recursive | default('no') }}
+    hourly = {{ dataset.snapshot.hourly | default(0) }}
+    daily = {{ dataset.snapshot.daily | default(30) }}
+
+{% endfor %}
+

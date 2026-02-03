@@ -31,3 +31,12 @@
         effect: "NoSchedule"
   # Targets your HA masters (101, 102, 103)
   loop: "{{ groups['server'] }}"
+
+- name: Taint Gpu node Nodes
+  kubernetes.core.k8s_taint:
+    state: present
+    name: "{{ item }}"
+    taints:
+      - key: "nvidia.com/gpu"
+        effect: "NoSchedule"
+  loop: "{{ groups['gpu'] }}"
