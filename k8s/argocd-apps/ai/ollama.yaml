@@ -18,10 +18,22 @@ spec:
         image:
           repository: ollama/ollama
           tag: "0.15.0"
+        
+        volumes:
+          - name: ollama-nfs
+            nfs:
+              server: 192.168.100.160
+              path: /tank-fast/ollama-models
+        
+        volumeMounts:
+          - name: ollama-nfs
+            mountPath: /root/.ollama
+        
         persistentVolume:
-          enabled: true
+          enabled: false
           size: 50Gi
           storageClass: "proxmox-zfs-nvme"
+        
         tolerations:
             - key: "nvidia.com/gpu"
               operator: "Exists"
