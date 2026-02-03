@@ -9,6 +9,9 @@ spec:
   description: Project for the AI workloads
   sourceRepos:
     - '*'
+  clusterResourceWhitelist:
+    - group: ''
+      kind: PersistentVolume
   destinations:
     - namespace: "ai"
       server: https://kubernetes.default.svc
