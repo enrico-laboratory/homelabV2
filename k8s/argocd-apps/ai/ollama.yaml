@@ -19,20 +19,38 @@ spec:
           repository: ollama/ollama
           tag: "0.15.0"
         
-        volumes:
-          - name: ollama-nfs
-            nfs:
-              server: 192.168.100.160
-              path: /tank-fast/ollama-models
-        
-        volumeMounts:
-          - name: ollama-nfs
-            mountPath: /root/.ollama
-        
         persistentVolume:
-          enabled: false
-          size: 50Gi
-          storageClass: "proxmox-zfs-nvme"
+          enabled: true
+          existingClaim: "ollama-nfs-pvc"
+
+        extraObjects:
+          - apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: ollama-nfs-pv
+            spec:
+              capacity:
+                storage: 50Gi
+              volumeMode: Filesystem
+              accessModes:
+                - ReadWriteMany
+              persistentVolumeReclaimPolicy: Retain
+              nfs:
+                path: /tank-fast/ollama-models
+                server: 192.168.100.160
+        
+          - apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: ollama-nfs-pvc
+            spec:
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ""
+              resources:
+                requests:
+                  storage: 100Gi
+              volumeName: ollama-nfs-pv
         
         tolerations:
             - key: "nvidia.com/gpu"
