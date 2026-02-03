@@ -43,18 +43,6 @@ spec:
             # Define the storage class as default
             annotations:
               storageclass.kubernetes.io/is-default-class: "true"
-          - name: proxmox-zfs-nvme-xfs
-            storage: kubedata
-            reclaimPolicy: Delete
-            fstype: xfs
-            ssd: true
-            backup: false
-          - name: proxmox-zfs-vmimages-xfs
-            storage: vmimages
-            reclaimPolicy: Delete
-            fstype: xfs
-            ssd: true
-            backup: false
           - name: proxmox-zfs-vmimages-ext4
             storage: vmimages
             reclaimPolicy: Delete
