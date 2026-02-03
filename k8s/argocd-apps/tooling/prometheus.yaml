@@ -29,6 +29,9 @@ spec:
           enabled: false
         grafana:
           enabled: true
+          operator:
+            admin:
+              existingSecret: prometheus-grafana-admin-credentials
           ingress:
             enabled: true
             ingressClassName: nginx
