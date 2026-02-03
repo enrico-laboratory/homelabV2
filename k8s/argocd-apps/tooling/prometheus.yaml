@@ -30,8 +30,10 @@ spec:
         grafana:
           enabled: true
           operator:
-            admin:
-              existingSecret: prometheus-grafana-admin-credentials
+            adminUser: admin
+            adminPassword: prom-operator
+            # admin:
+              # existingSecret: prometheus-grafana-admin-credentials
           ingress:
             enabled: true
             ingressClassName: nginx
