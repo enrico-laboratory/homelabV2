@@ -24,12 +24,27 @@ spec:
 
         # Disable main storage and UI components
         prometheus:
-          enabled: false
+          enabled: true
         alertmanager:
           enabled: false
         grafana:
-          enabled: false
-
+          enabled: true
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+              - grafana-kube.enricoruggieri.com
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+            tls:
+              - secretName: grafana-kube-tls
+                hosts:
+                  - grafana-kube.enricoruggieri.com
+          persistence:
+            enabled: true
+            storageClassName: proxmox-zfs-nvme
+            size: 10Gi
+          
         # Keep exporters enabled
         nodeExporter:
           enabled: true
