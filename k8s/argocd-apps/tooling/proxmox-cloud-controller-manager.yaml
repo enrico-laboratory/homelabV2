@@ -30,6 +30,10 @@ spec:
           - effect: NoSchedule
             key: node-role.kubernetes.io/master
             operator: Exists
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists
+  
         # CCM needs to run with specific arguments for k3s compatibility
         extraArgs:
           - --v=2
