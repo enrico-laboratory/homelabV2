@@ -49,6 +49,15 @@ spec:
             fstype: ext4
             ssd: true
             backup: false
+          - name: proxmox-zfs-kubedata-ext4
+            storage: kubedata
+            reclaimPolicy: Delete
+            fstype: ext4
+            ssd: true
+            cache: writethrough
+            backup: false
+            mountOptions:
+              - discard
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: proxmox-csi

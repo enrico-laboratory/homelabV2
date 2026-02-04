@@ -21,8 +21,38 @@ spec:
         
         persistentVolume:
           enabled: true
-          storageClass: proxmox-zfs-nvme
-          size: 100Gi
+          storageClassName: "proxmox-zfs-kubedata-ext4"
+          size: 50Gi
+          #existingClaim: "ollama-nfs-pvc"
+
+        extraObjects:
+          - apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: ollama-nfs-pv
+            spec:
+              capacity:
+                storage: 50Gi
+              volumeMode: Filesystem
+              accessModes:
+                - ReadWriteMany
+              persistentVolumeReclaimPolicy: Retain
+              nfs:
+                path: /tank-fast/ollama-models
+                server: 192.168.100.160
+        
+          - apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: ollama-nfs-pvc
+            spec:
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ""
+              resources:
+                requests:
+                  storage: 50Gi
+              volumeName: ollama-nfs-pv
         
         tolerations:
             - key: "nvidia.com/gpu"
@@ -38,9 +68,8 @@ spec:
           models:
             pull:
               #- llama3.2:3b
-              #- nomic-embed-text
-              #- mistral-small
-              #- qwen2.5-coder:14b
+              - nomic-embed-text
+              #- qwen3-coder:30b
 
           # Environment variables
           extraEnv:
