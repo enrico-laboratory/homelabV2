@@ -63,4 +63,17 @@
       ansible.builtin.include_role:
           name: compose_apps
 
+    - name: Home Assistant
+      vars:
+        deploy: True
+        stack_name: "ha"
+        state: "present"
+        application_folders:
+          - {"name": 'mosquitto/config', "owner": "root", "group": "root", "mode": "0755"}
+          - {"name": '/mosquitto/data', "owner": "root", "group": "root", "mode": "0755"}
+          - {"name": '/mosquitto/log', "owner": "root", "group": "root", "mode": "0755"}
+          - {"name": '/zigbee2mqtt/data', "owner": "root", "group": "root", "mode": "0755"}
+          - {"name": '/homeassistant/data', "owner": "root", "group": "root", "mode": "0755"}
+      ansible.builtin.include_role:
+        name: compose_apps
 
