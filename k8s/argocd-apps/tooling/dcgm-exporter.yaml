@@ -24,6 +24,14 @@ spec:
           - effect: NoSchedule
             key: nvidia.com/gpu
             operator: Exists
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvidia.com/gpu
+                  operator: Exists
+
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kube-system
