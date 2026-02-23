@@ -15,14 +15,16 @@ spec:
     helm:
       releaseName: ollama
       values: |
+        runtimeClassName: nvidia
         image:
           repository: ollama/ollama
           tag: "0.15.0"
         
         persistentVolume:
           enabled: true
-          storageClass: "proxmox-zfs-kubedata-ext4"
-          size: 50Gi
+          volumeName: "ollama-nfs-pv"
+          #storageClass: "proxmox-zfs-kubedata-ext4"
+          #size: 50Gi
           #existingClaim: "ollama-nfs-pvc"
 
         extraObjects:
