@@ -13,6 +13,7 @@ spec:
     targetRevision: 4.8.1
     helm:
       values: |
+        runtimeClassName: "nvidia"
         tolerations:
           - key: node-role.kubernetes.io/control-plane
             operator: Exists
