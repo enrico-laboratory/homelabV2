@@ -22,9 +22,8 @@ spec:
         
         persistentVolume:
           enabled: true
-          volumeName: "ollama-nfs-pv"
-          #storageClass: "proxmox-zfs-kubedata-ext4"
-          #size: 50Gi
+          storageClass: "proxmox-zfs-kubedata-ext4"
+          size: 50Gi
           #existingClaim: "ollama-nfs-pvc"
 
         extraObjects:
