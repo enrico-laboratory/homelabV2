@@ -9,6 +9,7 @@ spec:
   description: Project for the Media Server
   sourceRepos:
     - 'https://github.com/enrico-laboratory/homelabV2'
+    - "git@github.com:enrico-laboratory/homelabPrivate.git"
   destinations:
     - namespace: "mediaserver"
       server: https://kubernetes.default.svc
