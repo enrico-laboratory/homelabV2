@@ -23,7 +23,7 @@ spec:
         persistentVolume:
           enabled: true
           storageClass: "proxmox-zfs-kubedata-ext4"
-          size: 50Gi
+          size: 100Gi
           #existingClaim: "ollama-nfs-pvc"
 
         extraObjects:
