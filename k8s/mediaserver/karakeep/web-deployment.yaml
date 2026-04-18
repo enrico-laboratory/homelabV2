@@ -26,9 +26,9 @@ spec:
             - name: DATA_DIR
               value: /data
             - name: OLLAMA_BASE_URL
-              value: http://ollama.ai.svc:11434/v1
+              value: http://ollama.ai.svc:11434
             - name: INFERENCE_TEXT_MODEL
-              value: qwen3:4b
+              value: llama3.2:3b
           volumeMounts:
             - mountPath: /data
               name: data
