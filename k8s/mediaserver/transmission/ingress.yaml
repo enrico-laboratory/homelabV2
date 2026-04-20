@@ -16,3 +16,7 @@ spec:
                 name: transmission-service
                 port:
                   number: 9091
+  tls:
+    - hosts:
+        - transmission.enricoruggieri.com
+      secretName: transmission-cert-tls
