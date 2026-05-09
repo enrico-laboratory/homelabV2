@@ -59,7 +59,10 @@ spec:
             - name: POSTGRES_USER
               value: joplin
             - name: POSTGRES_PASSWORD
-              value: joplinpass
+              valueFrom:
+                secretKeyRef:
+                  name: joplin-postgres-credentials
+                  key: postgres-password
             - name: POSTGRES_DB
               value: joplin
             - name: PGDATA
@@ -112,7 +115,10 @@ spec:
             - name: DB_CLIENT
               value: pg
             - name: POSTGRES_PASSWORD
-              value: joplinpass
+              valueFrom:
+                secretKeyRef:
+                  name: joplin-postgres-credentials
+                  key: postgres-password
             - name: POSTGRES_DATABASE
               value: joplin
             - name: POSTGRES_USER
