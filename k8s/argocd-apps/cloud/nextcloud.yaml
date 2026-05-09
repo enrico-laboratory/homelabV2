@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nextcloud
+  namespace: argocd
+spec:
+  project: cloud
+  source:
+    repoURL: 'https://nextcloud.github.io/helm/'
+    chart: nextcloud
+    targetRevision: 6.0.0
+    helm:
+      values: |
+        nextcloud:
+          host: nextcloud.enricoruggieri.com
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-admin-credentials
+            usernameKey: nextcloud-username
+            passwordKey: nextcloud-password
+
+        persistence:
+          enabled: true
+          storageClass: proxmox-zfs-nvme
+          size: 50Gi
+
+        postgresql:
+          enabled: true
+          auth:
+            username: nextcloud
+            database: nextcloud
+            existingSecret: nextcloud-postgres-credentials
+            secretKeys:
+              adminPasswordKey: postgres-password
+              userPasswordKey: password
+          primary:
+            persistence:
+              enabled: true
+              storageClass: proxmox-zfs-nvme
+              size: 10Gi
+            extraEnvVars:
+              - name: PGDATA
+                value: /bitnami/postgresql/data/pgdata
+
+        ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+            nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+            nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+            nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+          hosts:
+            - host: nextcloud.enricoruggieri.com
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - hosts:
+                - nextcloud.enricoruggieri.com
+              secretName: nextcloud-tls
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: cloud
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

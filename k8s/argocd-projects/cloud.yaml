@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: "cloud"
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Project for the Cloud sharing services
+  sourceRepos:
+    - 'https://github.com/enrico-laboratory/homelabV2'
+    - 'https://nextcloud.github.io/helm/'
+  destinations:
+    - namespace: "cloud"
+      server: https://kubernetes.default.svc

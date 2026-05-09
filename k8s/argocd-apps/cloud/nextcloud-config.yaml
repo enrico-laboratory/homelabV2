@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "nextcloud-config"
+  namespace: argocd
+spec:
+  project: "cloud"
+  source:
+    repoURL: "https://github.com/enrico-laboratory/homelabV2"
+    targetRevision: HEAD
+    path: "k8s/cloud/nextcloud"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "cloud"
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
