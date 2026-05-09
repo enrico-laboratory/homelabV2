@@ -26,6 +26,10 @@ spec:
 
         postgresql:
           enabled: true
+          image:
+            registry: docker.io
+            repository: library/postgres
+            tag: "16"
           auth:
             username: nextcloud
             database: nextcloud
@@ -40,7 +44,7 @@ spec:
               size: 10Gi
             extraEnvVars:
               - name: PGDATA
-                value: /bitnami/postgresql/data/pgdata
+                value: /var/lib/postgresql/data/pgdata
 
         ingress:
           enabled: true
