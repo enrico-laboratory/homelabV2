@@ -1,0 +1,28 @@
+- name: Create sops-secrets-operator namespace
+  kubernetes.core.k8s:
+    name: sops-secrets-operator
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Wait for Kubernetes API to be ready
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: default
+  register: api_check
+  until: api_check.resources | length > 0
+  retries: 30
+  delay: 10
+
+- name: Inject SOPS age key as Kubernetes Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: age-key
+        namespace: sops-secrets-operator
+      type: Opaque
+      stringData:
+        key.txt: "{{ lookup('file', ansible_env.HOME + '/.sops/age_key.txt') }}"
