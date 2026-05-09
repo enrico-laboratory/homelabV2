@@ -47,7 +47,6 @@ homelabV2/
 ### Infrastructure
 - **Proxmox VE**: Virtualization platform for VM management
 - **k3s**: Lightweight Kubernetes distribution
-- **Longhorn**: Distributed block storage
 - **Container Registry**: Private image storage
 - **Ingress**: Nginx with automatic TLS via cert-manager
 
@@ -65,6 +64,11 @@ homelabV2/
 - Nextcloud (cloud storage)
 - Navidrome (music streaming)
 - Joplin (notes)
+
+### AI & ML Services
+- Ollama (LLM inference)
+- Qdrant (vector database)
+- Open WebUI (AI model management interface)
 
 ## Quick Start
 
