@@ -66,4 +66,5 @@ sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
 
 ## Rules
 
+- **Never use `kubectl` to create resources** — let ArgoCD manage all deployments. Only use kubectl for testing/debugging, never for persistent state changes.
 - Every time that a new application is added in Kubernetes, update the README.md. Exclude Sonarr, radarr and transmission
