@@ -13,3 +13,25 @@
     - k8s_argocd_deploy
     - k8s_argocd_base_projects_and_apps
 
+- name: Bootstrap SOPS age key into cluster
+  hosts: master_server
+  tasks:
+    - name: Wait for cluster to be ready
+      ansible.builtin.shell: |
+        kubectl get nodes --no-headers | wc -l
+      register: node_count
+      until: node_count.stdout | int >= 1
+      retries: 30
+      delay: 10
+
+    - name: Create sops-secrets-operator namespace
+      ansible.builtin.shell: |
+        kubectl create namespace sops-secrets-operator --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Inject age key as Kubernetes Secret
+      ansible.builtin.shell: |
+        kubectl create secret generic age-key \
+          --from-file=key.txt="{{ ansible_env.HOME }}/.config/sops/age/keys.txt" \
+          -n sops-secrets-operator \
+          --dry-run=client -o yaml | kubectl apply -f -
+
