@@ -57,7 +57,6 @@ homelabV2/
 - ArgoCD (GitOps controller)
 - Cert-Manager (TLS automation)
 - Prometheus + Grafana (monitoring)
-- Longhorn (distributed storage)
 - Proxmox CSI (storage integration)
 - MetalLB (load balancer)
 
@@ -65,7 +64,6 @@ homelabV2/
 - Jellyfin (media streaming)
 - Nextcloud (cloud storage)
 - Navidrome (music streaming)
-- Transmission (torrent)
 - Joplin (notes)
 
 ## Quick Start
