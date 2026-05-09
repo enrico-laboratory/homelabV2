@@ -25,26 +25,16 @@ spec:
           size: 50Gi
 
         postgresql:
-          enabled: true
-          image:
-            registry: docker.io
-            repository: library/postgres
-            tag: "16"
-          auth:
-            username: nextcloud
-            database: nextcloud
-            existingSecret: nextcloud-postgres-credentials
-            secretKeys:
-              adminPasswordKey: postgres-password
-              userPasswordKey: password
-          primary:
-            persistence:
-              enabled: true
-              storageClass: proxmox-zfs-nvme
-              size: 10Gi
-            extraEnvVars:
-              - name: PGDATA
-                value: /var/lib/postgresql/data/pgdata
+          enabled: false
+
+        externalDatabase:
+          type: postgresql
+          host: nextcloud-postgres
+          port: 5432
+          user: nextcloud
+          database: nextcloud
+          existingSecret: nextcloud-postgres-credentials
+          existingSecretPasswordKey: postgres-password
 
         ingress:
           enabled: true
