@@ -18,9 +18,14 @@ spec:
             secretName: nextcloud-admin-credentials
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
-          hooks:
-            post-installation: |
-              php occ config:system:set allow_local_remote_servers --value true --type bool
+          extraVolumes:
+            - name: nextcloud-custom-config
+              configMap:
+                name: nextcloud-custom-config
+          extraVolumeMounts:
+            - name: nextcloud-custom-config
+              mountPath: /var/www/html/config/custom.config.php
+              subPath: custom.config.php
 
         persistence:
           enabled: true

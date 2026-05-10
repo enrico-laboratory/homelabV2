@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-custom-config
+  namespace: cloud
+data:
+  custom.config.php: |
+    <?php
+    $CONFIG = array(
+      // Allow Nextcloud to reach local/private services (e.g., OnlyOffice)
+      'allow_local_remote_servers' => true,
+      // Force HTTPS protocol since we're behind an ingress with TLS termination
+      'overwriteprotocol' => 'https',
+      // Set CLI/polling URL to public domain to avoid redirect loops
+      'overwrite.cli.url' => 'https://nextcloud.enricoruggieri.com',
+      // Trust the Kubernetes ClusterIP range (Ingress proxy)
+      'trusted_proxies' => array('10.43.0.0/16'),
+    );
