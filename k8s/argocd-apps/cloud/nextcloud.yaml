@@ -15,7 +15,6 @@ spec:
           host: nextcloud.enricoruggieri.com
           existingSecret:
             enabled: true
-            secretName: nextcloud-admin-credentials
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
           configs:
@@ -38,7 +37,6 @@ spec:
           primary:
             persistence:
               enabled: true
-              size: 50Gi
 
         ingress:
           enabled: true
