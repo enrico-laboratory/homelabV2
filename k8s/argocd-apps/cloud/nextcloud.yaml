@@ -18,6 +18,9 @@ spec:
             secretName: nextcloud-admin-credentials
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
+          hooks:
+            post-installation:
+              - "php occ config:system:set allow_local_remote_servers --value true --type bool"
 
         persistence:
           enabled: true
@@ -53,13 +56,6 @@ spec:
             - hosts:
                 - nextcloud.enricoruggieri.com
               secretName: nextcloud-tls
-
-        configs:
-          local.config.php: |-
-            <?php
-            $CONFIG = array(
-              'allow_local_remote_servers' => true,
-            );
 
   destination:
     server: 'https://kubernetes.default.svc'
