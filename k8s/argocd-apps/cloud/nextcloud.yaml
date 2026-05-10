@@ -36,13 +36,16 @@ spec:
           enabled: false
 
         externalDatabase:
+          enabled: true
           type: postgresql
           host: nextcloud-postgres
           port: 5432
           user: nextcloud
           database: nextcloud
-          existingSecret: nextcloud-postgres-credentials
-          existingSecretPasswordKey: postgres-password
+          existingSecret:
+            enabled: true
+            usernameKey: nextcloud
+            passwordKey: postgres-password
 
         ingress:
           enabled: true
