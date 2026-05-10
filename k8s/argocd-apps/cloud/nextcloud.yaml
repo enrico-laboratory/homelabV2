@@ -18,12 +18,6 @@ spec:
             secretName: nextcloud-admin-credentials
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
-          podAnnotations:
-            prometheus.io/scrape: "true"
-            prometheus.io/port: "9205"
-          extraEnv: |
-            - name: TRUSTED_PROXIES
-              value: "10.42.0.0/16"
           configs:
             custom.config.php: |
               <?php
