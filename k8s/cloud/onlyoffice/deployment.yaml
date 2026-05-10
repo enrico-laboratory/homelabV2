@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice
+  namespace: cloud
+  labels:
+    app: onlyoffice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onlyoffice
+  template:
+    metadata:
+      labels:
+        app: onlyoffice
+    spec:
+      containers:
+        - name: onlyoffice
+          image: onlyoffice/documentserver:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: JWT_ENABLED
+              value: "true"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice-credentials
+                  key: jwt-secret
+          volumeMounts:
+            - mountPath: /var/www/onlyoffice/Data
+              name: onlyoffice-data
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+      volumes:
+        - name: onlyoffice-data
+          persistentVolumeClaim:
+            claimName: onlyoffice-pvc

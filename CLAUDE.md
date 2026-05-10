@@ -64,6 +64,10 @@ sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
 - Follows the `isindir/sops-secrets-operator` pattern used in this repo
 - Makes code review easier while protecting secrets
 
+## Infrastructure
+
+- **TrueNAS backup instance**: `truenas-backup.enricoruggieri.com` — use this hostname for any NFS backup mounts or rclone targets
+
 ## Rules
 
 - **Never use `kubectl` to create resources** — let ArgoCD manage all deployments. Only use kubectl for testing/debugging, never for persistent state changes.
