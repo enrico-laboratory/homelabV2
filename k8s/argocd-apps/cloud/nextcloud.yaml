@@ -34,18 +34,7 @@ spec:
           size: 50Gi
 
         postgresql:
-          enabled: false
-
-        externalDatabase:
           enabled: true
-          type: postgresql
-          host: nextcloud-postgres
-          user: nextcloud
-          database: nextcloud
-          existingSecret:
-            enabled: true
-            usernameKey: db-username
-            passwordKey: postgres-password
 
         ingress:
           enabled: true
