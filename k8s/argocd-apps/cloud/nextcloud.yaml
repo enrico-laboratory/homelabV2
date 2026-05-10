@@ -54,6 +54,13 @@ spec:
                 - nextcloud.enricoruggieri.com
               secretName: nextcloud-tls
 
+        configs:
+          system.config.php: |-
+            <?php
+            $CONFIG = array(
+              'allow_local_remote_servers' => true,
+            );
+
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: cloud
