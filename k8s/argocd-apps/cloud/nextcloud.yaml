@@ -38,6 +38,7 @@ spec:
           primary:
             persistence:
               enabled: true
+              size: 50Gi
 
         ingress:
           enabled: true
