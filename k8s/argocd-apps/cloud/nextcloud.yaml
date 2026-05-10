@@ -55,7 +55,7 @@ spec:
               secretName: nextcloud-tls
 
         configs:
-          system.config.php: |-
+          local.config.php: |-
             <?php
             $CONFIG = array(
               'allow_local_remote_servers' => true,
