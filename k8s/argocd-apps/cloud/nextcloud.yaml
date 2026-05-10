@@ -40,7 +40,6 @@ spec:
           enabled: true
           type: postgresql
           host: nextcloud-postgres
-          port: 5432
           user: nextcloud
           database: nextcloud
           existingSecret:
