@@ -44,7 +44,7 @@ spec:
           database: nextcloud
           existingSecret:
             enabled: true
-            usernameKey: nextcloud
+            usernameKey: db-username
             passwordKey: postgres-password
 
         ingress:
