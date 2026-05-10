@@ -13,6 +13,11 @@ spec:
       values: |
         nextcloud:
           host: nextcloud.enricoruggieri.com
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-admin-credentials
+            usernameKey: nextcloud-username
+            passwordKey: nextcloud-password
           configs:
             custom.config.php: |
               <?php
