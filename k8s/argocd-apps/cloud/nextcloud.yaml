@@ -38,8 +38,6 @@ spec:
           primary:
             persistence:
               enabled: true
-              storageClass: proxmox-zfs-nvme
-              size: 10Gi
 
         ingress:
           enabled: true
