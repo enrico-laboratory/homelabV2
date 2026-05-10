@@ -11,6 +11,12 @@ spec:
     targetRevision: 4.11.3
     helm:
       releaseName: ingress-nginx
+      values: |
+        controller:
+          config:
+            use-forwarded-headers: "true"
+            compute-full-forwarded-for: "true"
+            use-proxy-protocol: "false"
   destination:
     server: https://kubernetes.default.svc
     namespace: "ingress-nginx"
