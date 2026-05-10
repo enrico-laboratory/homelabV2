@@ -20,7 +20,7 @@ spec:
                 'allow_local_remote_servers' => true,
                 'overwriteprotocol' => 'https',
                 'overwrite.cli.url' => 'https://nextcloud.enricoruggieri.com',
-                'trusted_proxies' => array('10.43.0.0/16'),
+                'trusted_proxies' => array('10.42.0.0/16', '10.43.0.0/16'),
               );
 
         persistence:
