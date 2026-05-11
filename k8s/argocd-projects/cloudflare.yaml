@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cloudflare
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Project for Cloudflare Tunnel
+  sourceRepos:
+    - 'https://github.com/enrico-laboratory/homelabV2'
+  destinations:
+    - namespace: cloudflare
+      server: https://kubernetes.default.svc
