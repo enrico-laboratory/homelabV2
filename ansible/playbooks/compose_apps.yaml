@@ -34,7 +34,11 @@
         stack_name: "pihole"
         state: "present"
         application_folders:
-          - { "name": 'pihole',"owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'pihole', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'etc-dnsmasq.d', "owner": "root", "group": "root", "mode": "0755" }
+        copy_folder_content:
+          name: "etc-dnsmasq.d"
+          glob: "etc-dnsmasq.d/*"
       ansible.builtin.include_role:
         name: compose_apps
 

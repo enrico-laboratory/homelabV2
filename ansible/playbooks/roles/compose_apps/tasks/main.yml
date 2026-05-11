@@ -50,6 +50,7 @@
 
   - name: Copy all files in a folder
     when: copy_folder_content is defined
+    become: True
     copy:
       src: "{{ item }}"
       dest: "{{ stack_folder }}/{{ copy_folder_content.name }}/{{ item | basename }}"
