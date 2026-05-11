@@ -22,3 +22,8 @@ variable "cloudflare_zone_id" {
   description = "Cloudflare Zone ID"
   type        = string
 }
+
+variable "cloudflare_account_id" {
+  description = "Cloudflare Account ID (required for Zero Trust Access resources)"
+  type        = string
+}
