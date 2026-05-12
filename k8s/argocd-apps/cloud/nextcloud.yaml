@@ -19,7 +19,7 @@ spec:
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
           configs:
-            custom.config.php: |
+            z_custom.config.php: |
               <?php
               $CONFIG = array(
                 'allow_local_remote_servers' => true,
@@ -57,17 +57,10 @@ spec:
               paths:
                 - path: /
                   pathType: Prefix
-            - host: nextcloud-ext.enricoruggieri.com
-              paths:
-                - path: /
-                  pathType: Prefix
           tls:
             - hosts:
                 - nextcloud.enricoruggieri.com
               secretName: nextcloud-tls
-            - hosts:
-                - nextcloud-ext.enricoruggieri.com
-              secretName: nextcloud-ext-tls
 
   destination:
     server: 'https://kubernetes.default.svc'
