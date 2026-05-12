@@ -24,8 +24,12 @@ spec:
               $CONFIG = array(
                 'allow_local_remote_servers' => true,
                 'overwriteprotocol' => 'https',
-                'overwrite.cli.url' => 'https://nextcloud.enricoruggieri.com',
+                'overwrite.cli.url' => 'https://nextcloud-ext.enricoruggieri.com',
                 'trusted_proxies' => array('10.42.0.0/16'),
+                'trusted_domains' => array(
+                  0 => 'nextcloud.enricoruggieri.com',
+                  1 => 'nextcloud-ext.enricoruggieri.com',
+                ),
               );
 
         persistence:
@@ -53,10 +57,17 @@ spec:
               paths:
                 - path: /
                   pathType: Prefix
+            - host: nextcloud-ext.enricoruggieri.com
+              paths:
+                - path: /
+                  pathType: Prefix
           tls:
             - hosts:
                 - nextcloud.enricoruggieri.com
               secretName: nextcloud-tls
+            - hosts:
+                - nextcloud-ext.enricoruggieri.com
+              secretName: nextcloud-ext-tls
 
   destination:
     server: 'https://kubernetes.default.svc'
