@@ -38,13 +38,15 @@ spec:
 
         postgresql:
           enabled: true
-          auth:
-            database: nextcloud
-            username: nextcloud
-            existingSecret: nextcloud-postgres-credentials
-            secretKeys:
-              userPasswordKey: password
-              adminPasswordKey: postgres-password
+          global:
+            postgresql:
+              auth:
+                database: nextcloud
+                username: nextcloud
+                existingSecret: nextcloud-postgres-credentials
+                secretKeys:
+                  userPasswordKey: password
+                  adminPasswordKey: postgres-password
           primary:
             persistence:
               enabled: true
