@@ -36,6 +36,16 @@ spec:
           storageClass: proxmox-zfs-nvme
           size: 50Gi
 
+        internalDatabase:
+          enabled: false
+
+        externalDatabase:
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-postgres-credentials
+            usernameKey: db-username
+            passwordKey: password
+
         postgresql:
           enabled: true
           global:
