@@ -34,7 +34,7 @@ spec:
         persistence:
           enabled: true
           storageClass: proxmox-zfs-nvme
-          size: 50Gi
+          size: 200Gi
 
         internalDatabase:
           enabled: false
