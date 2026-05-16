@@ -5,6 +5,7 @@ metadata:
   namespace: mediaserver
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: nginx
   rules:
@@ -18,3 +19,7 @@ spec:
                 name: calibreweb-service
                 port:
                   number: 8083
+  tls:
+  - hosts:
+    - calibreweb.enricoruggieri.com
+    secretName: calibreweb-cert-tls
