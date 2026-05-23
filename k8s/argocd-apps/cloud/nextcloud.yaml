@@ -31,6 +31,27 @@ spec:
                 'twofactor_enforced_excluded_groups' => array(),
               );
 
+          extraVolumes:
+            - name: books-nfs
+              nfs:
+                server: nas.enricoruggieri.com
+                path: /tank-data/media/library/books
+                readOnly: true
+
+          extraVolumeMounts:
+            - name: books-nfs
+              mountPath: /mnt/books
+              readOnly: true
+
+          lifecycle:
+            postStartCommand:
+              - "/bin/sh"
+              - "-c"
+              - |
+                php /var/www/html/occ app:enable files_external || true
+                php /var/www/html/occ files_external:list | grep -q 'Books' || \
+                  php /var/www/html/occ files_external:create 'Books' local null::null admin /mnt/books
+
         persistence:
           enabled: true
           storageClass: proxmox-zfs-nvme
