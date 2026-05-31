@@ -20,7 +20,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: comfyui
-          image: yanwk/comfyui-boot:latest
+          image: yanwk/comfyui-boot:cu124-slim
           ports:
             - containerPort: 8188
           resources:
