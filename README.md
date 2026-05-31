@@ -67,6 +67,7 @@ homelabV2/
 
 ### AI & ML Services
 - Ollama (LLM inference)
+- ComfyUI (image generation — text-to-image, img2img, ControlNet)
 - Qdrant (vector database)
 - Open WebUI (AI model management interface)
 

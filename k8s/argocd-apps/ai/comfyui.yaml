@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: comfyui
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ai
+
+  source:
+    repoURL: "https://github.com/enrico-laboratory/homelabV2"
+    targetRevision: HEAD
+    path: k8s/ai/comfyui
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ai
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: comfyui
+      namespace: ai
+      jsonPointers:
+        - /spec/replicas
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -88,6 +88,14 @@ spec:
     server: https://kubernetes.default.svc
     namespace: ai
 
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: ollama
+      namespace: ai
+      jsonPointers:
+        - /spec/replicas
+
   syncPolicy:
     automated:
       prune: true
