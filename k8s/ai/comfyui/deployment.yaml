@@ -28,7 +28,7 @@ spec:
               nvidia.com/gpu: "1"
           volumeMounts:
             - name: comfyui-data
-              mountPath: /home/user/ComfyUI
+              mountPath: /root/ComfyUI
       volumes:
         - name: comfyui-data
           persistentVolumeClaim:
