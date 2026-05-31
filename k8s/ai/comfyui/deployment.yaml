@@ -20,7 +20,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: comfyui
-          image: ghcr.io/ai-dock/comfyui:latest-cuda
+          image: yanwk/comfyui-boot:latest
           ports:
             - containerPort: 8188
           resources:
@@ -28,12 +28,7 @@ spec:
               nvidia.com/gpu: "1"
           volumeMounts:
             - name: comfyui-data
-              mountPath: /workspace
-          env:
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: "all"
-            - name: NVIDIA_DRIVER_CAPABILITIES
-              value: "compute,utility"
+              mountPath: /home/user/ComfyUI
       volumes:
         - name: comfyui-data
           persistentVolumeClaim:
