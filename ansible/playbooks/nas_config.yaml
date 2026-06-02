@@ -1,0 +1,83 @@
+- name: NAS config
+  hosts: nas
+  become: yes
+  vars:
+    packages_to_install:
+      - samba
+      - nfs-kernel-server
+      - nfs-common
+    zfs_templates:
+      - name: 'default'
+        hourly: 0
+        daily: 30
+    zfs_pools:
+      - name: "tank-data"
+      - name: "tank-fast"
+    zfs_datasets:
+      - name: "archivio"
+        pool: "tank-data"
+      - name: "audio"
+        pool: "tank-data"
+      - name: "media"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+      - name: "media/audiobooks"
+        pool: "tank-data"
+      - name: "media/library"
+        pool: "tank-data"
+      - name: "media/movies"
+        pool: "tank-data"
+      - name: "media/music"
+        pool: "tank-data"
+      - name: "media/podcasts"
+        pool: "tank-data"
+      - name: "media/torrent-watch"
+        pool: "tank-data"
+        snapshot:
+          enabled: false
+      - name: "media/torrents"
+        pool: "tank-data"
+        snapshot:
+          enabled: false
+      - name: "media/torrents-2"
+        pool: "tank-data"
+        snapshot:
+          enabled: false
+      - name: "media/tv-shows"
+        pool: "tank-data"
+      - name: "media/tv-shows-2"
+        pool: "tank-data"
+        snapshot:
+          enabled: false
+      - name: "media/videos"
+        pool: "tank-data"
+      - name: "minecraft"
+        pool: "tank-fast"
+        nfs:
+          enabled: false
+      - name: "ollama-models"
+        pool: "tank-fast"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
+      - name: "comfyui-output"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
+    nfs_default_options: "all_squash,anonuid=1000,anongid=1000,insecure,nohide,rw=@192.168.100.0/24,no_subtree_check"
+    backup_perms: [send, snapshot, hold, release]
+  roles:
+#    - update_host
+#    - prometheus.prometheus.node_exporter
+#    - packages_install
+    - nas_zfs
+    - nas_sanoid
+# The first time you run this plabook it needs the following to map the main user to the sambe user
+# sudo smbpasswd -a username
+    - nas_smb

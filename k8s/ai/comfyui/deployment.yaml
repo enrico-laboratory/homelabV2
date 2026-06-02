@@ -29,7 +29,13 @@ spec:
           volumeMounts:
             - name: comfyui-data
               mountPath: /root/ComfyUI
+            - name: comfyui-output
+              mountPath: /root/ComfyUI/output
       volumes:
         - name: comfyui-data
           persistentVolumeClaim:
             claimName: comfyui-pvc
+        - name: comfyui-output
+          nfs:
+            server: nas.enricoruggieri.com
+            path: /tank-data/comfyui-output
