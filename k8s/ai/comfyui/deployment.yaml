@@ -23,6 +23,9 @@ spec:
           image: yanwk/comfyui-boot:cu128-slim-20260518
           ports:
             - containerPort: 8188
+          env:
+            - name: HF_HOME
+              value: /root/.cache/huggingface
           resources:
             limits:
               nvidia.com/gpu: "1"
@@ -31,6 +34,8 @@ spec:
               mountPath: /root/ComfyUI
             - name: comfyui-output
               mountPath: /root/ComfyUI/output
+            - name: comfyui-hf-cache
+              mountPath: /root/.cache/huggingface
       volumes:
         - name: comfyui-data
           persistentVolumeClaim:
@@ -39,3 +44,6 @@ spec:
           nfs:
             server: nas.enricoruggieri.com
             path: /tank-data/comfyui-output
+        - name: comfyui-hf-cache
+          persistentVolumeClaim:
+            claimName: comfyui-hf-cache-pvc
