@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: comfyui-cache-pvc
+  namespace: ai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: proxmox-zfs-kubedata-ext4
+  resources:
+    requests:
+      storage: 10Gi

@@ -63,7 +63,30 @@
           options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
         snapshot:
           enabled: false
-      - name: "comfyui-output"
+      - name: "comfyui"
+        pool: "tank-data"
+      - name: "comfyui/output"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
+      - name: "comfyui/input"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
+      - name: "comfyui/user"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
+      - name: "comfyui/user-scripts"
         pool: "tank-data"
         nfs:
           enabled: true

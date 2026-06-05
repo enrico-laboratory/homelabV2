@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: comfyui-hf-cache-pvc
+  name: comfyui-custom-nodes-pvc
   namespace: ai
 spec:
   accessModes:

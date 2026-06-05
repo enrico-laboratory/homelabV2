@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: comfyui-pvc
+  name: comfyui-models-pvc
   namespace: ai
 spec:
   accessModes:

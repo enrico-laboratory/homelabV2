@@ -20,7 +20,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: comfyui
-          image: yanwk/comfyui-boot:cu128-slim-20260518
+          image: yanwk/comfyui-boot:cu130-megapak-pt211
           ports:
             - containerPort: 8188
           env:
@@ -30,20 +30,48 @@ spec:
             limits:
               nvidia.com/gpu: "1"
           volumeMounts:
-            - name: comfyui-data
-              mountPath: /root/ComfyUI
+            - name: comfyui-models
+              mountPath: /root/ComfyUI/models
+            - name: comfyui-custom-nodes
+              mountPath: /root/ComfyUI/custom_nodes
+            - name: comfyui-cache
+              mountPath: /root/.cache
+            - name: comfyui-config
+              mountPath: /root/.config
             - name: comfyui-output
               mountPath: /root/ComfyUI/output
-            - name: comfyui-hf-cache
-              mountPath: /root/.cache/huggingface
+            - name: comfyui-input
+              mountPath: /root/ComfyUI/input
+            - name: comfyui-user
+              mountPath: /root/ComfyUI/user
+            - name: comfyui-user-scripts
+              mountPath: /root/user-scripts
       volumes:
-        - name: comfyui-data
+        - name: comfyui-models
           persistentVolumeClaim:
-            claimName: comfyui-pvc
+            claimName: comfyui-models-pvc
+        - name: comfyui-custom-nodes
+          persistentVolumeClaim:
+            claimName: comfyui-custom-nodes-pvc
+        - name: comfyui-cache
+          persistentVolumeClaim:
+            claimName: comfyui-cache-pvc
+        - name: comfyui-config
+          persistentVolumeClaim:
+            claimName: comfyui-config-pvc
         - name: comfyui-output
           nfs:
             server: nas.enricoruggieri.com
-            path: /tank-data/comfyui-output
-        - name: comfyui-hf-cache
-          persistentVolumeClaim:
-            claimName: comfyui-hf-cache-pvc
+            path: /tank-data/comfyui/output
+        - name: comfyui-input
+          nfs:
+            server: nas.enricoruggieri.com
+            path: /tank-data/comfyui/input
+        - name: comfyui-user
+          nfs:
+            server: nas.enricoruggieri.com
+            path: /tank-data/comfyui/user
+        - name: comfyui-user-scripts
+          nfs:
+            server: nas.enricoruggieri.com
+            path: /tank-data/comfyui/user-scripts
