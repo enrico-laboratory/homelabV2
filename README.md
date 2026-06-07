@@ -64,6 +64,7 @@ homelabV2/
 - Nextcloud (cloud storage)
 - Navidrome (music streaming)
 - Joplin (notes)
+- Meal Plan (personal dashboard at personal.enricoruggieri.com)
 
 ### AI & ML Services
 - Ollama (LLM inference)
