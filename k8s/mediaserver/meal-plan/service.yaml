@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: meal-plan-service
+  namespace: mediaserver
+spec:
+  selector:
+    app: meal-plan
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP

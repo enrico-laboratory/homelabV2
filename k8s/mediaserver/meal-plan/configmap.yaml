@@ -1,0 +1,410 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: meal-plan-html
+  namespace: mediaserver
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Meal Plan</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: Georgia, serif;
+          background: #faf9f7;
+          color: #2c2c2c;
+          padding: 1.5rem;
+        }
+        .page {
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+        h1 {
+          font-size: 1.8rem;
+          font-weight: normal;
+          letter-spacing: 0.03em;
+          margin-bottom: 0.3rem;
+        }
+        .subtitle {
+          color: #888;
+          font-size: 0.85rem;
+          margin-bottom: 2rem;
+        }
+        .desktop-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 2.5rem;
+        }
+        .desktop-table thead th {
+          text-align: left;
+          padding: 0.6rem 0.8rem;
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #666;
+          border-bottom: 2px solid #ddd;
+        }
+        .desktop-table thead th.meal-col { width: 90px; }
+        .desktop-table tbody tr { border-bottom: 1px solid #eee; }
+        .desktop-table tbody tr:last-child { border-bottom: none; }
+        .desktop-table td { padding: 0.75rem 0.8rem; vertical-align: top; }
+        .desktop-table td.meal-label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #999;
+          padding-top: 0.95rem;
+          white-space: nowrap;
+        }
+        .mobile-days { display: none; }
+        .day-card {
+          background: #fff;
+          border: 1px solid #e8e5e0;
+          border-radius: 6px;
+          margin-bottom: 1.2rem;
+          overflow: hidden;
+        }
+        .day-card h2 {
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #666;
+          padding: 0.6rem 1rem;
+          background: #f5f3f0;
+          border-bottom: 1px solid #e8e5e0;
+          font-weight: normal;
+        }
+        .meal-row {
+          display: grid;
+          grid-template-columns: 70px 1fr;
+          border-bottom: 1px solid #eee;
+          padding: 0.7rem 1rem;
+          gap: 0.5rem;
+          align-items: start;
+        }
+        .meal-row:last-child { border-bottom: none; }
+        .meal-row .label {
+          font-size: 0.72rem;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #aaa;
+          padding-top: 0.1rem;
+        }
+        .recipe-link {
+          display: block;
+          color: #2c2c2c;
+          text-decoration: none;
+          font-size: 0.93rem;
+          line-height: 1.35;
+        }
+        .recipe-link:hover { color: #7b5e3a; text-decoration: underline; }
+        .fermented {
+          font-size: 0.78rem;
+          color: #888;
+          font-style: italic;
+          margin-top: 0.25rem;
+        }
+        .tags {
+          margin-top: 0.3rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .tag {
+          font-size: 0.68rem;
+          padding: 0.12rem 0.38rem;
+          border-radius: 2px;
+          background: #eee;
+          color: #666;
+        }
+        .tag.nocook { background: #e8f4e8; color: #4a7a4a; }
+        .tag.fast   { background: #fef3e2; color: #8a6020; }
+        .tag.it     { background: #f0eaf8; color: #5a3e8a; }
+        .tag.me     { background: #fde8ec; color: #8a3050; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 2rem 0; }
+        .habits {
+          font-size: 0.86rem;
+          color: #555;
+          margin-bottom: 1.5rem;
+        }
+        .habits h2 {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #999;
+          margin-bottom: 0.7rem;
+          font-weight: normal;
+        }
+        .habits ul { list-style: none; }
+        .habits li { padding: 0.2rem 0; }
+        .habits li::before { content: "— "; color: #bbb; }
+        @media (max-width: 700px) {
+          body { padding: 1rem; }
+          h1 { font-size: 1.4rem; }
+          .desktop-table { display: none; }
+          .mobile-days { display: block; }
+          .habits ul { display: flex; flex-direction: column; gap: 0.1rem; }
+        }
+      </style>
+    </head>
+    <body>
+    <div class="page">
+      <h1>Meal Plan</h1>
+      <p class="subtitle">Eating window 7:30 – 18:00 &nbsp;·&nbsp; Overnight fast 13.5 h &nbsp;·&nbsp; Italian &amp; Middle Eastern</p>
+
+      <table class="desktop-table">
+        <thead>
+          <tr>
+            <th class="meal-col"></th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="meal-label">Breakfast<br>7:30</td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/gp2jt1obd6d9s5qudtfan0m0" target="_blank">Shakshuka con Spinaci e Patata Dolce</a>
+              <p class="fermented">Labneh or yogurt on top</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/cd8nyfeezd8fuzgm6dh6svxc" target="_blank">Frittata con Asparagi Bianchi e Aglio Orsino</a>
+              <p class="fermented">Labneh on side</p>
+              <div class="tags"><span class="tag it">Italian</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/zovonvaxo4leerhpx2xuq0df" target="_blank">Smoothie Verde Medio Orientale</a>
+              <p class="fermented">Kefir or labneh base</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/fw17dp882815r9ww96cmw6of" target="_blank">Smoothie Proteico Italiano</a>
+              <p class="fermented">Greek yogurt base</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/x35wpbto6cdurzhph16ppah8" target="_blank">Chia Pudding con Labneh e Melograno</a>
+              <p class="fermented">Labneh or Greek yogurt</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td class="meal-label">Lunch<br>12:30</td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/hqf4n9vna1gurc5g7xdbgkf1" target="_blank">Sardine e Lenticchie in Barattolo</a>
+              <p class="fermented">Preserved olives or capers</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/qb0er4o48fd126b8fkr3u1hj" target="_blank">Sgombro, Patata Dolce e Dressing al Tahini</a>
+              <p class="fermented">Miso in dressing or side of tempeh</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/s973nsbd70xjl972rzg0oy4x" target="_blank">Antipasto di Finocchio, Tonno e Fagioli Bianchi</a>
+              <p class="fermented">Olives, preserved capers</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/xrmvxs2qpvgxmrh442x1m1pz" target="_blank">Insalata Mediterranea con Tonno, Fagioli e Patata Dolce</a>
+              <p class="fermented">Miso dressing or side of tempeh</p>
+              <div class="tags"><span class="tag it">Italian</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/yb7pnf4lsvg6s77j4bxnywd6" target="_blank">Mezze Box</a>
+              <p class="fermented">Labneh (counts as fermented)</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td class="meal-label">Dinner<br>17:15</td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/t2tm0y545ijir4qvyqj2qmr4" target="_blank">Salmone al Limone e Capperi con Asparagi Verdi</a>
+              <p class="fermented">Kimchi or sauerkraut on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/hrw47wzswgwe514iuz7kigqt" target="_blank">Tagliata di Manzo con Funghi, Spinaci e Zucchine</a>
+              <p class="fermented">Fermented vegetables on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/vaych15bbg6iokmhyctvdiow" target="_blank">Fegato alla Veneziana con Cavoletti Arrosti</a>
+              <p class="fermented">Sauerkraut on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/gr70rvsf0uql9c2xpobl9h6n" target="_blank">Kofta di Agnello con Broccoli e Barbabietola</a>
+              <p class="fermented">Fermented vegetables on side</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag fast">Fast</span></div>
+            </td>
+            <td>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/j1k71axmf0ulhuqk8a39s0qp" target="_blank">Fegatini con Capperi, Limone e Zucchine</a>
+              <p class="fermented">Sauerkraut or fermented vegetables</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mobile-days">
+        <div class="day-card">
+          <h2>Monday</h2>
+          <div class="meal-row">
+            <span class="label">Breakfast<br>7:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/gp2jt1obd6d9s5qudtfan0m0" target="_blank">Shakshuka con Spinaci e Patata Dolce</a>
+              <p class="fermented">Labneh or yogurt on top</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Lunch<br>12:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/hqf4n9vna1gurc5g7xdbgkf1" target="_blank">Sardine e Lenticchie in Barattolo</a>
+              <p class="fermented">Preserved olives or capers</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Dinner<br>17:15</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/t2tm0y545ijir4qvyqj2qmr4" target="_blank">Salmone al Limone e Capperi con Asparagi Verdi</a>
+              <p class="fermented">Kimchi or sauerkraut on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="day-card">
+          <h2>Tuesday</h2>
+          <div class="meal-row">
+            <span class="label">Breakfast<br>7:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/cd8nyfeezd8fuzgm6dh6svxc" target="_blank">Frittata con Asparagi Bianchi e Aglio Orsino</a>
+              <p class="fermented">Labneh on side</p>
+              <div class="tags"><span class="tag it">Italian</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Lunch<br>12:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/qb0er4o48fd126b8fkr3u1hj" target="_blank">Sgombro, Patata Dolce e Dressing al Tahini</a>
+              <p class="fermented">Miso in dressing or side of tempeh</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Dinner<br>17:15</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/hrw47wzswgwe514iuz7kigqt" target="_blank">Tagliata di Manzo con Funghi, Spinaci e Zucchine</a>
+              <p class="fermented">Fermented vegetables on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="day-card">
+          <h2>Wednesday</h2>
+          <div class="meal-row">
+            <span class="label">Breakfast<br>7:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/zovonvaxo4leerhpx2xuq0df" target="_blank">Smoothie Verde Medio Orientale</a>
+              <p class="fermented">Kefir or labneh base</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Lunch<br>12:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/s973nsbd70xjl972rzg0oy4x" target="_blank">Antipasto di Finocchio, Tonno e Fagioli Bianchi</a>
+              <p class="fermented">Olives, preserved capers</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Dinner<br>17:15</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/vaych15bbg6iokmhyctvdiow" target="_blank">Fegato alla Veneziana con Cavoletti Arrosti</a>
+              <p class="fermented">Sauerkraut on side</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="day-card">
+          <h2>Thursday</h2>
+          <div class="meal-row">
+            <span class="label">Breakfast<br>7:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/fw17dp882815r9ww96cmw6of" target="_blank">Smoothie Proteico Italiano</a>
+              <p class="fermented">Greek yogurt base</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Lunch<br>12:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/xrmvxs2qpvgxmrh442x1m1pz" target="_blank">Insalata Mediterranea con Tonno, Fagioli e Patata Dolce</a>
+              <p class="fermented">Miso dressing or side of tempeh</p>
+              <div class="tags"><span class="tag it">Italian</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Dinner<br>17:15</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/gr70rvsf0uql9c2xpobl9h6n" target="_blank">Kofta di Agnello con Broccoli e Barbabietola</a>
+              <p class="fermented">Fermented vegetables on side</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag fast">Fast</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="day-card">
+          <h2>Friday</h2>
+          <div class="meal-row">
+            <span class="label">Breakfast<br>7:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/x35wpbto6cdurzhph16ppah8" target="_blank">Chia Pudding con Labneh e Melograno</a>
+              <p class="fermented">Labneh or Greek yogurt</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Lunch<br>12:30</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/yb7pnf4lsvg6s77j4bxnywd6" target="_blank">Mezze Box</a>
+              <p class="fermented">Labneh (counts as fermented)</p>
+              <div class="tags"><span class="tag me">Middle Eastern</span><span class="tag nocook">No cook</span></div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <span class="label">Dinner<br>17:15</span>
+            <div>
+              <a class="recipe-link" href="https://karakeep.enricoruggieri.com/bookmarks/j1k71axmf0ulhuqk8a39s0qp" target="_blank">Fegatini con Capperi, Limone e Zucchine</a>
+              <p class="fermented">Sauerkraut or fermented vegetables</p>
+              <div class="tags"><span class="tag it">Italian</span><span class="tag fast">Fast</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="habits">
+        <h2>Daily habits</h2>
+        <ul>
+          <li>ACV (1 tbsp) 15 min before each meal</li>
+          <li>Cinnamon at every breakfast</li>
+          <li>15 min walk after each meal</li>
+          <li>Meal sequence: veg &rarr; fat/protein &rarr; carbs last</li>
+          <li>Last food by 18:00</li>
+        </ul>
+      </div>
+    </div>
+    </body>
+    </html>
