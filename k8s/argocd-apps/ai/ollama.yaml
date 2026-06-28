@@ -63,13 +63,13 @@ spec:
               # - qwen3:4b
 
           # Environment variables
-          extraEnv:
-            - name: OLLAMA_KEEP_ALIVE
-              value: "24h"
-            - name: OLLAMA_HOST
-              value: "0.0.0.0"
-            - name: OLLAMA_CONTEXT_LENGTH
-              value: "64000"
+        extraEnv:
+          - name: OLLAMA_KEEP_ALIVE
+            value: "24h"
+          - name: OLLAMA_HOST
+            value: "0.0.0.0"
+          - name: OLLAMA_CONTEXT_LENGTH
+            value: "64000"
 
         ingress:
           enabled: true
