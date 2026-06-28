@@ -8,7 +8,7 @@ spec:
   source:
     chart: open-webui
     repoURL: https://helm.openwebui.com/
-    targetRevision: 10.2.0
+    targetRevision: 14.11.0
     helm:
       values: |
         ollama:
@@ -19,16 +19,6 @@ spec:
 
         pipelines:
           enabled: false
-
-        db:
-          engine: postgres
-          # This creates a postgres sub-chart deployment
-          postgres:
-            enabled: true
-            persistence:
-              enabled: true
-              storageClass: "proxmox-zfs-nvme"
-              size: 5Gi
 
         persistence:
           enabled: true
