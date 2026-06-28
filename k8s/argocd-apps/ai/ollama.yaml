@@ -68,6 +68,8 @@ spec:
               value: "24h"
             - name: OLLAMA_HOST
               value: "0.0.0.0"
+            - name: OLLAMA_CONTEXT_LENGTH
+              value: "64000"
 
         ingress:
           enabled: true
