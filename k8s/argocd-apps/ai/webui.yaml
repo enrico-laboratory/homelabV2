@@ -46,7 +46,7 @@ spec:
                 name: qdrant-api-key-secret
                 key: api-key
           - name: ENABLE_RETRIEVAL_UNSCOPED_COLLECTIONS
-            value: "true
+            value: "true"
         tolerations:
             - key: "nvidia.com/gpu"
               operator: "Exists"
