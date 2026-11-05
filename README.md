@@ -61,7 +61,7 @@ homelabV2/
 
 ### Media & Applications
 - Jellyfin (media streaming)
-- Nextcloud (cloud storage)
+- Nextcloud (cloud storage), with nightly restic backup to TrueNAS
 - Navidrome (music streaming)
 - Joplin (notes)
 - Meal Plan (personal dashboard at personal.enricoruggieri.com)
