@@ -83,6 +83,34 @@ spec:
               enabled: true
               storageClass: proxmox-zfs-nvme
 
+        # Redis provides file locking (memcache.locking) and distributed cache.
+        # The nextcloud image enables both when REDIS_HOST is set (chart sets it).
+        redis:
+          enabled: true
+          architecture: standalone
+          auth:
+            enabled: true
+            existingSecret: nextcloud-redis-credentials
+            existingSecretPasswordKey: redis-password
+          global:
+            storageClass: proxmox-zfs-nvme
+          master:
+            persistence:
+              enabled: true
+
+        # Background jobs (also purges expired rows from oc_file_locks)
+        cronjob:
+          enabled: true
+          type: sidecar
+
+        # Switch Nextcloud from AJAX to cron background-job mode (idempotent).
+        # Must be top-level: the chart ignores nextcloud.lifecycle.
+        lifecycle:
+          postStartCommand:
+            - "/bin/sh"
+            - "-c"
+            - "su -s /bin/sh www-data -c 'php /var/www/html/occ background:cron' || true"
+
         ingress:
           enabled: true
           className: nginx
