@@ -43,15 +43,6 @@ spec:
               mountPath: /mnt/books
               readOnly: true
 
-          lifecycle:
-            postStartCommand:
-              - "/bin/sh"
-              - "-c"
-              - |
-                su -s /bin/sh www-data -c 'php /var/www/html/occ app:enable files_external' || true
-                su -s /bin/sh www-data -c 'php /var/www/html/occ files_external:list' | grep -q 'Books' || \
-                  su -s /bin/sh www-data -c 'php /var/www/html/occ files_external:create Books local null::null -c datadir=/mnt/books --user admin'
-
         persistence:
           enabled: true
           storageClass: proxmox-zfs-nvme
