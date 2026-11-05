@@ -1,0 +1,110 @@
+# Nightly Karakeep backup to TrueNAS (restic over NFS).
+#   1. dump   : consistent SQLite copy (.backup) + JSON export of all bookmarks/notes via the API
+#   2. restic : backup of assets + dump, then retention
+#   3. check  : fails the job if any step failed (steps 1 and 2 never abort the pod)
+# Meilisearch is not backed up: the index is rebuilt from the DB.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: karakeep-backup
+  namespace: mediaserver
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          # The data PVC is ReadWriteOnce: run on the same node as Karakeep.
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      app: karakeep-web
+          initContainers:
+            - name: dump
+              image: alpine:3.22
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  apk add --no-cache sqlite curl jq >/dev/null || { touch /status/failed; exit 0; }
+                  sqlite3 /data/db.db ".backup /dump/db.db" || touch /status/failed
+                  # JSON export (portable, independent of the DB schema)
+                  cursor=""; n=0
+                  : > /dump/bookmarks.ndjson
+                  while :; do
+                    url="http://karakeep-web:3000/api/v1/bookmarks?limit=100&includeContent=true"
+                    [ -n "$cursor" ] && url="$url&cursor=$cursor"
+                    curl -fsS -H "Authorization: Bearer $KARAKEEP_API_KEY" "$url" -o /tmp/page.json \
+                      || { touch /status/failed; break; }
+                    jq -c '.bookmarks[]' /tmp/page.json >> /dump/bookmarks.ndjson
+                    cursor=$(jq -r '.nextCursor // empty' /tmp/page.json)
+                    [ -z "$cursor" ] && break
+                  done
+                  jq -s '.' /dump/bookmarks.ndjson > /dump/bookmarks.json && rm /dump/bookmarks.ndjson \
+                    || touch /status/failed
+                  [ -s /dump/bookmarks.json ] || touch /status/failed
+                  exit 0
+              env:
+                - name: KARAKEEP_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: karakeep-backup-secrets
+                      key: api_key
+              volumeMounts:
+                - { name: data, mountPath: /data }
+                - { name: dump, mountPath: /dump }
+                - { name: status, mountPath: /status }
+            - name: restic
+              image: restic/restic:0.18.0
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  restic cat config >/dev/null 2>&1 || restic init || { touch /status/failed; exit 0; }
+                  restic backup /data/assets /dump --host karakeep || { touch /status/failed; exit 0; }
+                  restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune \
+                    || touch /status/failed
+                  exit 0
+              env:
+                - { name: RESTIC_REPOSITORY, value: /repo }
+                - { name: RESTIC_CACHE_DIR, value: /cache }
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: karakeep-backup-secrets
+                      key: restic_password
+              volumeMounts:
+                - { name: data, mountPath: /data, readOnly: true }
+                - { name: dump, mountPath: /dump }
+                - { name: cache, mountPath: /cache }
+                - { name: repo, mountPath: /repo }
+          containers:
+            - name: check
+              image: alpine:3.22
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  if [ -e /status/failed ]; then echo "backup step failed, see init container logs"; exit 1; fi
+              volumeMounts:
+                - { name: status, mountPath: /status }
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: web-data-pvc
+            - name: repo
+              nfs:
+                server: truenas-backup.enricoruggieri.com
+                path: /mnt/backup-pool-2/karakeep
+            - name: dump
+              emptyDir: {}
+            - name: status
+              emptyDir: {}
+            - name: cache
+              emptyDir: {}

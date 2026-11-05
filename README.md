@@ -64,6 +64,7 @@ homelabV2/
 - Nextcloud (cloud storage), with nightly restic backup to TrueNAS
 - Navidrome (music streaming)
 - Joplin (notes)
+- Karakeep (bookmarks and notes), with nightly restic backup to TrueNAS
 - Meal Plan (personal dashboard at personal.enricoruggieri.com)
 
 ### AI & ML Services
