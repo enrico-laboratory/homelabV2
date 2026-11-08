@@ -25,10 +25,19 @@ spec:
               value: http://chrome:9222
             - name: DATA_DIR
               value: /data
-#            - name: OLLAMA_BASE_URL
-#              value: http://ollama.ai.svc:11434/v1/
-#            - name: INFERENCE_TEXT_MODEL
-#              value: llama3.2:3b
+            # AI auto-tagging via Ollama (native API). The secret carries an
+            # OPENAI_API_KEY that would take precedence, so blank it here:
+            # explicit env wins over envFrom.
+            - name: OPENAI_API_KEY
+              value: ""
+            - name: OLLAMA_BASE_URL
+              value: http://ollama.ai.svc:11434
+            - name: INFERENCE_TEXT_MODEL
+              value: llama3.2:3b
+            - name: INFERENCE_CONTEXT_LENGTH
+              value: "8192"
+            - name: INFERENCE_JOB_TIMEOUT_SEC
+              value: "120"
           volumeMounts:
             - mountPath: /data
               name: data

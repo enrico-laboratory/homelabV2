@@ -68,7 +68,6 @@ spec:
               - orieg/gemma3-tools:12b-ft
               - dolphin3:8b
               - dolphin-phi
-              - gemma3:4b
 
           # Environment variables
         extraEnv:
