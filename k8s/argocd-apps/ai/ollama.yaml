@@ -11,7 +11,7 @@ spec:
   source:
     chart: ollama
     repoURL: https://helm.otwld.com/
-    targetRevision: 1.40.0
+    targetRevision: 1.95.0
     helm:
       releaseName: ollama
       values: |
@@ -52,15 +52,23 @@ spec:
             type: nvidia
             number: 1
 
-          # Models to pull at startup
-          # models:
-            # pull:
-              # - llama3.2:3b
-              # - llama3.2:1b
-              # - llama3.2-vision
-              # - nomic-embed-text
-              # - qwen3-coder:30b
-              # - qwen3:4b
+          # Models pulled at startup (no-op when already on the PVC).
+          # Additive only: removing an entry does not delete the model.
+          models:
+            pull:
+              - llama3.2:1b
+              - llama3.2:3b
+              - llama3.2-vision
+              - nomic-embed-text
+              - qwen3:4b
+              - qwen2.5-coder:7b
+              - qwen2.5-coder:14b
+              - mistral-small
+              - gemma3:12b
+              - orieg/gemma3-tools:12b-ft
+              - dolphin3:8b
+              - dolphin-phi
+              - gemma3:4b
 
           # Environment variables
         extraEnv:
@@ -70,6 +78,8 @@ spec:
             value: "0.0.0.0"
           - name: OLLAMA_CONTEXT_LENGTH
             value: "64000"
+          - name: OLLAMA_FLASH_ATTENTION
+            value: '1'
 
         ingress:
           enabled: true
