@@ -4,6 +4,8 @@ metadata:
   name: web
 spec:
   replicas: 1
+  strategy:
+    type: Recreate  # RWO data PVC: the old pod must release it first
   selector:
     matchLabels:
       app: karakeep-web
