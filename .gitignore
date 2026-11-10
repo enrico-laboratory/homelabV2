@@ -19,3 +19,6 @@ update_hosts_last_run.log
 age_key.txt
 proxmox-config-raw.yaml
 backup-codes.txt
+
+# GPU ROM dumps
+*.rom
