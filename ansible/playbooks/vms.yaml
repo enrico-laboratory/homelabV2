@@ -138,21 +138,6 @@
             format: raw
             size: 20
             state: "present"
-      - vmid: 140
-        state: "stopped"
-        disk_type: "scsi0"
-        vm_name: "{{ name_suffix }}proxy"
-        node_name: "pve-node1"
-        template: false
-        onboot: true
-        cores: 2
-        memory: 2048
-        started: true
-        nameservers:
-          - "192.168.100.80"
-          - "8.8.8.8"
-        searchdomains:
-          - enricoruggieri.com
       - vmid: 149
         state: "present"
         disk_type: "scsi0"

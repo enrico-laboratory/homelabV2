@@ -62,31 +62,6 @@ module "k3s-workers" {
   ]
 }
 
-module "proxy" {
-  source = "./modules/vms"
-
-  on_boot          = true
-  started          = true
-  cpu_default      = 2
-  hostname         = "k3s-proxy"
-  memory_default   = 2048
-  node_name        = var.node_name
-  user_name        = var.user_name
-  vm_id            = 140
-  vm_name          = "k3s-proxy"
-  ssh_pub_key_path = "${var.home_folder}/.ssh/id_rsa.pub"
-  hostpci          = null
-  disks = [
-    {
-      datastore_id = var.vm_images_datastore
-      size         = 32
-      interface    = "${var.disk_interface}0"
-      iothread     = true
-      import_from  = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
-    }
-  ]
-}
-
 module "nas" {
   source = "./modules/vms"
 
