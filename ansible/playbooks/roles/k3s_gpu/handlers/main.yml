@@ -1,0 +1,17 @@
+- name: update-initramfs
+  command: update-initramfs -u
+  become: yes
+
+- name: reboot-node
+  reboot:
+    msg: "Rebooting to apply Nouveau blacklist and update kernel initramfs"
+    reboot_timeout: 600
+    connect_timeout: 5
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+
+- name: restart-k3s
+  systemd:
+    name: k3s-agent
+    state: restarted
