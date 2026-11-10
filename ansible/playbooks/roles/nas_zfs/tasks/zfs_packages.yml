@@ -1,0 +1,39 @@
+#- name: Install prerequisite packages for adding repositories
+#  apt:
+#    name:
+#      - build-essential
+#      - "linux-headers-{{ ansible_kernel }}"
+#    state: present
+#    update_cache: yes
+#
+#- name: Ensure keyrings directory exists
+#  ansible.builtin.file:
+#    path: /etc/apt/keyrings
+#    state: directory
+#    mode: '0755'
+#
+#- name: Download Zabbly GPG key
+#  ansible.builtin.get_url:
+#    url: https://pkgs.zabbly.com/key.asc
+#    dest: /etc/apt/keyrings/zabbly.asc
+#    mode: '0644'
+#
+#- name: Add Zabbly ZFS repository
+#  ansible.builtin.apt_repository:
+#    repo: "deb [signed-by=/etc/apt/keyrings/zabbly.asc] https://pkgs.zabbly.com/kernel/stable jammy zfs main"
+#    filename: zabbly-zfs
+#    state: present
+#
+#- name: Update apt cache and install OpenZFS 2.2
+#  ansible.builtin.apt:
+#    name:
+#      - openzfs-zfsutils
+#      - openzfs-zfs-dkms
+#    state: latest
+#    update_cache: yes
+#  register: zfs_upgrade
+#
+#- name: reboot nas
+#  reboot:
+#    msg: "Rebooting NAS to reload zfs module into kernel"
+#  when: zfs_upgrade.changed

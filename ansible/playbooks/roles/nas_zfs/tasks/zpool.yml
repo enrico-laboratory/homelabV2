@@ -1,0 +1,25 @@
+- name: Check if pool is already imported
+  ansible.builtin.command: "zpool list {{ zfs_pool.name }}"
+  register: pool_status
+  failed_when: false
+  changed_when: false
+
+- name: Import the pool if it exists but is not imported
+  ansible.builtin.command: "zpool import -f {{ zfs_pool.name }}"
+  when: pool_status.rc != 0
+  register: import_result
+  failed_when: false
+  changed_when: import_result.rc == 0
+
+- name: Create the pool if import failed (Library Fallback)
+  community.general.zpool:
+    name: "{{ zfs_pool.name }}"
+    state: present
+    slot: "{{ zfs_pool.devices }}"
+  when:
+    - pool_status.rc != 0
+    - import_result.rc != 0
+
+- name: Ensure pool is registered in ZFS cache for auto-import on boot
+  ansible.builtin.command: "zpool set cachefile=/etc/zfs/zpool.cache {{ zfs_pool.name }}"
+  changed_when: false

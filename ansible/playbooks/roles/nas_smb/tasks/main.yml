@@ -1,0 +1,38 @@
+---
+- name: Install Samba packages
+  apt:
+    name:
+      - samba
+      - samba-common-bin
+    state: present
+
+- name: Configure Samba for anonymous share
+  blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [downloads]
+      path = /tank-data/media/torrents
+      browseable = yes
+      read only = no
+      guest ok = no
+      valid users = {{ main_user }}
+      force user = {{ main_user }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - DOWNLOAD SHARE"
+  notify: Restart Samba
+
+- name: Ensure Samba services are running
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - smbd
+    - nmbd
+
+- name: Ensure Samba maps unknown users to guest
+  lineinfile:
+    path: /etc/samba/smb.conf
+    regexp: '^\s*map to guest\s*='
+    line: '   map to guest = bad user'
+    insertafter: '\[global\]'
+  notify: Restart Samba

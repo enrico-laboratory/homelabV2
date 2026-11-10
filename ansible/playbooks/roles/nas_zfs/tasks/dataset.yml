@@ -1,0 +1,37 @@
+- name: Gather ZFS dataset facts
+  community.general.zfs_facts:
+    name: "{{ zfs_dataset.pool }}/{{ zfs_dataset.name }}"
+  register: dataset_check
+  failed_when: false
+
+- name: Manage Filesystem Dataset
+  community.general.zfs:
+    name: "{{ zfs_dataset.pool }}/{{ zfs_dataset.name }}"
+    state: present
+    extra_zfs_properties:
+      sharenfs: >-
+        {%- if zfs_dataset.nfs.enabled | default(true) | bool or zfs_dataset.nfs.options is defined -%}
+          {{ zfs_dataset.nfs.options | default(nfs_default_options) }}
+        {%- else -%}
+          off
+        {%- endif -%}
+  when: >
+    (dataset_check.ansible_facts.ansible_zfs_datasets | default([]) | length == 0) or
+    (dataset_check.ansible_facts.ansible_zfs_datasets[0].type == 'filesystem')
+  notify: "Update NFS exports"
+
+- name: Manage Volume Dataset (ZVOL)
+  community.general.zfs:
+    name: "{{ zfs_dataset.pool }}/{{ zfs_dataset.name }}"
+    state: present
+  when:
+    - dataset_check.ansible_facts.ansible_zfs_datasets | default([]) | length > 0
+    - dataset_check.ansible_facts.ansible_zfs_datasets[0].type == 'volume'
+
+- name: Delegate Permissions
+  community.general.zfs_delegate_admin:
+    name: "{{ zfs_dataset.pool }}/{{ zfs_dataset.name }}"
+    users: "{{ main_user }}"
+    permissions: "{{ backup_perms }}"
+    state: present
+  when: (dataset_check.ansible_facts.ansible_zfs_datasets | default([]) | length > 0) or (not ansible_failed_task is defined)

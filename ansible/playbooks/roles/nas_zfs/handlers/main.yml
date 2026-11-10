@@ -1,0 +1,6 @@
+- name: reboot nas
+  reboot:
+    msg: "Rebooting NAS to reload zfs module into kernel"
+
+- name: Update NFS exports
+  command: exportfs -ra

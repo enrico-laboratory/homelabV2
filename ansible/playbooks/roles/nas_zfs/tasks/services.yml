@@ -1,0 +1,17 @@
+- name: Enable and start ZFS import cache service
+  ansible.builtin.systemd:
+    name: zfs-import-cache.service
+    enabled: true
+    state: started
+
+- name: Enable and start NFS kernel server
+  ansible.builtin.systemd:
+    name: nfs-kernel-server.service
+    enabled: true
+    state: started
+
+- name: Enable and start ZFS share service
+  ansible.builtin.systemd:
+    name: zfs-share.service
+    enabled: true
+    state: started

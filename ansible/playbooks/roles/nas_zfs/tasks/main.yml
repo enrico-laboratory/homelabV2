@@ -1,0 +1,18 @@
+#- name: Ensure ZFS utilities are installed
+#  include_tasks: zfs_packages.yml
+
+- name: Prepare zpools
+  include_tasks: zpool.yml
+  loop: "{{ zfs_pools }}"
+  loop_control:
+    loop_var: zfs_pool
+
+- name: Prepare datasets
+  include_tasks: dataset.yml
+  loop: "{{ zfs_datasets }}"
+  loop_control:
+    loop_var: zfs_dataset
+
+- name: Configure ZFS and NFS services for boot persistence
+  include_tasks: services.yml
+
