@@ -22,6 +22,12 @@ services:
       - '--storage.tsdb.path=/prometheus'
     ports:
       - "9090:9090"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.enricoruggieri.com`)
+      - traefik.http.routers.prometheus.entrypoints=websecure
+      - traefik.http.routers.prometheus.tls.certresolver=cf
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090
     restart: unless-stopped
 
   grafana:
@@ -39,15 +45,28 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.enricoruggieri.com`)
+      - traefik.http.routers.grafana.entrypoints=websecure
+      - traefik.http.routers.grafana.tls.certresolver=cf
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
     restart: unless-stopped
 
   gatus:
     image: twinproduction/gatus:latest
     container_name: gatus
+    restart: unless-stopped
     networks:
       - main
     ports:
       - 8082:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gatus.rule=Host(`gatus.enricoruggieri.com`)
+      - traefik.http.routers.gatus.entrypoints=websecure
+      - traefik.http.routers.gatus.tls.certresolver=cf
+      - traefik.http.services.gatus.loadbalancer.server.port=8080
     volumes:
       - ./gatus:/config
       - gatus_db:/data
@@ -55,6 +74,7 @@ services:
   dozzle:
     image: amir20/dozzle:latest
     container_name: dozzle
+    restart: unless-stopped
     environment:
       - "DOZZLE_ENABLE_ACTIONS=true"
       - "DOZZLE_ENABLE_SHELL=true"
@@ -65,12 +85,19 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8081:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.rule=Host(`dozzle.enricoruggieri.com`)
+      - traefik.http.routers.dozzle.entrypoints=websecure
+      - traefik.http.routers.dozzle.tls.certresolver=cf
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
     networks:
       - main
 
   netalertx:
     image: ghcr.io/jokob-sk/netalertx:latest
     container_name: netalertx
+    restart: unless-stopped
     network_mode: host
     environment:
       - PORT=20211

@@ -13,7 +13,7 @@ cd ansible
 make <target>
 # e.g.:
 make k8s_bootstrap_cluster     # Deploy ArgoCD and bootstrap the cluster
-make k3s_config                 # Configure k3s nodes, proxy, GPU
+make k3s_config                 # Configure k3s nodes, GPU
 make compose_apps               # Deploy docker-compose apps (monitoring, pihole, etc.)
 make dns_config                 # Configure DNS records via Ansible
 make update_hosts               # Update /etc/hosts on nodes
@@ -214,7 +214,7 @@ sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
 
 - **Proxmox cluster**: nodes at `192.168.100.23` (pve_node3)
 - **k3s master**: `k3s-101` at `192.168.100.101`; agents at `.111`, `.112`, `.113`
-- **Proxy/LB**: `192.168.100.140`
+- **Reverse proxy**: Traefik container on `ops` (`192.168.100.78`) — label discovery for Docker services, TLS passthrough (SNI) to the k8s ingress at `192.168.100.111:443`. kubectl and k3s agents talk to the master `192.168.100.101:6443` directly
 - **TrueNAS backup**: `truenas-backup.enricoruggieri.com` — use for NFS backup mounts or rclone targets
 
 ## Rules

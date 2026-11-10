@@ -1,7 +1,6 @@
 - name: Configure K3s cluster
   hosts:
     - k3s_cluster
-    - proxy
   become: true
   vars:
     helm_version: "v4.0.4"
@@ -24,16 +23,6 @@
       when: group_names is contains('master_server')
       ansible.builtin.include_role:
         name: k3s_ansible_kubernetes
-
-    - name: Configure proxy
-      when: group_names is contains('proxy')
-      ansible.builtin.include_role:
-        name: k3s_proxy
-
-    - name: Install node exporter
-      when: group_names is contains('proxy')
-      ansible.builtin.include_role:
-        name: prometheus.prometheus.node_exporter
 
     - name: Configure gpu passthrough
 ## To install in the pve with intel alder lake cpu

@@ -2,5 +2,5 @@ ansible_port: 22
 ansible_user: "{{ main_user }}"
 k3s_version: v1.34.3+k3s1
 api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
-extra_server_args: '--disable=traefik --tls-san 192.168.100.140 --disable=coredns --disable-cloud-controller --kubelet-arg="cloud-provider=external"'
-extra_agent_args: '--server https://192.168.100.140:6443 --kubelet-arg="cloud-provider=external"'
+extra_server_args: '--disable=traefik --disable=coredns --disable-cloud-controller --kubelet-arg="cloud-provider=external"'
+extra_agent_args: '--kubelet-arg="cloud-provider=external"'

@@ -36,10 +36,6 @@ k3s_cluster:
       hosts:
         k3s-113:
 
-proxy:
-  hosts:
-    192.168.100.140:
-
 storage:
   hosts:
     nas:

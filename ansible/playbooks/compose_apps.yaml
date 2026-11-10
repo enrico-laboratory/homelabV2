@@ -42,21 +42,6 @@
       ansible.builtin.include_role:
         name: compose_apps
 
-    - name: Nginx
-      vars:
-        deploy: True
-        stack_name: "nginx"
-        state: "present"
-        application_folders:
-          - {"name": 'data', "owner": "root", "group": "root", "mode": "0755", "container_mount": "data"}
-          - {"name": 'letsencrypt', "owner": "root", "group": "root", "mode": "0755", container_mount: "etc/letsencrypt"}
-        ports:
-          - "80:80"
-          - "81:81"
-          - "443:443"
-      ansible.builtin.include_role:
-        name: compose_apps
-
     - name: Tailscale
       vars:
         deploy: True
@@ -81,3 +66,46 @@
       ansible.builtin.include_role:
         name: compose_apps
 
+    # Reverse proxy for Docker services (label discovery) and TLS passthrough
+    # for the k8s ingress.
+    - name: Traefik
+      vars:
+        deploy: True
+        stack_name: "traefik"
+        state: "present"
+        traefik_http_port: 80
+        traefik_https_port: 443
+        acme_email: "enr.ruggieri.mail@gmail.com"
+        k8s_ingress_ip: "192.168.100.111"
+        k8s_hostnames:
+          - argocd.enricoruggieri.com
+          - calibreweb.enricoruggieri.com
+          - comfyui.enricoruggieri.com
+          - grafana-kube.enricoruggieri.com
+          - jackett.enricoruggieri.com
+          - jellyfin.enricoruggieri.com
+          - joplin.enricoruggieri.com
+          - karakeep.enricoruggieri.com
+          - navidrome.enricoruggieri.com
+          - nextcloud.enricoruggieri.com
+          - ollama.enricoruggieri.com
+          - onlyoffice.enricoruggieri.com
+          - personal.enricoruggieri.com
+          - prowlarr.enricoruggieri.com
+          - radarr.enricoruggieri.com
+          - sonarr.enricoruggieri.com
+          - transmission.enricoruggieri.com
+          - webui.enricoruggieri.com
+        host_services:
+          - { "name": "netalertx", "port": 20211 }
+          - { "name": "zigbee2mqtt", "url": "http://zigbee2mqtt:8099" }
+          - { "name": "pihole", "port": 8083 }
+          - { "name": "homeassistant", "port": 8123 }
+        application_folders:
+          - { "name": 'letsencrypt', "owner": "root", "group": "root", "mode": "0700" }
+          - { "name": 'dynamic', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+        templates:
+          - { "src": "k8s.yml", "dest": "dynamic/k8s.yml" }
+          - { "src": "docker-hosts.yml", "dest": "dynamic/docker-hosts.yml" }
+      ansible.builtin.include_role:
+        name: compose_apps

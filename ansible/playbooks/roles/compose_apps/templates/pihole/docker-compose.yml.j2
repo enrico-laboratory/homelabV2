@@ -20,7 +20,7 @@ services:
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'ALL'
       FTLCONF_dns_listeningMode: 'ALL'
       FTLCONF_dns_upstreams: '8.8.8.8;8.8.4.4'
-      FTLCONF_webserver_port: '8082,443s'
+      FTLCONF_webserver_port: '8082'
       FTLCONF_misc_etc_dnsmasq_d: 'true'
     # Volumes store your data between container upgrades
     volumes:
