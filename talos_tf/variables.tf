@@ -11,8 +11,14 @@ variable "cluster_name" {
 
 variable "talos_version" {
   type        = string
-  default     = "v1.13.10"
+  default     = "v1.14.5"
   description = "Talos Linux version used for the image factory schematic and installer"
+}
+
+variable "kubernetes_version" {
+  type        = string
+  default     = "1.36.4"
+  description = "Pinned below the provider default (1.37.0) to stay on a release line Cilium and the Proxmox CCM have shipped against"
 }
 
 variable "gateway" {
@@ -53,8 +59,9 @@ variable "nodes" {
   }))
   default = {
     "talos-121" = { role = "controlplane", vm_id = 121, cpu = 2, memory = 4096, disk_size = 32 }
-    "talos-131" = { role = "worker", vm_id = 131, cpu = 4, memory = 8192, disk_size = 48 }
-    "talos-132" = { role = "worker", vm_id = 132, cpu = 4, memory = 8192, disk_size = 48 }
+    # memory kept small while k3s is still running on the same host (~17 GB free); raise once k3s is decommissioned
+    "talos-131" = { role = "worker", vm_id = 131, cpu = 4, memory = 4096, disk_size = 48 }
+    "talos-132" = { role = "worker", vm_id = 132, cpu = 4, memory = 4096, disk_size = 48 }
   }
 }
 

@@ -26,36 +26,73 @@ data "talos_machine_configuration" "this" {
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   talos_version    = var.talos_version
 
+  kubernetes_version = var.kubernetes_version
+
+  # Talos >= 1.12 splits the config into one document per concern. Anything set here must use the
+  # document form when the generated config already has one (validated offline with `talosctl validate`).
   config_patches = [
+    # static address; still configured through the v1alpha1 document
     yamlencode({
       machine = {
         network = {
-          hostname = each.key
           interfaces = [{
             deviceSelector = { driver = "virtio_net" }
             addresses      = ["${local.static_ips[each.key]}/24"]
             routes         = [{ network = "0.0.0.0/0", gateway = var.gateway }]
           }]
-          nameservers = var.nameservers
-        }
-        install = {
-          disk  = "/dev/sda"
-          image = data.talos_image_factory_urls.this.urls.installer
-        }
-        # proxmox-csi-plugin matches nodes to VMs by these labels
-        nodeLabels = {
-          "topology.kubernetes.io/region" = var.proxmox_region
-          "topology.kubernetes.io/zone"   = var.node_name
         }
       }
       cluster = {
-        network = { cni = { name = "none" } }
-        proxy   = { disabled = true }
+        # with the KubeProxyConfig document deleted below, Talos falls back to this legacy
+        # setting, whose default is "enabled"; disable it explicitly
+        proxy = { disabled = true }
         # kubelet runs with --cloud-provider=external: nodes stay tainted
         # (node.cloudprovider.kubernetes.io/uninitialized) until the Proxmox CCM initializes them
         externalCloudProvider = { enabled = true }
       }
-    })
+    }),
+    # the node name must match the Proxmox VM name (CSI/CCM look the VM up by it)
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "HostnameConfig"
+      auto       = "off"
+      hostname   = each.key
+    }),
+    # installer image from our schematic (qemu-guest-agent extension)
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "UnattendedInstallConfig"
+      installer  = { image = data.talos_image_factory_urls.this.urls.installer }
+      provisioning = {
+        diskSelector = { match = "disk.dev_path == \"/dev/sda\"" }
+        wipe         = false
+      }
+    }),
+    yamlencode({
+      apiVersion  = "v1alpha1"
+      kind        = "ResolverConfig"
+      nameservers = [for ns in var.nameservers : { address = ns }]
+    }),
+    # proxmox-csi-plugin matches nodes to VMs by these labels
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "KubeNodeConfig"
+      labels = {
+        "topology.kubernetes.io/region" = var.proxmox_region
+        "topology.kubernetes.io/zone"   = var.node_name
+      }
+    }),
+    # Cilium replaces flannel and kube-proxy
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "KubeFlannelCNIConfig"
+      "$patch"   = "delete"
+    }),
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "KubeProxyConfig"
+      "$patch"   = "delete"
+    }),
   ]
 }
 
