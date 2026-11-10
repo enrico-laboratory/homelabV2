@@ -27,6 +27,8 @@ homelabV2/
 │   ├── roles/                    # Reusable task collections
 │   └── inventories/              # Host inventory and encrypted variables
 ├── pve_tf/                        # Terraform for Proxmox infrastructure
+├── talos_tf/                      # Terraform for the Talos cluster (VMs, bootstrap, Cilium, Flux)
+├── k8s-talos/                     # Flux GitOps tree for the Talos cluster
 ├── .sops.yaml                     # SOPS encryption configuration
 └── CLAUDE.md                      # Development guidelines
 ```
@@ -98,3 +100,18 @@ kubectl get applications -n argocd
 ## License
 
 Personal homelab setup. Adapt as needed for your environment.
+
+## Talos Cluster (in progress)
+
+A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `talos-121`, 2 workers `talos-131/132`), fully provisioned by `talos_tf/`:
+
+- VMs, machine config, bootstrap and kubeconfig via the `bpg/proxmox` and `siderolabs/talos` providers
+- Cilium as CNI (kube-proxy replacement, L2 LB-IPAM pool 192.168.100.200-219)
+- Flux bootstrapped from Terraform, reconciling `k8s-talos/clusters/talos`
+- Storage: Proxmox CSI on the `kubedata` ZFS pool; NFS via inline volumes to the NAS
+
+```bash
+cd talos_tf
+make tf-init && make tf-plan && make tf-apply
+make configs   # writes ~/.talos/config and ~/.kube/talos-config
+```

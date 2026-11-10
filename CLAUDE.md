@@ -46,6 +46,10 @@ export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
 sops --decrypt dns/terraform.tfvars.enc > /tmp/terraform.tfvars   # never commit decrypted
 ```
 
+## Talos cluster (talos_tf/)
+
+Separate Terraform root module for the Talos k8s cluster (own state). Run via `cd talos_tf && make tf-plan|tf-apply` (secrets from `auth.enc.yaml`, see `auth.example.yaml`). GitOps for this cluster is **Flux** (not ArgoCD), reading `k8s-talos/`; Flux is bootstrapped by Terraform (`flux_bootstrap_git`). The ArgoCD/`k8s/` rules in this file apply to the k3s cluster only.
+
 ## Architecture
 
 ### GitOps Flow

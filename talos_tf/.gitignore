@@ -1,0 +1,4 @@
+auth.yaml
+kubeconfig*
+talosconfig*
+*.tfplan

@@ -1,0 +1,18 @@
+PROXMOX_VE_USERNAME: ENC[AES256_GCM,data:dgFb2tMJEj8=,iv:5moX7XHuLCQeCt99gQ0va+I+0ScCP7hw4DAQ62Fg9N8=,tag:wXis8TJBMWcMf+tgyJFQjA==,type:str]
+PROXMOX_VE_PASSWORD: ENC[AES256_GCM,data:Rp78sCmCxXMlERI=,iv:LoEerW0uB2xEk3/6A9qm1YM+3GPiAaC2eZR8kc85CKg=,tag:5MQQtYIAgehVaceWDAkJOw==,type:str]
+TF_VAR_github_token: ENC[AES256_GCM,data:AgPZ07pSY1qw6SgbiIptU8EkAdNUqiSKu/rnjW1zNsPJ3YWKppYnXdNXHgKV2XUbNEFEab/F4wyf1grCmGmJIo/QdZaeabRrZ4H38K4BMIBzE238fuIhZ5YB8wLI,iv:cFzbJORtMz2TE1Wd+ejy6VE955vBs2GCWDyM/ZcE9ow=,tag:qIfceThK/P32exVFI5+9Iw==,type:str]
+sops:
+    age:
+        - recipient: age1gdp9htuaff9js8n4vl5y2z9nq39cctn9v2dae2v98hfh5fxs23cscu987d
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBSaU9hRXZQK2d2LzNRT3Rk
+            WUlXSEhKbnNiSDlnbndLclRyVWF0Y0EvYUhVCnphaEFBczRNOXVoRXhmOXQxY0JR
+            Q2ZPTGp4RGV3RXI1QzRCeHV6S1hHWFkKLS0tIExBeUcwb05YUmZlaHZ2NEFEL0VH
+            NXE2a1Q5QzdMYnhhSVVKdzNEem50LzgKR6q+kOTCVPr//kmzclKkb1FGpDPhWV1P
+            jZ7L6ZcrK3UeavHA7EOYAqfC+yhiZaAcYzheLY4oEVjamZSoNPfPiw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-11-10T18:31:13Z"
+    mac: ENC[AES256_GCM,data:sG8ZbibKspYfILionBZofDiKb2OOKrl0ZtlDu8z4Kyd1S5Am+FJMj1wpzryafsgs4FL6hZ5TXSgd1mn00aHHUsj91c+Z0p315nFcOJfgu3tSF4ZK7agotIw7BaPn07j6MIQdXo4uGzps9O2JD4Vc7hYLE0HxRUdhSymwE4jSq3U=,iv:6Pi3CgJ43fra2EOOTEzrnkUlmxdDM3Ec9N4bSdRbjDA=,tag:sVgj/fXRxwKbnIj6WXZqZg==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.10.2

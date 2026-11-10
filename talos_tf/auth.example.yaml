@@ -1,0 +1,6 @@
+# Template for auth.enc.yaml. Copy to auth.yaml (gitignored), fill in, then:
+#   SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops --encrypt auth.yaml > auth.enc.yaml
+PROXMOX_VE_USERNAME: root@pam
+PROXMOX_VE_PASSWORD: changeme
+# fine-grained PAT, repo homelabV2, Contents: read & write
+TF_VAR_github_token: ghp_changeme
