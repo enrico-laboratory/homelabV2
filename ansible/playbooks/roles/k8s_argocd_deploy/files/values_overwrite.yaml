@@ -1,35 +1,25 @@
 global:
   domain: "argocd.enricoruggieri.com"
-config:
+configs:
   params:
     server.insecure: "true"
-server:
-  # ingress:
-  #   enabled: true
-  #   ingressClassName: nginx
-  #   path: /https
-  #   tls: false
-  #   annotations:
-  #     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  #   extraRules:
-  #   - http:
-  #       paths:
-  #       - path: /
-  #         pathType: Prefix
-  #         backend:
-  #           service:
-  #             name: argocd-server
-  #             port:
-  #               name: http
-  service:
-    type: LoadBalancer
-    # -- Server service http port
-    servicePortHttp: 8089
-    # -- Server service https port
-    servicePortHttps: 4437
-configs:
   repositories:
     private-repo:
       url: https://github.com/enrico-laboratory/homelabV2.git
-
-
+server:
+  certificate:
+    enabled: true
+    issuer:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-cloudflare
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    tls: true
+  service:
+    type: LoadBalancer
+    servicePortHttp: 8089
+    servicePortHttps: 4437
