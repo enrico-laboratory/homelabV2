@@ -9,6 +9,7 @@ services:
       - TS_ENABLE_HEALTH_CHECK=true
       - TS_ENABLE_METRICS=true
       - TS_ROUTES=192.168.100.0/24
+      - TS_EXTRA_ARGS=--advertise-exit-node
     volumes:
       - tailscale:/var/lib/tailscale
     devices:
