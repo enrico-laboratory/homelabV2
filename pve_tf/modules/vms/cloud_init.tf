@@ -29,6 +29,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - nfs-common
       - open-iscsi
     runcmd:
+      - apt update -y && apt upgrade -y
       - systemctl start qemu-guest-agent
       - echo "done" > /tmp/cloud-config.done
     EOF

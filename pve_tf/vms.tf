@@ -30,13 +30,14 @@ module "k3s-workers" {
 
   on_boot        = true
   started        = true
-  cpu_default    = 4
-  hostname       = "k3s-${var.k3s_worker_first_host + count.index}"
-  memory_default = 4096
+  cpu_default    = 6
+  cpu_type       = var.k3s_worker_first_host + count.index == 113 ? "host" : "x86-64-v2-AES"
+  hostname      = "k3s-${var.k3s_worker_first_host + count.index}"
+  memory_default = 6144
   vm_gpu = {
     id     = 113
-    memory = 24576
-    cpu    = 8
+    memory = 20480
+    cpu    = 6
   }
   node_name        = var.node_name
   user_name        = var.user_name
@@ -49,14 +50,16 @@ module "k3s-workers" {
     pcie     = true
     xvga     = false
     rombar   = true
-    rom_file = "gtx970.rom"
+    rom_file = "rtx3060.rom"
   }
   disks = [
     {
       datastore_id = var.vm_images_datastore
       size         = 48
       interface    = "${var.disk_interface}0"
-      iothread     = true
+      iothread     = false
+      aio          = "threads"
+      ssd          = true
       import_from  = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
     }
   ]
@@ -104,13 +107,13 @@ resource "proxmox_virtual_environment_vm" "win_11" {
   name    = "win-11"
   started = false
   cpu {
-    cores   = 4
-    type    = "x86-64-v3"
+    cores   = 6
+    type    = "host"
     sockets = 1
     flags   = ["+aes"]
   }
   memory {
-    dedicated = 8192
+    dedicated = 14336
     floating  = 0
   }
   bios = "ovmf"
@@ -129,7 +132,7 @@ resource "proxmox_virtual_environment_vm" "win_11" {
   }
   hostpci {
     device   = "hostpci0"
-    id       = "0000:0c:00.0"
+    id       = "0000:0c:00"
     pcie     = true
     rom_file = "patched_gpu.rom"
     xvga     = true

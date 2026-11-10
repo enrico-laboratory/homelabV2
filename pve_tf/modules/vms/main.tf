@@ -46,6 +46,8 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       iothread     = lookup(disk.value, "iothread", null)
       import_from  = lookup(disk.value, "import_from", null)
       file_id      = lookup(disk.value, "file_id", null)
+      aio          = lookup(disk.value, "aio", null)
+      ssd          = lookup(disk.value, "ssd", null)
     }
   }
 

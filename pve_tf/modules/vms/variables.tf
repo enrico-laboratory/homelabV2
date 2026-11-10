@@ -46,6 +46,8 @@ variable "disks" {
     iothread     = optional(bool)
     import_from  = optional(string)
     file_id      = optional(string)
+    aio          = optional(string)
+    ssd          = optional(bool)
   }))
 }
 
