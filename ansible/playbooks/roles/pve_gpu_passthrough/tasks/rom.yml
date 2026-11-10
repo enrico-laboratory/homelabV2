@@ -1,0 +1,33 @@
+---
+- name: Ensure KVM rom directory exists
+  ansible.builtin.file:
+    path: /usr/share/kvm
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Copy GPU ROM to Proxmox host
+  ansible.builtin.copy:
+    src: "{{ gtx_rom_filename }}"
+    dest: "/usr/share/kvm/{{ gtx_rom_filename }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: update-initramfs
+
+- name: Copy RTX3060 ROM to Proxmox host
+  ansible.builtin.copy:
+    src: "{{ rtx_rom_filename }}"
+    dest: "/usr/share/kvm/{{ rtx_rom_filename }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: update-initramfs
+
+- name: Ensure VFIO-PCI can read the ROM
+  ansible.builtin.file:
+    path: "/usr/share/kvm/{{ rtx_rom_filename }}"
+    owner: root
+    group: root
+    mode: '0644'

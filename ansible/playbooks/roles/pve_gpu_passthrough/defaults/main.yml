@@ -1,0 +1,3 @@
+gpu_rom_filename: "patched_gpu.rom"
+gtx_rom_filename: "gtx970.rom"
+rtx_rom_filename: "rtx3060.rom"
