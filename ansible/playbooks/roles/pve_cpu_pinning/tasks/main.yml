@@ -1,0 +1,23 @@
+---
+- name: Ensure Proxmox snippets directory exists
+  file:
+    path: /var/lib/vz/snippets
+    state: directory
+    mode: '0755'
+
+- name: Deploy CPU pinning hookscript
+  copy:
+    src: cpu-pinning.sh
+    dest: /var/lib/vz/snippets/cpu-pinning.sh
+    mode: '0755'
+
+- name: Configure VM to use the hookscript
+  command: "qm set {{ vmid }} --hookscript local:snippets/cpu-pinning.sh"
+  register: qm_result
+  changed_when: "'update' in qm_result.stdout"
+
+- name: Set environment variable for pinned cores in the script
+  lineinfile:
+    path: /var/lib/vz/snippets/cpu-pinning.sh
+    regexp: '^    TARGET_CORES='
+    line: "    TARGET_CORES=({{ pinned_cores | join(' ') }})"
