@@ -1,7 +1,25 @@
+# Gateway API CRDs (standard channel). Cilium only looks for them at operator startup, so they must
+# exist before the Cilium release. Fetched from the upstream release at plan time, nothing vendored.
+data "http" "gateway_api_crds" {
+  url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v${var.gateway_api_version}/standard-install.yaml"
+}
+
+data "kubectl_file_documents" "gateway_api_crds" {
+  content = data.http.gateway_api_crds.response_body
+}
+
+resource "kubectl_manifest" "gateway_api_crds" {
+  for_each          = data.kubectl_file_documents.gateway_api_crds.manifests
+  yaml_body         = each.value
+  server_side_apply = true # the CRDs exceed the client-side apply annotation size limit
+
+  depends_on = [data.talos_cluster_health.control_plane]
+}
+
 # Cilium is installed here because the nodes cannot become Ready (and Flux cannot run) without a CNI.
 # LB-IPAM pool and L2 announcement policy live in k8s-talos/ (Flux), since their CRDs come from this chart.
 resource "helm_release" "cilium" {
-  depends_on = [data.talos_cluster_health.control_plane]
+  depends_on = [data.talos_cluster_health.control_plane, kubectl_manifest.gateway_api_crds]
 
   name       = "cilium"
   namespace  = "kube-system"
@@ -20,22 +38,18 @@ resource "helm_release" "cilium" {
     externalIPs        = { enabled = true }
     k8sClientRateLimit = { qps = 50, burst = 100 } # required by l2announcements
 
+    # Ingress via Gateway API (GatewayClass "cilium"); Gateways are defined in k8s-talos/gateway/
+    gatewayAPI = { enabled = true }
+
     # Metrics endpoints only; the ServiceMonitors live in k8s-talos/infrastructure/monitoring/
     # because the CRD does not exist yet when Terraform installs Cilium
     prometheus = { enabled = true }
     operator   = { prometheus = { enabled = true } }
     hubble = {
       enabled = true
-      # Hubble UI, exposed on a fixed Cilium LB-IPAM address (no ingress controller on Talos yet).
-      # No authentication: LAN only.
+      # Hubble UI is ClusterIP, published through an HTTPRoute (k8s-talos/gateway/). No authentication: LAN only.
       relay = { enabled = true }
-      ui = {
-        enabled = true
-        service = {
-          type        = "LoadBalancer"
-          annotations = { "lbipam.cilium.io/ips" = "192.168.100.201" }
-        }
-      }
+      ui    = { enabled = true }
       metrics = {
         enabled = [
           "dns",

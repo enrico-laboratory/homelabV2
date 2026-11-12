@@ -18,6 +18,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.38"
     }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.1"
+    }
     sops = {
       source  = "carlpett/sops"
       version = "~> 1.2"
@@ -58,6 +62,14 @@ provider "kubernetes" {
   client_certificate     = base64decode(local.kubeconfig.client_certificate)
   client_key             = base64decode(local.kubeconfig.client_key)
   cluster_ca_certificate = base64decode(local.kubeconfig.ca_certificate)
+}
+
+provider "kubectl" {
+  host                   = local.kubeconfig.host
+  client_certificate     = base64decode(local.kubeconfig.client_certificate)
+  client_key             = base64decode(local.kubeconfig.client_key)
+  cluster_ca_certificate = base64decode(local.kubeconfig.ca_certificate)
+  load_config_file       = false
 }
 
 provider "flux" {

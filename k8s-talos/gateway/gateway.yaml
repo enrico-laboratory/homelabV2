@@ -1,0 +1,33 @@
+# Single shared entrypoint (Cilium Gateway API), fixed LB-IPAM address 192.168.100.202.
+# cert-manager's gateway-shim issues the wildcard certificate for the https listener (DNS01).
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: main
+  namespace: gateway
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 192.168.100.202
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.enricoruggieri.com"
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.enricoruggieri.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-enricoruggieri-com-tls
+      allowedRoutes:
+        namespaces:
+          from: All

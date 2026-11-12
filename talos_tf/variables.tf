@@ -82,6 +82,12 @@ variable "cilium_version" {
   default = "1.20.4"
 }
 
+# Must match what the Cilium release supports (https://docs.cilium.io/en/latest/network/servicemesh/gateway-api/gateway-api/)
+variable "gateway_api_version" {
+  type    = string
+  default = "1.6.3"
+}
+
 variable "ccm_chart_version" {
   type    = string
   default = "0.2.32"
