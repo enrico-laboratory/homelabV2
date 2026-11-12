@@ -109,6 +109,7 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Cilium as CNI (kube-proxy replacement, L2 LB-IPAM pool 192.168.100.200-219)
 - Flux bootstrapped from Terraform, reconciling `k8s-talos/clusters/talos`
 - Storage: Proxmox CSI on the `kubedata` ZFS pool; NFS via inline volumes to the NAS
+- Hubble UI (flow visibility) on `http://192.168.100.201`, LAN only, no authentication
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
 
 ```bash

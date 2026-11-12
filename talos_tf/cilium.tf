@@ -26,6 +26,16 @@ resource "helm_release" "cilium" {
     operator   = { prometheus = { enabled = true } }
     hubble = {
       enabled = true
+      # Hubble UI, exposed on a fixed Cilium LB-IPAM address (no ingress controller on Talos yet).
+      # No authentication: LAN only.
+      relay = { enabled = true }
+      ui = {
+        enabled = true
+        service = {
+          type        = "LoadBalancer"
+          annotations = { "lbipam.cilium.io/ips" = "192.168.100.201" }
+        }
+      }
       metrics = {
         enabled = [
           "dns",
