@@ -20,6 +20,25 @@ resource "helm_release" "cilium" {
     externalIPs        = { enabled = true }
     k8sClientRateLimit = { qps = 50, burst = 100 } # required by l2announcements
 
+    # Metrics endpoints only; the ServiceMonitors live in k8s-talos/infrastructure/monitoring/
+    # because the CRD does not exist yet when Terraform installs Cilium
+    prometheus = { enabled = true }
+    operator   = { prometheus = { enabled = true } }
+    hubble = {
+      enabled = true
+      metrics = {
+        enabled = [
+          "dns",
+          "drop",
+          "tcp",
+          "flow",
+          "port-distribution",
+          "icmp",
+          "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction",
+        ]
+      }
+    }
+
     # Talos specifics: https://www.talos.dev/latest/kubernetes-guides/network/deploying-cilium/
     securityContext = {
       capabilities = {

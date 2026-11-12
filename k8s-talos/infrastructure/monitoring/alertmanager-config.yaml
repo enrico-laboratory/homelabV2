@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: telegram-config
+  namespace: monitoring
+spec:
+  route:
+    receiver: telegram
+    groupBy: ["alertname", "namespace"]
+  receivers:
+    - name: telegram
+      telegramConfigs:
+        - chatID: 5135976074
+          botToken:
+            name: telegram-bot-token-secret
+            key: token

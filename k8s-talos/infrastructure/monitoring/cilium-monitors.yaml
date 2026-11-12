@@ -1,0 +1,53 @@
+# Cilium is installed by Terraform (talos_tf/cilium.tf) before the ServiceMonitor CRD exists,
+# so its monitors live here instead of in the chart values. The chart only creates the agent and
+# operator metrics Services together with its own ServiceMonitor, hence PodMonitors for those two.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cilium-agent
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [kube-system]
+  selector:
+    matchLabels:
+      k8s-app: cilium
+  podMetricsEndpoints:
+    - port: prometheus
+      interval: 30s
+      path: /metrics
+      honorLabels: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cilium-operator
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [kube-system]
+  selector:
+    matchLabels:
+      io.cilium/app: operator
+  podMetricsEndpoints:
+    - port: prometheus
+      interval: 30s
+      path: /metrics
+      honorLabels: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hubble
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [kube-system]
+  selector:
+    matchLabels:
+      k8s-app: hubble
+  endpoints:
+    - port: hubble-metrics
+      interval: 30s
+      path: /metrics
+      honorLabels: true

@@ -1,0 +1,120 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: monitoring
+spec:
+  interval: 1h
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: 80.5.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  # CRDs ship with the chart here (k3s uses a separate prometheus-crds app)
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    crds:
+      enabled: true
+
+    # Grafana runs on ops and uses this Prometheus as a datasource
+    grafana:
+      enabled: false
+      forceDeployDashboards: false
+
+    # Cilium replaces kube-proxy
+    kubeProxy:
+      enabled: false
+
+    kubeApiServer:
+      enabled: true
+
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        # Talos kubelet serving certs are self-signed
+        insecureSkipVerify: true
+
+    # Talos binds these to 127.0.0.1 by default; talos_tf/talos.tf patches them to 0.0.0.0
+    kubeControllerManager:
+      enabled: true
+      service:
+        selector:
+          k8s-app: kube-controller-manager
+      serviceMonitor:
+        https: true
+        insecureSkipVerify: true
+    kubeScheduler:
+      enabled: true
+      service:
+        selector:
+          k8s-app: kube-scheduler
+      serviceMonitor:
+        https: true
+        insecureSkipVerify: true
+    # etcd is a host service on Talos (no pod), so scrape the control-plane node directly
+    kubeEtcd:
+      enabled: true
+      endpoints:
+        - 192.168.100.121
+      service:
+        port: 2381
+        targetPort: 2381
+
+    nodeExporter:
+      enabled: true
+    kubeStateMetrics:
+      enabled: true
+
+    prometheus:
+      service:
+        type: LoadBalancer
+        annotations:
+          # fixed IP from the Cilium pool (cilium-config/lb-pool.yaml), used by the ops Grafana datasource
+          lbipam.cilium.io/ips: 192.168.100.200
+      prometheusSpec:
+        externalLabels:
+          cluster: talos
+        retention: 15d
+        retentionSize: 18GB
+        # pick up ServiceMonitors/PodMonitors/rules from every namespace, not only this release's
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: proxmox-zfs-nvme
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 20Gi
+
+    alertmanager:
+      enabled: true
+      alertmanagerSpec:
+        # AlertmanagerConfig objects (telegram-config) in any namespace are merged into the config
+        alertmanagerConfigSelector: {}
+        alertmanagerConfigNamespaceSelector: {}
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: proxmox-zfs-nvme
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 2Gi

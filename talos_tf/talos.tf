@@ -30,7 +30,7 @@ data "talos_machine_configuration" "this" {
 
   # Talos >= 1.12 splits the config into one document per concern. Anything set here must use the
   # document form when the generated config already has one (validated offline with `talosctl validate`).
-  config_patches = [
+  config_patches = concat([
     # static address; still configured through the v1alpha1 document
     yamlencode({
       machine = {
@@ -93,7 +93,26 @@ data "talos_machine_configuration" "this" {
       kind       = "KubeProxyConfig"
       "$patch"   = "delete"
     }),
-  ]
+    ],
+    # expose control-plane metrics to Prometheus (Talos binds them to 127.0.0.1 by default).
+    # The controller-manager and scheduler have their own documents in the multi-document config;
+    # etcd is still in the v1alpha1 document. All three are only allowed on control-plane nodes.
+    each.value.role == "controlplane" ? [
+      yamlencode({
+        cluster = { etcd = { extraArgs = { "listen-metrics-urls" = "http://0.0.0.0:2381" } } }
+      }),
+      yamlencode({
+        apiVersion = "v1alpha1"
+        kind       = "KubeControllerManagerConfig"
+        extraArgs  = { "bind-address" = "0.0.0.0" }
+      }),
+      yamlencode({
+        apiVersion = "v1alpha1"
+        kind       = "KubeSchedulerConfig"
+        extraArgs  = { "bind-address" = "0.0.0.0" }
+      }),
+    ] : [],
+  )
 }
 
 resource "talos_machine_configuration_apply" "this" {
