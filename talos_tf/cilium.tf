@@ -39,7 +39,9 @@ resource "helm_release" "cilium" {
     k8sClientRateLimit = { qps = 50, burst = 100 } # required by l2announcements
 
     # Ingress via Gateway API (GatewayClass "cilium"); Gateways are defined in k8s-talos/gateway/
-    gatewayAPI = { enabled = true }
+    # Only reachable through Traefik on ops, which sends PROXY protocol v2 to preserve the client IP.
+    # With this on, the Gateway rejects connections that do not carry the PROXY header.
+    gatewayAPI = { enabled = true, enableProxyProtocol = true }
 
     # Metrics endpoints only; the ServiceMonitors live in k8s-talos/infrastructure/monitoring/
     # because the CRD does not exist yet when Terraform installs Cilium

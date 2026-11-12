@@ -77,6 +77,10 @@
         traefik_https_port: 443
         acme_email: "enr.ruggieri.mail@gmail.com"
         k8s_ingress_ip: "192.168.100.111"
+        # Talos cluster Cilium Gateway (PROXY protocol v2 keeps the client source IP)
+        talos_gateway_ip: "192.168.100.202"
+        talos_hostnames:
+          - hubble.enricoruggieri.com
         k8s_hostnames:
           - argocd.enricoruggieri.com
           - calibreweb.enricoruggieri.com

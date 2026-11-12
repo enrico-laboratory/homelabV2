@@ -109,7 +109,7 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Cilium as CNI (kube-proxy replacement, L2 LB-IPAM pool 192.168.100.200-219)
 - Flux bootstrapped from Terraform, reconciling `k8s-talos/clusters/talos`
 - Storage: Proxmox CSI on the `kubedata` ZFS pool; NFS via inline volumes to the NAS
-- Ingress: Cilium native Gateway API (GatewayClass `cilium`, shared Gateway `gateway/main` on `192.168.100.202`, HTTP→HTTPS redirect); Gateway API CRDs are installed by Terraform before Cilium
+- Ingress: Cilium native Gateway API (GatewayClass `cilium`, shared Gateway `gateway/main` on `192.168.100.202`); Gateway API CRDs are installed by Terraform before Cilium. Reached only through Traefik on `ops` (TLS passthrough by SNI + PROXY protocol v2, so the client source IP is preserved); direct connections to the Gateway IP are rejected
 - cert-manager (Gateway API support) with the `letsencrypt-cloudflare` ClusterIssuer (DNS01) issuing a wildcard certificate for `*.enricoruggieri.com`
 - Hubble UI (flow visibility) on `https://hubble.enricoruggieri.com` via HTTPRoute, LAN only, no authentication
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
