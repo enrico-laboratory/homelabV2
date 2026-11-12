@@ -110,6 +110,9 @@ spec:
         # AlertmanagerConfig objects (telegram-config) in any namespace are merged into the config
         alertmanagerConfigSelector: {}
         alertmanagerConfigNamespaceSelector: {}
+        # default (OnNamespace) would only route alerts labelled namespace=monitoring to Telegram
+        alertmanagerConfigMatcherStrategy:
+          type: None
         storage:
           volumeClaimTemplate:
             spec:
