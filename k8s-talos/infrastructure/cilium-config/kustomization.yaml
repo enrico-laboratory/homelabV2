@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
   - lb-pool.yaml
   - l2-policy.yaml
+  # Hubble UI is installed by Terraform (Cilium chart), so its route lives here
+  - httproute-hubble.yaml

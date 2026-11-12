@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - cert-manager
   - cilium-config
+  - gateway
   - monitoring
   - proxmox-csi
