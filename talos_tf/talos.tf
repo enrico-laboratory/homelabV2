@@ -34,14 +34,15 @@ data "talos_machine_configuration" "this" {
     # static address; still configured through the v1alpha1 document
     yamlencode({
       machine = {
-        # lets the Tuppr upgrade controller (k8s-talos/infrastructure/tuppr, namespace system-upgrade) call the Talos API
-        features = {
+        # lets the Tuppr upgrade controller (k8s-talos/infrastructure/tuppr, namespace system-upgrade) call the
+        # Talos API; Talos only accepts this feature on control plane nodes
+        features = each.value.role == "controlplane" ? {
           kubernetesTalosAPIAccess = {
             enabled                     = true
             allowedRoles                = ["os:admin"]
             allowedKubernetesNamespaces = ["system-upgrade"]
           }
-        }
+        } : {}
         network = {
           interfaces = [{
             deviceSelector = { driver = "virtio_net" }
