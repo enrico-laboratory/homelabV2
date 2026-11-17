@@ -1,8 +1,8 @@
-# Nightly one-way copy of the NAS library into the Nextcloud user "library".
-#   1. sync : rclone sync NFS (read-only) -> data/library/files/Library, then chown to www-data
+# Nightly one-way copy of the NAS library into the Nextcloud user "admin".
+#   1. sync : rclone sync NFS (read-only) -> data/admin/files/Library, then chown to www-data
 #   2. scan : occ files:scan so Nextcloud picks up the changes
-# The "library" user must exist (one-time: occ user:add library) and the Library
-# folder must be shared read-only to the intended users/groups.
+# The Library folder lives in the admin user's files; the copy is overwritten on every run,
+# so do not edit it.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -36,9 +36,9 @@ spec:
               args:
                 - |
                   set -e
-                  mkdir -p /data/library/files/Library
-                  rclone sync /source /data/library/files/Library --transfers 4 --stats-one-line -v
-                  chown -R 33:33 /data/library
+                  mkdir -p /data/admin/files/Library
+                  rclone sync /source /data/admin/files/Library --transfers 4 --stats-one-line -v
+                  chown -R 33:33 /data/admin/files/Library
               volumeMounts:
                 - { name: library-nfs, mountPath: /source, readOnly: true }
                 - { name: nextcloud-data, mountPath: /data, subPath: data }
@@ -47,7 +47,7 @@ spec:
               image: nextcloud:35.0.2-apache
               command: ["/bin/sh", "-c"]
               args:
-                - su -s /bin/sh www-data -c 'php /var/www/html/occ files:scan --path="library/files/Library"'
+                - su -s /bin/sh www-data -c 'php /var/www/html/occ files:scan --path="admin/files/Library"'
               # Same subPath layout as the Nextcloud chart: the PVC root is not the web root.
               volumeMounts:
                 - { name: nextcloud-data, mountPath: /var/www, subPath: root }
