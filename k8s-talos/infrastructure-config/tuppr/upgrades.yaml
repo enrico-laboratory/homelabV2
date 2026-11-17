@@ -1,0 +1,24 @@
+# Talos and Kubernetes upgrades are driven by these versions: bump them here to roll the cluster
+# (one node at a time). Keep them in sync with talos_tf/variables.tf (talos_version, kubernetes_version)
+# so a rebuilt cluster matches. The installer image/schematic (qemu-guest-agent) is taken from each
+# node's current install image, so the extension is preserved.
+apiVersion: tuppr.home-operations.com/v1alpha1
+kind: TalosUpgrade
+metadata:
+  name: cluster
+spec:
+  talos:
+    version: v1.14.5
+  healthChecks:
+    - apiVersion: v1
+      kind: Node
+      expr: status.conditions.filter(c, c.type == "Ready").all(c, c.status == "True")
+      description: all nodes Ready
+---
+apiVersion: tuppr.home-operations.com/v1alpha1
+kind: KubernetesUpgrade
+metadata:
+  name: kubernetes
+spec:
+  kubernetes:
+    version: v1.36.4

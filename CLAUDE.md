@@ -46,9 +46,18 @@ export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
 sops --decrypt dns/terraform.tfvars.enc > /tmp/terraform.tfvars   # never commit decrypted
 ```
 
-## Talos cluster (talos_tf/)
+## Talos cluster (talos_tf/) — migration target
 
-Separate Terraform root module for the Talos k8s cluster (own state). Run via `cd talos_tf && make tf-plan|tf-apply` (secrets from `auth.enc.yaml`, see `auth.example.yaml`). GitOps for this cluster is **Flux** (not ArgoCD), reading `k8s-talos/`; Flux is bootstrapped by Terraform (`flux_bootstrap_git`). The ArgoCD/`k8s/` rules in this file apply to the k3s cluster only.
+There are two Kubernetes clusters. **Services are being migrated from the k3s cluster to the new Talos cluster**; until the migration is finished both run side by side, and k3s remains the source of truth for anything not yet moved.
+
+| | k3s (legacy) | Talos (new) |
+|---|---|---|
+| Provisioning | Ansible (`k3s_config`, `k8s_bootstrap_cluster`) | Terraform, `talos_tf/` (1 CP + 2 workers on Proxmox, own state) |
+| GitOps | ArgoCD, bootstrapped by Ansible | **Flux**, bootstrapped by Terraform (`flux_bootstrap_git`) |
+| Manifests | `k8s/` | `k8s-talos/` (`clusters/talos/` = Flux entrypoint, `infrastructure/` = apps) |
+| Secrets | `SopsSecret` CRD (sops-secrets-operator) | Native `Secret` decrypted by Flux |
+
+Run Terraform via `cd talos_tf && make tf-plan|tf-apply` (secrets from `auth.enc.yaml`, see `auth.example.yaml`). The ArgoCD/`k8s/` rules in this file (ArgoCD flow, `SopsSecret`, the `k8s/` layout, the "never use kubectl to create resources" rule) apply to the k3s cluster only. The same "let GitOps manage it" principle applies on Talos: change things by committing to `k8s-talos/`, not with `kubectl`. Use `flux` CLI to inspect and reconcile (`flux get all -A`, `flux reconcile kustomization infrastructure --with-source`). When migrating a service, port its manifests from `k8s/` to `k8s-talos/`, convert its `SopsSecret` to a native `Secret` (see SOPS below), and only remove it from `k8s/` once it is verified on Talos. Notes: `knowledge/flux.md` in the notes repo.
 
 ## Architecture
 
@@ -91,7 +100,7 @@ cd ansible && make k8s_bootstrap_cluster
 
 ### NAS & Storage Management
 
-**NAS hostname**: `nas.enricoruggieri.com` (TrueNAS)
+**NAS hostname**: `nas.enricoruggieri.com` (a Linux VM on Proxmox, not TrueNAS; only `truenas-backup` is TrueNAS)
 
 **All NAS datasets, NFS exports, and SMB shares are managed via Ansible** in `ansible/playbooks/nas_config.yaml`. This playbook:
 - Manages ZFS datasets and pools
@@ -176,14 +185,48 @@ spec:
 
 ### Secret Management
 
-All secrets use `SopsSecret` CRD (isindir/sops-secrets-operator). Never use plain Kubernetes `Secret` resources in git.
+**k3s cluster (`k8s/`)**: all secrets use the `SopsSecret` CRD (isindir/sops-secrets-operator). Never use plain Kubernetes `Secret` resources in git.
+
+**Talos cluster (`k8s-talos/`)**: the opposite. Flux decrypts SOPS natively, so secrets are plain `v1/Secret` manifests encrypted with SOPS. Do **not** use the `SopsSecret` CRD there (the operator is not installed). See the differences below.
 
 ## SOPS + Age Key Management
 
 ### Age Key Location
-The age private key is stored at: **`~/.sops/age_key.txt`** (user's home directory, not in repo)
+The age private key is stored at: **`~/.sops/age_key.txt`** (user's home directory, not in repo). Both clusters use the same age key.
 
-### Encrypting Kubernetes Secrets with SOPS
+### k3s vs Talos: SOPS differences
+
+| | k3s (`k8s/`) | Talos (`k8s-talos/`) |
+|---|---|---|
+| Resource kind | `SopsSecret` (`isindir.github.com/v1alpha3`) | native `Secret` (`v1`) |
+| Decrypted by | sops-secrets-operator in the cluster | Flux kustomize-controller (`decryption.provider: sops` on the Flux `Kustomization`) |
+| Key in cluster | operator's own age key secret | Secret `sops-age` in `flux-system`, created by Terraform (`talos_tf/flux.tf`) from `sops_age_key` |
+| Fields encrypted | `stringData` | `data` and `stringData` |
+| Encrypt command | needs explicit `--encrypted-regex '^(stringData)$'` | `.sops.yaml` rule for `k8s-talos/` already sets `encrypted_regex: ^(data\|stringData)$`, so just `sops --encrypt --in-place <file>` |
+
+A new Flux `Kustomization` that contains encrypted files must set `spec.decryption` (`provider: sops`, `secretRef.name: sops-age`), as `k8s-talos/clusters/talos/infrastructure.yaml` does. Without it, the encrypted Secret is applied as-is and the app breaks.
+
+### Encrypting Talos (Flux) secrets
+
+1. Create a plaintext `Secret` at `k8s-talos/infrastructure/{app}/sops_secret.yaml` (use `stringData`, not base64 `data`):
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {secret-name}
+  namespace: {namespace}
+stringData:
+  key1: plaintext-value-1
+```
+2. Encrypt and verify:
+```bash
+export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
+sops --encrypt --in-place k8s-talos/infrastructure/{app}/sops_secret.yaml
+sops --decrypt k8s-talos/infrastructure/{app}/sops_secret.yaml
+```
+3. Add the file to the app's `kustomization.yaml` and commit. Flux decrypts and applies it.
+
+### Encrypting k3s Kubernetes Secrets with SOPS
 
 **Always use selective encryption** with the `--encrypted-regex` flag to encrypt only `stringData` fields.
 
@@ -214,6 +257,21 @@ sops --encrypt --in-place --encrypted-regex '^(stringData)$' k8s/{namespace}/{ap
 sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
 ```
 
+## Host updates
+
+A cron job on `ops` (Sunday 03:00, `ansible/playbooks/cronjob.yaml`) runs `ansible/playbooks/update_hosts.yaml`: apt dist-upgrade plus automatic reboot when needed, in dependency order: k3s agents (serial, drain/uncordon) -> k3s master -> nas -> pve_node3 -> ops (last, detached reboot). `nas_config.yaml` is re-applied after the NAS reboots (and after pve reboots), because the NFS exports are lost on every NAS reboot. A failed run sends a Telegram message (`notify_failure.yaml`). Talos nodes have no apt and are not in the Ansible inventory; they are upgraded by Tuppr (see below).
+
+### Upgrading the Talos cluster (Talos and Kubernetes versions)
+
+Tuppr (`k8s-talos/infrastructure/tuppr`, namespace `system-upgrade`) rolls Talos and Kubernetes one node at a time (cordon, drain, upgrade, reboot, health check). Upgrades are triggered by git, not by cron:
+
+1. Check the target is supported: Talos release notes, and the Kubernetes version must be supported by the target Talos. If both change, upgrade Kubernetes first (Tuppr rejects the Talos upgrade otherwise).
+2. Edit the version in `k8s-talos/infrastructure-config/tuppr/upgrades.yaml` (`TalosUpgrade.spec.talos.version` and/or `KubernetesUpgrade.spec.kubernetes.version`, with the `v` prefix).
+3. Edit the same value in `talos_tf/variables.tf` (`talos_version`, `kubernetes_version`, no `v` for Kubernetes) so a rebuilt cluster matches. Do **not** run `tf-apply` to upgrade running nodes; Terraform only needs to be applied for new/rebuilt nodes.
+4. Commit and push. Flux applies the CR and Tuppr starts. Follow it with `flux reconcile kustomization infrastructure-config --with-source`, `kubectl --kubeconfig ~/.kube/talos-config get talosupgrade,kubernetesupgrade` and `talosctl --talosconfig ~/.talos/config version`.
+
+The installer image and schematic (qemu-guest-agent extension) are taken from each node's current install image, so extensions are preserved. If the schematic itself changes (new extension), change it in `talos_tf/image.tf` and use the `factory-url`/`schematic` annotations described in the Tuppr docs. The Talos API access Tuppr needs (`kubernetesTalosAPIAccess`, namespace `system-upgrade`) is part of the machine config in `talos_tf/talos.tf`; it reaches existing nodes only after a `make tf-apply`. Do not upgrade while the pve host update (Sunday 03:00) is running.
+
 ## Infrastructure
 
 - **Proxmox cluster**: nodes at `192.168.100.23` (pve_node3)
@@ -224,5 +282,5 @@ sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
 ## Rules
 
 - **Never use `kubectl` to create resources** — let ArgoCD manage all deployments. Only use kubectl for testing/debugging, never for persistent state changes.
-- **SOPS Encryption**: Always use `--encrypt --in-place --encrypted-regex '^(stringData)$'`. Never manually encrypt or bypass this workflow.
-- Every time a new application is added in Kubernetes, update the README.md. Exclude Sonarr, Radarr, and Transmission.
+- **SOPS Encryption**: Always use `sops --encrypt --in-place`; never manually encrypt or bypass this workflow. For k3s (`k8s/`) add `--encrypted-regex '^(stringData)$'`; for Talos (`k8s-talos/`) the regex comes from `.sops.yaml`. Details in "SOPS + Age Key Management".
+- Every time a new application is added in Kubernetes, update the README.md. Exclude Sonarr, Radarr, and Transmission. Scope by cluster: an app added to k3s (`k8s/`) goes in the "Services Deployed" section; an app added to Talos (`k8s-talos/`) goes in the "Talos Cluster" section. An app migrated from k3s to Talos is moved between those sections once it runs on Talos, not listed in both.

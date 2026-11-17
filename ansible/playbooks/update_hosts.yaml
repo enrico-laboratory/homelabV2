@@ -1,22 +1,127 @@
-- name: update all hosts all hosts
-  hosts: all
+# Nightly host updates. Order follows the dependencies: guests before their hypervisor, the NAS (NFS for k3s)
+# after k3s, ops last because it runs this playbook. NFS exports on the NAS are lost on every reboot of the VM,
+# so nas_config.yaml is re-applied after the NAS and after pve restart it. Talos nodes are upgraded by Tuppr
+# (k8s-talos/), not here. A failure of the whole run is reported by notify_failure.yaml (see cronjob.yaml).
+
+- name: update k3s agents one at a time (drain, reboot, uncordon)
+  hosts: agent
+  serial: 1
+  gather_facts: true
+  become: true
+  vars:
+    update_host_k3s_drain: true
+    update_host_k3s_wait_ready: true
+  tasks:
+    - name: update hosts
+      block:
+        - ansible.builtin.include_role:
+            name: update_host
+      rescue:
+        - &telegram_failure
+          name: Send Telegram message based on play result
+          become: false
+          uri:
+            url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+            method: POST
+            body_format: json
+            body:
+              chat_id: "{{ telegram_chat_id }}"
+              text: "{{ failure_message }}"
+          delegate_to: localhost
+        - ansible.builtin.fail:
+            msg: "update failed on {{ inventory_hostname }}"
+
+- name: update the k3s master
+  hosts: master_server
+  gather_facts: true
+  become: true
+  vars:
+    update_host_k3s_wait_ready: true
+  tasks:
+    - name: update hosts
+      block:
+        - ansible.builtin.include_role:
+            name: update_host
+      rescue:
+        - *telegram_failure
+        - ansible.builtin.fail:
+            msg: "update failed on {{ inventory_hostname }}"
+
+- name: update the NAS
+  hosts: storage
   gather_facts: true
   become: true
   tasks:
-  - name: update hosts
-    block:
-      - name: update hosts role
-        register: result
-        ansible.builtin.include_role:
-          name: update_host
-    rescue:
-      - name: Send Telegram message based on play result
-        become: false
-        uri:
-          url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
-          method: POST
-          body_format: json
-          body:
-            chat_id: "{{ telegram_chat_id }}"
-            text: "{{ failure_message }}"
-        delegate_to: localhost
+    - name: update hosts
+      block:
+        - ansible.builtin.include_role:
+            name: update_host
+      rescue:
+        - *telegram_failure
+        - ansible.builtin.fail:
+            msg: "update failed on {{ inventory_hostname }}"
+
+# NFS exports are lost when the NAS reboots
+- ansible.builtin.import_playbook: nas_config.yaml
+
+- name: update the Proxmox node (takes down every VM when it reboots)
+  hosts: pvenodes
+  gather_facts: true
+  become: true
+  tasks:
+    - name: update hosts
+      block:
+        - ansible.builtin.include_role:
+            name: update_host
+      rescue:
+        - *telegram_failure
+        - ansible.builtin.fail:
+            msg: "update failed on {{ inventory_hostname }}"
+
+- name: wait for the NAS VM to be back after the Proxmox node
+  hosts: storage
+  gather_facts: false
+  tasks:
+    - name: wait for ssh
+      ansible.builtin.wait_for_connection:
+        timeout: 900
+
+# the NAS booted together with pve, so the exports are gone again
+- ansible.builtin.import_playbook: nas_config.yaml
+
+- name: wait for NFS and the k3s nodes after the Proxmox node
+  hosts: master_server
+  gather_facts: false
+  become: true
+  tasks:
+    - name: wait for the NFS port on the NAS
+      ansible.builtin.wait_for:
+        host: "{{ hostvars[groups['storage'][0]]['ansible_host'] }}"
+        port: 2049
+        timeout: 300
+      delegate_to: localhost
+      become: false
+
+    - name: wait for the k3s API and all nodes to be Ready
+      ansible.builtin.command: k3s kubectl wait --for=condition=Ready nodes --all --timeout=60s
+      retries: 20
+      delay: 15
+      register: nodes_ready
+      until: nodes_ready.rc == 0
+      changed_when: false
+
+- name: update ops (last, it runs this playbook; the reboot is scheduled detached)
+  hosts: ops
+  gather_facts: true
+  become: true
+  vars:
+    update_host_reboot_detached: true
+  tasks:
+    - name: update hosts
+      block:
+        - ansible.builtin.include_role:
+            name: update_host
+      rescue:
+        - *telegram_failure
+        - ansible.builtin.fail:
+            msg: "update failed on {{ inventory_hostname }}"

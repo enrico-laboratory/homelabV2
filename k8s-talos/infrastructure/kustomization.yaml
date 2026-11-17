@@ -6,3 +6,4 @@ resources:
   - gateway
   - monitoring
   - proxmox-csi
+  - tuppr

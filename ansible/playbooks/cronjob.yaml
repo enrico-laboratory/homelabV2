@@ -14,9 +14,9 @@
       cron:
         name: "Update hosts"
         minute: "0"
-        hour: "8"
-        weekday: "5"
-        job: 'cd {{ homelab_repo_dest }}/ansible && ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/update_hosts.yaml > update_hosts_last_run.log'
+        hour: "3"
+        weekday: "0"
+        job: 'cd {{ homelab_repo_dest }}/ansible && (ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/update_hosts.yaml > update_hosts_last_run.log 2>&1 || ansible-playbook -i {{ inventory_path }} {{ playbooks_folder }}/notify_failure.yaml)'
         state: present
         user: "{{ main_user }}"
 

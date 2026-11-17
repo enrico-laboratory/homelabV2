@@ -3,10 +3,6 @@ pvenodes:
     pve_node3:
       ansible_host: 192.168.100.23
 
-home_assistant:
-  hosts:
-    192.168.100.65:
-
 ops:
   hosts:
     192.168.100.78:
@@ -17,10 +13,6 @@ k3s_cluster:
       hosts:
         k3s-101:
           ansible_host: 192.168.100.101
-#        k3s-102:
-#          ansible_host: 192.168.100.102
-#        k3s-103:
-#          ansible_host: 192.168.100.103
     master_server:
       hosts:
         k3s-101:
@@ -40,8 +32,3 @@ storage:
   hosts:
     nas:
       ansible_host: 192.168.100.160
-
-#dozzle:
-#    hosts:
-#      192.168.100.150:
-      

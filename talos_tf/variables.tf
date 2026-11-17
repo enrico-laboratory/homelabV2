@@ -12,13 +12,13 @@ variable "cluster_name" {
 variable "talos_version" {
   type        = string
   default     = "v1.14.5"
-  description = "Talos Linux version used for the image factory schematic and installer"
+  description = "Talos Linux version used for the image factory schematic and installer. Keep in sync with the TalosUpgrade in k8s-talos/infrastructure-config/tuppr/upgrades.yaml"
 }
 
 variable "kubernetes_version" {
   type        = string
   default     = "1.36.4"
-  description = "Pinned below the provider default (1.37.0) to stay on a release line Cilium and the Proxmox CCM have shipped against"
+  description = "Keep in sync with the KubernetesUpgrade in k8s-talos/infrastructure-config/tuppr/upgrades.yaml. Pinned below the provider default (1.37.0) to stay on a release line Cilium and the Proxmox CCM have shipped against"
 }
 
 variable "gateway" {

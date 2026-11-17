@@ -1,0 +1,14 @@
+# Run by cron when update_hosts.yaml exits non-zero (covers unreachable hosts and imported plays)
+- name: Notify that the host update run failed
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Send Telegram message
+      uri:
+        url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+        method: POST
+        body_format: json
+        body:
+          chat_id: "{{ telegram_chat_id }}"
+          text: "❌ update_hosts.yaml failed, see update_hosts_last_run.log on ops"
