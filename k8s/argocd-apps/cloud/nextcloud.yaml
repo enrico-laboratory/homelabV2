@@ -31,18 +31,6 @@ spec:
                 'twofactor_enforced_excluded_groups' => array(),
               );
 
-          extraVolumes:
-            - name: books-nfs
-              nfs:
-                server: nas.enricoruggieri.com
-                path: /tank-data/media/library/books
-                readOnly: true
-
-          extraVolumeMounts:
-            - name: books-nfs
-              mountPath: /mnt/books
-              readOnly: true
-
         persistence:
           enabled: true
           storageClass: proxmox-zfs-nvme
