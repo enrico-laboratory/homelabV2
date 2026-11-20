@@ -212,4 +212,4 @@ Changing a node's CPU or memory (`nodes` in `talos_tf/variables.tf`) reboots the
 
 - **Never use `kubectl` to create resources** — let Flux manage everything from `k8s-talos/`. Only use kubectl for testing/debugging, never for persistent state changes.
 - **SOPS Encryption**: Always use `sops --encrypt --in-place`; never manually encrypt or bypass this workflow. The regex comes from `.sops.yaml`. Details in "SOPS + Age Key Management".
-- Every time a new application is added in Kubernetes, update the "Talos Cluster" section of README.md. Exclude Sonarr, Radarr, and Transmission.
+- Every time a new application is added in Kubernetes, update the "Talos Cluster" section of README.md.
