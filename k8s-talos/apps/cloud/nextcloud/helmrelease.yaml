@@ -30,9 +30,9 @@ spec:
   upgrade:
     disableWait: true
   values:
-    # 0 until migrate-restore.yaml has filled the PVC and the database: on an empty
+    # Started only after migrate-restore.yaml filled the PVC and the database: on an empty
     # volume the image would run a fresh install against the new database.
-    replicaCount: 0
+    replicaCount: 1
 
     nextcloud:
       host: nextcloud.enricoruggieri.com

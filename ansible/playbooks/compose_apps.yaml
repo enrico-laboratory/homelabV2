@@ -89,7 +89,9 @@
           - joplin.enricoruggieri.com
           - karakeep.enricoruggieri.com
           - navidrome.enricoruggieri.com
+          - nextcloud.enricoruggieri.com
           - ollama.enricoruggieri.com
+          - onlyoffice.enricoruggieri.com
           - personal.enricoruggieri.com
           - prowlarr.enricoruggieri.com
           - radarr.enricoruggieri.com
@@ -99,8 +101,6 @@
         k8s_hostnames:
           - argocd.enricoruggieri.com
           - grafana-kube.enricoruggieri.com
-          - nextcloud.enricoruggieri.com
-          - onlyoffice.enricoruggieri.com
         host_services:
           - { "name": "netalertx", "port": 20211 }
           - { "name": "zigbee2mqtt", "url": "http://zigbee2mqtt:8099" }
