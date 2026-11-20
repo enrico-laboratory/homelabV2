@@ -27,6 +27,20 @@ spec:
     # label set by talos_tf on nodes with gpu = true (the chart tolerates the nvidia.com/gpu taint)
     nodeSelector:
       nvidia.com/gpu.present: "true"
+    # Time-slicing: the single GPU is advertised as 4 nvidia.com/gpu so ollama, comfyui and Immich ML can
+    # share it. No VRAM isolation between the pods (12 GB total).
+    config:
+      default: default
+      map:
+        default: |-
+          version: v1
+          sharing:
+            timeSlicing:
+              renameByDefault: false
+              failRequestsGreaterThanOne: false
+              resources:
+                - name: nvidia.com/gpu
+                  replicas: 4
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
