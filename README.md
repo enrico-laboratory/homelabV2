@@ -1,117 +1,71 @@
 # homelabV2
 
-A complete Infrastructure-as-Code homelab setup for self-hosted Kubernetes on Proxmox, managed through GitOps with ArgoCD.
+Infrastructure-as-Code homelab: a Talos Linux Kubernetes cluster on Proxmox, managed through GitOps with Flux.
 
 ## Overview
 
-This repository contains the complete automation stack for a production-like homelab environment featuring:
-
-- **Kubernetes on Proxmox**: k3s clusters deployed on Proxmox VE virtualization platform
-- **GitOps with ArgoCD**: Declarative application management and auto-syncing from git
-- **Unified Secret Management**: SOPS+age encryption for all secrets across Kubernetes, Ansible, and Terraform
-- **Infrastructure as Code**: Terraform configurations for Proxmox resource management
-- **Automated Provisioning**: Ansible playbooks for cluster bootstrapping and service deployment
+- **Kubernetes on Proxmox**: Talos Linux cluster, fully provisioned by Terraform (`talos_tf/`)
+- **GitOps with Flux**: Flux is bootstrapped by Terraform and reconciles `k8s-talos/` from this repository
+- **Unified secret management**: SOPS + age for every secret across Kubernetes, Ansible and Terraform
+- **Infrastructure as Code**: Terraform for Proxmox VMs (`pve_tf/`), the cluster (`talos_tf/`) and DNS (`dns/`)
+- **Host automation**: Ansible for the Proxmox node, the NAS, the `ops` Docker host (Traefik and the other compose apps) and the weekly host updates
 
 ## Repository Structure
 
 ```
 homelabV2/
-├── k8s/                           # Kubernetes manifests and ArgoCD applications
-│   ├── argocd-apps/              # Application definitions (auto-synced by ArgoCD)
-│   │   ├── tooling/              # Core services (SOPS, cert-manager, monitoring)
-│   │   ├── mediaserver/          # Media and content services
-│   │   └── ai/                   # AI/ML services
-│   └── argocd-projects/          # ArgoCD project definitions
-├── ansible/                       # Ansible automation
-│   ├── playbooks/                # Cluster bootstrap and configuration
-│   ├── roles/                    # Reusable task collections
-│   └── inventories/              # Host inventory and encrypted variables
-├── pve_tf/                        # Terraform for Proxmox infrastructure
-├── talos_tf/                      # Terraform for the Talos cluster (VMs, bootstrap, Cilium, Flux)
-├── k8s-talos/                     # Flux GitOps tree for the Talos cluster
-├── .sops.yaml                     # SOPS encryption configuration
+├── k8s-talos/                     # Flux GitOps tree
+│   ├── clusters/talos/           # Flux entrypoint (one Kustomization per layer and app group)
+│   ├── infrastructure/           # Platform: Cilium config, gateway, cert-manager, CSI, monitoring, Tuppr, NVIDIA…
+│   ├── infrastructure-config/    # Resources that need the platform CRDs (issuers, upgrade CRs…)
+│   └── apps/<group>/<app>/       # Apps: mediaserver, cloud, ai, cloudflare
+├── talos_tf/                      # Terraform for the Talos cluster (VMs, machine config, Cilium, Flux)
+├── pve_tf/                        # Terraform for the other Proxmox VMs (NAS, win-11) and the CSI user
+├── dns/                           # Terraform for the Cloudflare DNS records
+├── ansible/                       # Playbooks for pve, NAS, ops and host updates
+├── .sops.yaml                     # SOPS encryption rules
 └── CLAUDE.md                      # Development guidelines
 ```
 
-## Key Features
+## Talos Cluster
 
-### Secrets Management
-- **SOPS + age encryption**: All sensitive data encrypted at rest
-- **Selective encryption**: Only secret values encrypted, maintaining readability of YAML structure
-- **Unified approach**: Single tool (SOPS) across Kubernetes, Ansible, and Terraform
-
-### GitOps Workflow
-- ArgoCD watches this repository for changes
-- Automatic sync of applications and configurations
-- App-of-apps pattern for scalable application management
-- Helm chart integration for package deployment
-
-### Infrastructure
-- **Proxmox VE**: Virtualization platform for VM management
-- **k3s**: Lightweight Kubernetes distribution
-- **Container Registry**: Private image storage
-- **Ingress**: Nginx with automatic TLS via cert-manager
-
-## Services Deployed
-
-### Core Infrastructure
-- ArgoCD (GitOps controller)
-- Cert-Manager (TLS automation)
-- Prometheus + Grafana (monitoring)
-- Proxmox CSI (storage integration)
-- MetalLB (load balancer)
-
-### Media & Applications
-All apps now run on the Talos cluster (see below).
-
-## Quick Start
-
-### Prerequisites
-- Proxmox VE cluster with SSH access
-- Ansible, kubectl installed
-- Age encryption key: `~/.sops/age_key.txt`
-
-### Bootstrap Cluster
-
-```bash
-# Generate encryption key (if needed)
-age-keygen -o ~/.sops/age_key.txt
-
-# Deploy Kubernetes
-cd ansible
-ansible-playbook playbooks/pve_1_bootstrap_node3.yaml
-ansible-playbook playbooks/k8s_bootstrap_cluster.yaml
-
-# Verify ArgoCD
-kubectl get applications -n argocd
-```
-
-## License
-
-Personal homelab setup. Adapt as needed for your environment.
-
-## Talos Cluster (in progress)
-
-A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `talos-121`, 2 workers `talos-131/132`, GPU worker `talos-133`), fully provisioned by `talos_tf/`:
+A Talos Linux cluster on Proxmox (1 control plane `talos-121`, 2 workers `talos-131/132`, GPU worker `talos-133`), fully provisioned by `talos_tf/`:
 
 - VMs, machine config, bootstrap and kubeconfig via the `bpg/proxmox` and `siderolabs/talos` providers
 - Cilium as CNI (kube-proxy replacement, L2 LB-IPAM pool 192.168.100.200-219)
 - Flux bootstrapped from Terraform, reconciling `k8s-talos/clusters/talos`
 - Storage: Proxmox CSI on the `kubedata` ZFS pool; NFS via inline volumes to the NAS
 - Ingress: Cilium native Gateway API (GatewayClass `cilium`, shared Gateway `gateway/main` on `192.168.100.202`); Gateway API CRDs are installed by Terraform before Cilium. Reached only through Traefik on `ops` (TLS passthrough by SNI + PROXY protocol v2, so the client source IP is preserved); direct connections to the Gateway IP are rejected
+- External access: Cloudflare Tunnel (`cloudflared` in `cloudflare`) for `nextcloud.enricoruggieri.com` only
 - cert-manager (Gateway API support) with the `letsencrypt-cloudflare` ClusterIssuer (DNS01) issuing a wildcard certificate for `*.enricoruggieri.com`
 - Hubble UI (flow visibility) on `https://hubble.enricoruggieri.com` via HTTPRoute, LAN only, no authentication
 - Headlamp (cluster dashboard with the Flux plugin) on `https://headlamp.enricoruggieri.com` via HTTPRoute, LAN only, login with the `headlamp-admin` ServiceAccount token
 - Upgrades: Tuppr (`system-upgrade`) rolls Talos and Kubernetes one node at a time; bump the versions in `k8s-talos/infrastructure-config/tuppr/upgrades.yaml` (and `talos_tf/variables.tf`)
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
-- Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group, ported from k3s with `scripts/k3s2talos.py`):
-  - mediaserver: Jellyfin (media streaming), Navidrome (music streaming), Joplin (notes, with its Postgres), Karakeep (bookmarks and notes, with nightly restic backup to TrueNAS), Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), FlareSolverr (Cloudflare challenge solver for the indexers)
+- Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group; migrated from the former k3s cluster in November 2026):
+  - mediaserver: Jellyfin (media streaming), Navidrome (music streaming), Joplin (notes, with its Postgres), Karakeep (bookmarks and notes, with nightly restic backup to TrueNAS), Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), arr-postgres (one shared Postgres for Sonarr, Radarr and Prowlarr, with nightly restic backup to TrueNAS), FlareSolverr (Cloudflare challenge solver for the indexers)
   - cloud: Nextcloud (cloud storage, with its Postgres and Redis, nightly restic backup to TrueNAS and a nightly one-way sync of the NAS library), OnlyOffice (document server for Nextcloud)
   - ai: Ollama (LLM inference), Open WebUI (chat UI for Ollama), Qdrant (vector database for Open WebUI), ComfyUI (image generation; created at 0 replicas and scaled by hand, outputs on the NAS)
 - GPU: worker `talos-133` with the RTX 3060 passed through (`gpu = true` in `talos_tf/variables.tf`), NVIDIA LTS driver + container toolkit as Talos extensions, RuntimeClass `nvidia`, nvidia-device-plugin and dcgm-exporter in `nvidia`
+
+## Quick Start
+
+### Prerequisites
+- Proxmox VE node with SSH access
+- Terraform, Ansible, kubectl, talosctl, flux, sops installed
+- Age encryption key: `~/.sops/age_key.txt`
+
+### Build the cluster
 
 ```bash
 cd talos_tf
 make tf-init && make tf-plan && make tf-apply
 make configs   # writes ~/.talos/config and ~/.kube/talos-config
+
+# Flux then reconciles everything under k8s-talos/
+flux get kustomizations
 ```
+
+## License
+
+Personal homelab setup. Adapt as needed for your environment.

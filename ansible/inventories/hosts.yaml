@@ -7,21 +7,6 @@ ops:
   hosts:
     192.168.100.78:
 
-k3s_cluster:
-  children:
-    server:
-      hosts:
-        k3s-101:
-          ansible_host: 192.168.100.101
-    master_server:
-      hosts:
-        k3s-101:
-    agent:
-      hosts:
-        k3s-111:
-          ansible_host: 192.168.100.111
-    # k3s-112 and k3s-113 removed during the Talos migration (k3s-113's GPU is on talos-133)
-
 storage:
   hosts:
     nas:

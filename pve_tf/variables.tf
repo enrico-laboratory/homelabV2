@@ -4,26 +4,6 @@ variable "node_name" {
 }
 
 ### VMS
-variable "k3s_masters_count" {
-  type = number
-  default = 1
-}
-
-variable "k3s_master_first_host" {
-  type = number
-  default = 101
-}
-
-variable "k3s_workers_count" {
-  type = number
-  default = 1 # k3s-112/113 removed during the Talos migration (k3s-113's GPU is on talos-133)
-}
-
-variable "k3s_worker_first_host" {
-  type = number
-  default = 111
-}
-
 variable "user_name" {
   type = string
 }

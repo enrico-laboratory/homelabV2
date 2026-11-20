@@ -1,16 +1,12 @@
-# Nightly host updates. Order follows the dependencies: guests before their hypervisor, the NAS (NFS for k3s)
-# after k3s, ops last because it runs this playbook. NFS exports on the NAS are lost on every reboot of the VM,
+# Nightly host updates. Order follows the dependencies: guests before their hypervisor,
+# ops last because it runs this playbook. NFS exports on the NAS are lost on every reboot of the VM,
 # so nas_config.yaml is re-applied after the NAS and after pve restart it. Talos nodes are upgraded by Tuppr
 # (k8s-talos/), not here. A failure of the whole run is reported by notify_failure.yaml (see cronjob.yaml).
 
-- name: update k3s agents one at a time (drain, reboot, uncordon)
-  hosts: agent
-  serial: 1
+- name: update the NAS
+  hosts: storage
   gather_facts: true
   become: true
-  vars:
-    update_host_k3s_drain: true
-    update_host_k3s_wait_ready: true
   tasks:
     - name: update hosts
       block:
@@ -28,36 +24,6 @@
               chat_id: "{{ telegram_chat_id }}"
               text: "{{ failure_message }}"
           delegate_to: localhost
-        - ansible.builtin.fail:
-            msg: "update failed on {{ inventory_hostname }}"
-
-- name: update the k3s master
-  hosts: master_server
-  gather_facts: true
-  become: true
-  vars:
-    update_host_k3s_wait_ready: true
-  tasks:
-    - name: update hosts
-      block:
-        - ansible.builtin.include_role:
-            name: update_host
-      rescue:
-        - *telegram_failure
-        - ansible.builtin.fail:
-            msg: "update failed on {{ inventory_hostname }}"
-
-- name: update the NAS
-  hosts: storage
-  gather_facts: true
-  become: true
-  tasks:
-    - name: update hosts
-      block:
-        - ansible.builtin.include_role:
-            name: update_host
-      rescue:
-        - *telegram_failure
         - ansible.builtin.fail:
             msg: "update failed on {{ inventory_hostname }}"
 
@@ -88,27 +54,6 @@
 
 # the NAS booted together with pve, so the exports are gone again
 - ansible.builtin.import_playbook: nas_config.yaml
-
-- name: wait for NFS and the k3s nodes after the Proxmox node
-  hosts: master_server
-  gather_facts: false
-  become: true
-  tasks:
-    - name: wait for the NFS port on the NAS
-      ansible.builtin.wait_for:
-        host: "{{ hostvars[groups['storage'][0]]['ansible_host'] }}"
-        port: 2049
-        timeout: 300
-      delegate_to: localhost
-      become: false
-
-    - name: wait for the k3s API and all nodes to be Ready
-      ansible.builtin.command: k3s kubectl wait --for=condition=Ready nodes --all --timeout=60s
-      retries: 20
-      delay: 15
-      register: nodes_ready
-      until: nodes_ready.rc == 0
-      changed_when: false
 
 - name: update ops (last, it runs this playbook; the reboot is scheduled detached)
   hosts: ops

@@ -6,4 +6,3 @@ resources:
 - service.yaml
 - sops_secret.yaml
 - httproute.yaml
-- migrate-import.yaml

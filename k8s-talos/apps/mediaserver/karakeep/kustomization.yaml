@@ -13,4 +13,3 @@ resources:
 - web-pvc.yaml
 - web-svc.yaml
 - httproute.yaml
-- migrate-restore.yaml

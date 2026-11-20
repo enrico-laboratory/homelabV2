@@ -1,17 +1,3 @@
-- name: Set k3s node facts
-  ansible.builtin.set_fact:
-    update_host_k3s_node: "{{ ansible_hostname | lower }}"
-    update_host_k3s_master: "{{ groups['master_server'][0] | default('') }}"
-  when: update_host_k3s_drain | bool or update_host_k3s_wait_ready | bool
-
-- name: Drain the k3s node
-  ansible.builtin.command: >-
-    k3s kubectl drain {{ update_host_k3s_node }}
-    --ignore-daemonsets --delete-emptydir-data --timeout=300s
-  delegate_to: "{{ update_host_k3s_master }}"
-  when: update_host_k3s_drain | bool
-  changed_when: true
-
 - name: Tell Telegram the reboot is scheduled (detached)
   delegate_to: localhost
   become: false
@@ -33,23 +19,6 @@
   ansible.builtin.reboot:
     reboot_timeout: "{{ update_host_reboot_timeout }}"
   when: not (update_host_reboot_detached | bool)
-
-- name: Wait for the k3s node to be Ready
-  ansible.builtin.command: >-
-    k3s kubectl wait --for=condition=Ready node/{{ update_host_k3s_node }} --timeout=300s
-  delegate_to: "{{ update_host_k3s_master }}"
-  retries: 10
-  delay: 15
-  register: update_host_node_ready
-  until: update_host_node_ready.rc == 0
-  when: update_host_k3s_wait_ready | bool
-  changed_when: false
-
-- name: Uncordon the k3s node
-  ansible.builtin.command: k3s kubectl uncordon {{ update_host_k3s_node }}
-  delegate_to: "{{ update_host_k3s_master }}"
-  when: update_host_k3s_drain | bool
-  changed_when: true
 
 - name: send a telegram after the reboot
   delegate_to: localhost

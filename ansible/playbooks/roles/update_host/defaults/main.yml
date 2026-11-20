@@ -1,8 +1,5 @@
 # reboot automatically when /var/run/reboot-required exists
 update_host_reboot: true
-# k3s node handling: drain before / uncordon after the reboot (agents), wait for Ready after (agents and master)
-update_host_k3s_drain: false
-update_host_k3s_wait_ready: false
 # schedule the reboot detached instead of waiting for the host to return (the host running this play, i.e. ops)
 update_host_reboot_detached: false
 update_host_reboot_timeout: 900

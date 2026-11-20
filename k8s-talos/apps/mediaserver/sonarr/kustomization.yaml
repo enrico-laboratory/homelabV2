@@ -5,4 +5,3 @@ resources:
 - pvc.yaml
 - service.yaml
 - httproute.yaml
-- migrate-import.yaml

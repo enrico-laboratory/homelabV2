@@ -67,7 +67,7 @@
         name: compose_apps
 
     # Reverse proxy for Docker services (label discovery) and TLS passthrough
-    # for the k8s ingress.
+    # to the Talos Gateway.
     - name: Traefik
       vars:
         deploy: True
@@ -76,7 +76,6 @@
         traefik_http_port: 80
         traefik_https_port: 443
         acme_email: "enr.ruggieri.mail@gmail.com"
-        k8s_ingress_ip: "192.168.100.111"
         # Talos cluster Cilium Gateway (PROXY protocol v2 keeps the client source IP)
         talos_gateway_ip: "192.168.100.202"
         talos_hostnames:
@@ -98,9 +97,6 @@
           - sonarr.enricoruggieri.com
           - transmission.enricoruggieri.com
           - webui.enricoruggieri.com
-        k8s_hostnames:
-          - argocd.enricoruggieri.com
-          - grafana-kube.enricoruggieri.com
         host_services:
           - { "name": "netalertx", "port": 20211 }
           - { "name": "zigbee2mqtt", "url": "http://zigbee2mqtt:8099" }

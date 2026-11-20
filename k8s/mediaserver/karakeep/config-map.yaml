@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: karakeep-configuration
-  namespace: mediaserver
-data:
-  NEXTAUTH_URL: https://karakeep.enricoruggieri.com

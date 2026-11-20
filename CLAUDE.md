@@ -12,11 +12,10 @@ All playbooks are run from `ansible/` using the Makefile:
 cd ansible
 make <target>
 # e.g.:
-make k8s_bootstrap_cluster     # Deploy ArgoCD and bootstrap the cluster
-make k3s_config                 # Configure k3s nodes, GPU
-make compose_apps               # Deploy docker-compose apps (monitoring, pihole, etc.)
+make compose_apps               # Deploy docker-compose apps on ops (Traefik, monitoring, pihole, etc.)
 make dns_config                 # Configure DNS records via Ansible
-make update_hosts               # Update /etc/hosts on nodes
+make nas_config                 # NAS datasets, NFS exports, SMB shares, sanoid
+make update_hosts               # apt upgrade + reboot of nas, pve and ops (see Host updates)
 make ops                        # Ops-level tasks
 ```
 
@@ -35,7 +34,7 @@ The Makefile automatically sets `SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt`.
 cd dns
 terraform plan && terraform apply
 
-# Proxmox infrastructure
+# Proxmox VMs other than the Talos nodes (nas, win-11) and the CSI user/token
 cd pve_tf
 terraform plan && terraform apply
 ```
@@ -46,57 +45,53 @@ export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
 sops --decrypt dns/terraform.tfvars.enc > /tmp/terraform.tfvars   # never commit decrypted
 ```
 
-## Talos cluster (talos_tf/) — migration target
+## Kubernetes: the Talos cluster (talos_tf/, k8s-talos/)
 
-There are two Kubernetes clusters. **Services are being migrated from the k3s cluster to the new Talos cluster**; until the migration is finished both run side by side, and k3s remains the source of truth for anything not yet moved.
+The homelab runs one Kubernetes cluster, Talos Linux on Proxmox (control plane `talos-121`, workers `talos-131/132`, GPU worker `talos-133`). It replaced the former k3s/ArgoCD cluster in November 2026 (migration log: `logs/2026-11-19-k3s-to-talos-migration-plan.md` in the notes repo).
 
-| | k3s (legacy) | Talos (new) |
-|---|---|---|
-| Provisioning | Ansible (`k3s_config`, `k8s_bootstrap_cluster`) | Terraform, `talos_tf/` (1 CP + 2 workers on Proxmox, own state) |
-| GitOps | ArgoCD, bootstrapped by Ansible | **Flux**, bootstrapped by Terraform (`flux_bootstrap_git`) |
-| Manifests | `k8s/` | `k8s-talos/` (`clusters/talos/` = Flux entrypoint, `infrastructure/` = apps) |
-| Secrets | `SopsSecret` CRD (sops-secrets-operator) | Native `Secret` decrypted by Flux |
+- **Provisioning**: Terraform, `talos_tf/` (VMs, machine config, bootstrap, Cilium, Flux; own state). Run it via `cd talos_tf && make tf-plan|tf-apply` (secrets from `auth.enc.yaml`, see `auth.example.yaml`). `make configs` writes `~/.talos/config` and `~/.kube/talos-config`.
+- **GitOps**: Flux, bootstrapped by Terraform (`flux_bootstrap_git`). Change things by committing to `k8s-talos/`, never with `kubectl`. Use the `flux` CLI to inspect and reconcile (`flux get all -A`, `flux reconcile kustomization infrastructure --with-source`). Notes: `knowledge/flux.md` in the notes repo.
+- **kubectl**: always `--kubeconfig ~/.kube/talos-config` (or `KUBECONFIG=~/.kube/talos-config`); `~/.kube/config` is the old k3s cluster, which no longer exists.
 
-Run Terraform via `cd talos_tf && make tf-plan|tf-apply` (secrets from `auth.enc.yaml`, see `auth.example.yaml`). The ArgoCD/`k8s/` rules in this file (ArgoCD flow, `SopsSecret`, the `k8s/` layout, the "never use kubectl to create resources" rule) apply to the k3s cluster only. The same "let GitOps manage it" principle applies on Talos: change things by committing to `k8s-talos/`, not with `kubectl`. Use `flux` CLI to inspect and reconcile (`flux get all -A`, `flux reconcile kustomization infrastructure --with-source`). When migrating a service, port its manifests from `k8s/` to `k8s-talos/`, convert its `SopsSecret` to a native `Secret` (see SOPS below), and only remove it from `k8s/` once it is verified on Talos. Migrated apps live in `k8s-talos/apps/<group>/<app>/` (groups: mediaserver, cloud, ai, cloudflare), one Flux Kustomization per group (`k8s-talos/clusters/talos/apps-<group>.yaml`). Ingresses become `HTTPRoute`s on `gateway/main`, and `LoadBalancer` services become ClusterIP. `scripts/k3s2talos.py convert` does the porting and `migrate-jobs` writes the PVC copy Jobs (staged on the NAS dataset `tank-data/k8s-migration`); run it from the repo root with `~/.venvs/homelab/bin/python3` (PyYAML, `scripts/requirements.txt`). Cutover per hostname: move it from `k8s_hostnames` to `talos_hostnames` in `ansible/playbooks/compose_apps.yaml`, then `make compose_apps`. Plan and status: `logs/2026-11-19-k3s-to-talos-migration-plan.md` in the notes repo. Notes: `knowledge/flux.md` in the notes repo.
-
-## Architecture
-
-### GitOps Flow
-
-ArgoCD is **bootstrapped via Ansible** (not managed by itself initially). Once running, it self-manages all cluster resources from this git repo:
-
-1. **Ansible bootstrap** (`k8s_bootstrap_cluster.yaml`) deploys ArgoCD via Helm, then creates two seed Applications:
-   - `argocd-apps` — watches `k8s/argocd-apps/` (recursive), instantiates all Application CRs
-   - `argocd-app-projects` — watches `k8s/argocd-projects/`, instantiates AppProject CRs
-2. From then on, pushing to `main` triggers ArgoCD auto-sync
-
-### Kubernetes Manifest Layout
+### Manifest layout
 
 ```
-k8s/
-├── argocd-apps/            # Application CRs (one per service, grouped by project)
-│   ├── tooling/            # Core infra apps (cert-manager, sops-operator, prometheus…)
-│   ├── mediaserver/        # Media apps (jellyfin, navidrome, joplin…)
-│   ├── ai/                 # AI apps (ollama, qdrant, webui)
-│   └── cloud/              # Cloud apps (nextcloud, onlyoffice)
-├── argocd-projects/        # AppProject CRs (namespace + RBAC boundaries)
-├── tooling/                # Manifests for core infra (cert-manager, metallb, CSI…)
-├── mediaserver/            # Manifests for media services
-├── cloud/                  # Manifests for cloud services
-└── cloudflare/             # Cloudflare tunnel configs
+k8s-talos/
+├── clusters/talos/          # Flux entrypoint: one Kustomization per layer and per app group
+│   ├── infrastructure.yaml  # -> infrastructure/
+│   ├── infrastructure-config.yaml
+│   └── apps-<group>.yaml    # -> apps/<group>/ (mediaserver, cloud, ai, cloudflare)
+├── infrastructure/          # Platform (Cilium config, gateway, cert-manager, Proxmox CSI, monitoring, Tuppr, NVIDIA…)
+├── infrastructure-config/   # Resources that need the platform CRDs (ClusterIssuer, Tuppr upgrade CRs…)
+└── apps/<group>/<app>/      # One folder per app, each with its own kustomization.yaml
 ```
 
-Each service under `mediaserver/`, `cloud/`, etc. typically contains: `deployment.yaml`, `service.yaml`, `ingress.yaml`, `sops_secret.yaml`, and a PVC if needed.
+Each group owns its `namespace.yaml` and lists its apps in `apps/<group>/kustomization.yaml`; each app `kustomization.yaml` sets `namespace:`. Helm apps use a `HelmRepository` + `HelmRelease` pair (see `k8s-talos/apps/cloud/nextcloud/helmrelease.yaml`). Services are ClusterIP; nothing uses `type: LoadBalancer` except the Gateway and Prometheus.
 
-### ArgoCD Helm Configuration
+### HTTPRoute pattern
 
-ArgoCD is deployed via Helm chart (`argocd/argo-cd`). The overriding values are in:
-`ansible/playbooks/roles/k8s_argocd_deploy/files/values_overwrite.yaml`
+There are no `Ingress` resources. Every app gets an `httproute.yaml` attached to the shared Gateway; TLS is terminated there with the wildcard certificate, so no per-app certificate or cert-manager annotation is needed:
 
-To apply changes to ArgoCD's own config, edit that file and re-run:
-```bash
-cd ansible && make k8s_bootstrap_cluster
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: <app>
+  namespace: <namespace>
+spec:
+  parentRefs:
+  - name: main
+    namespace: gateway
+    sectionName: https
+  hostnames:
+  - <app>.enricoruggieri.com
+  rules:
+  - backendRefs:
+    - name: <service>
+      port: <port>
 ```
+
+Long requests (uploads, websockets with long idle) need `rules[].timeouts.request` (Nextcloud and OnlyOffice use `3600s`). A new hostname must also be added to `talos_hostnames` in `ansible/playbooks/compose_apps.yaml`, then `make compose_apps`, so Traefik passes it through.
 
 ### NAS & Storage Management
 
@@ -117,10 +112,12 @@ cd ansible && make k8s_bootstrap_cluster
 - `tank-data/`: Primary storage pool for media, app configs, and large datasets
   - `media/`: Movies, music, audiobooks, TV shows
   - `comfyui/`: ComfyUI outputs, inputs, and user data
-  - `ollama-models/`: LLM model cache (NFS-mounted by k8s)
+  - `ollama-models/`: LLM model cache
   - Other app-specific datasets
 - `tank-fast/`: Faster NVMe pool for latency-sensitive workloads
 - `fast-pool1/`: Legacy fast storage (being phased out)
+
+**Block storage in Kubernetes**: Proxmox CSI on the `kubedata` ZFS pool (`kube-pool`), StorageClasses `proxmox-zfs-nvme` (default) and `proxmox-zfs-kubedata-ext4`; WaitForFirstConsumer, volume expansion allowed.
 
 **NFS Mount Pattern in Kubernetes:**
 NFS volumes are mounted directly as inline volumes in Deployment specs (no PV/PVC abstraction):
@@ -134,7 +131,7 @@ volumes:
 ```
 
 All NFS datasets are exported with:
-- `rw=@192.168.100.0/24`: Read-write to k8s subnet
+- `rw=@192.168.100.0/24`: Read-write to the homelab subnet
 - `no_root_squash`: Allow containers running as root to write (required for many k8s apps)
 - `nohide, no_subtree_check`: Standard k8s-friendly options
 
@@ -142,73 +139,34 @@ All NFS datasets are exported with:
 1. Add entry to `zfs_datasets` in `nas_config.yaml` with `nfs: enabled: true`
 2. Specify NFS options (use `ollama-models` or `comfyui-output` as templates)
 3. Run `make nas_config`
-4. Update k8s deployment to mount the new dataset
+4. Update the k8s deployment to mount the new dataset
 
 ### Networking
 
-- **MetalLB**: Provides LoadBalancer IPs for services on the `192.168.100.x` subnet
-- **ingress-nginx**: Single ingress controller deployed in `ingress-nginx` namespace, handles TLS termination for all services
-- **cert-manager**: Issues Let's Encrypt certificates via DNS01 challenge (Cloudflare). ClusterIssuer: `letsencrypt-cloudflare`
-- **Cloudflared**: Cloudflare tunnel for external access to selected services
+- **Cilium**: CNI with kube-proxy replacement and L2 LB-IPAM (pool `192.168.100.200-219`)
+- **Gateway API**: Cilium native Gateway `gateway/main` on `192.168.100.202`, reached only through Traefik on `ops` (TLS passthrough by SNI + PROXY protocol v2); direct connections are rejected. Pod CIDR `10.244.0.0/16` (what apps see as the proxy address, e.g. Nextcloud `trusted_proxies`)
+- **cert-manager**: Let's Encrypt wildcard certificate for `*.enricoruggieri.com` via DNS01 (Cloudflare). ClusterIssuer: `letsencrypt-cloudflare`
+- **Cloudflared**: Cloudflare tunnel (`apps/cloudflare/cloudflared`) for external access; its only public hostname is `nextcloud.enricoruggieri.com` -> `http://nextcloud.cloud.svc.cluster.local:8080`, configured in the Cloudflare dashboard (not Terraform)
 - **DNS**: `enricoruggieri.com` managed via Cloudflare; internal records in Terraform (`dns/`); Pi-hole for local resolution
-
-### Ingress Pattern
-
-All service ingresses follow this pattern (TLS via cert-manager DNS01):
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: <service>
-  namespace: <namespace>
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: "<service>.enricoruggieri.com"
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: <service>-service
-                port:
-                  number: <port>
-  tls:
-    - hosts:
-        - <service>.enricoruggieri.com
-      secretName: <service>-cert-tls
-```
 
 ### Secret Management
 
-**k3s cluster (`k8s/`)**: all secrets use the `SopsSecret` CRD (isindir/sops-secrets-operator). Never use plain Kubernetes `Secret` resources in git.
-
-**Talos cluster (`k8s-talos/`)**: the opposite. Flux decrypts SOPS natively, so secrets are plain `v1/Secret` manifests encrypted with SOPS. Do **not** use the `SopsSecret` CRD there (the operator is not installed). See the differences below.
+Flux decrypts SOPS natively, so secrets are plain `v1/Secret` manifests encrypted with SOPS (`sops_secret.yaml` in the app folder). There is no `SopsSecret` CRD (sops-secrets-operator is not installed).
 
 ## SOPS + Age Key Management
 
 ### Age Key Location
-The age private key is stored at: **`~/.sops/age_key.txt`** (user's home directory, not in repo). Both clusters use the same age key.
+The age private key is stored at: **`~/.sops/age_key.txt`** (user's home directory, not in repo).
 
-### k3s vs Talos: SOPS differences
+### How Flux decrypts
 
-| | k3s (`k8s/`) | Talos (`k8s-talos/`) |
-|---|---|---|
-| Resource kind | `SopsSecret` (`isindir.github.com/v1alpha3`) | native `Secret` (`v1`) |
-| Decrypted by | sops-secrets-operator in the cluster | Flux kustomize-controller (`decryption.provider: sops` on the Flux `Kustomization`) |
-| Key in cluster | operator's own age key secret | Secret `sops-age` in `flux-system`, created by Terraform (`talos_tf/flux.tf`) from `sops_age_key` |
-| Fields encrypted | `stringData` | `data` and `stringData` |
-| Encrypt command | needs explicit `--encrypted-regex '^(stringData)$'` | `.sops.yaml` rule for `k8s-talos/` already sets `encrypted_regex: ^(data\|stringData)$`, so just `sops --encrypt --in-place <file>` |
+- Flux kustomize-controller decrypts with `decryption.provider: sops` on the Flux `Kustomization`, using the Secret `sops-age` in `flux-system` (created by Terraform, `talos_tf/flux.tf`, from `sops_age_key`).
+- A new Flux `Kustomization` that contains encrypted files must set `spec.decryption` (`provider: sops`, `secretRef.name: sops-age`), as `k8s-talos/clusters/talos/infrastructure.yaml` does. Without it, the encrypted Secret is applied as-is and the app breaks.
+- The `.sops.yaml` rule for `k8s-talos/` sets `encrypted_regex: ^(data|stringData)$`, so only the values are encrypted.
 
-A new Flux `Kustomization` that contains encrypted files must set `spec.decryption` (`provider: sops`, `secretRef.name: sops-age`), as `k8s-talos/clusters/talos/infrastructure.yaml` does. Without it, the encrypted Secret is applied as-is and the app breaks.
+### Encrypting secrets
 
-### Encrypting Talos (Flux) secrets
-
-1. Create a plaintext `Secret` at `k8s-talos/infrastructure/{app}/sops_secret.yaml` (use `stringData`, not base64 `data`):
+1. Create a plaintext `Secret` at `k8s-talos/apps/<group>/<app>/sops_secret.yaml` (or `k8s-talos/infrastructure/<app>/`), using `stringData`, not base64 `data`:
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -221,45 +179,14 @@ stringData:
 2. Encrypt and verify:
 ```bash
 export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
-sops --encrypt --in-place k8s-talos/infrastructure/{app}/sops_secret.yaml
-sops --decrypt k8s-talos/infrastructure/{app}/sops_secret.yaml
+sops --encrypt --in-place k8s-talos/apps/<group>/<app>/sops_secret.yaml
+sops --decrypt k8s-talos/apps/<group>/<app>/sops_secret.yaml
 ```
 3. Add the file to the app's `kustomization.yaml` and commit. Flux decrypts and applies it.
 
-### Encrypting k3s Kubernetes Secrets with SOPS
-
-**Always use selective encryption** with the `--encrypted-regex` flag to encrypt only `stringData` fields.
-
-#### Step-by-step for new secrets:
-
-1. **Create plaintext SopsSecret** at `k8s/{namespace}/{app}/sops_secret.yaml`:
-```yaml
-apiVersion: isindir.github.com/v1alpha3
-kind: SopsSecret
-metadata:
-    name: {app}-secrets-sops
-    namespace: {namespace}
-spec:
-    secretTemplates:
-        - name: {secret-name}
-          stringData:
-            key1: plaintext-value-1
-```
-
-2. **Encrypt**:
-```bash
-export SOPS_AGE_KEY_FILE=~/.sops/age_key.txt
-sops --encrypt --in-place --encrypted-regex '^(stringData)$' k8s/{namespace}/{app}/sops_secret.yaml
-```
-
-3. **Verify**:
-```bash
-sops --decrypt k8s/{namespace}/{app}/sops_secret.yaml
-```
-
 ## Host updates
 
-A cron job on `ops` (Sunday 03:00, `ansible/playbooks/cronjob.yaml`) runs `ansible/playbooks/update_hosts.yaml`: apt dist-upgrade plus automatic reboot when needed, in dependency order: k3s agents (serial, drain/uncordon) -> k3s master -> nas -> pve_node3 -> ops (last, detached reboot). `nas_config.yaml` is re-applied after the NAS reboots (and after pve reboots), because the NFS exports are lost on every NAS reboot. A failed run sends a Telegram message (`notify_failure.yaml`). Talos nodes have no apt and are not in the Ansible inventory; they are upgraded by Tuppr (see below).
+A cron job on `ops` (Sunday 03:00, `ansible/playbooks/cronjob.yaml`) runs `ansible/playbooks/update_hosts.yaml`: apt dist-upgrade plus automatic reboot when needed, in dependency order: nas -> pve_node3 -> ops (last, detached reboot). `nas_config.yaml` is re-applied after the NAS reboots (and after pve reboots), because the NFS exports are lost on every NAS reboot. A failed run sends a Telegram message (`notify_failure.yaml`). Talos nodes have no apt and are not in the Ansible inventory; they are upgraded by Tuppr (see below).
 
 ### Upgrading the Talos cluster (Talos and Kubernetes versions)
 
@@ -270,17 +197,19 @@ Tuppr (`k8s-talos/infrastructure/tuppr`, namespace `system-upgrade`) rolls Talos
 3. Edit the same value in `talos_tf/variables.tf` (`talos_version`, `kubernetes_version`, no `v` for Kubernetes) so a rebuilt cluster matches. Do **not** run `tf-apply` to upgrade running nodes; Terraform only needs to be applied for new/rebuilt nodes.
 4. Commit and push. Flux applies the CR and Tuppr starts. Follow it with `flux reconcile kustomization infrastructure-config --with-source`, `kubectl --kubeconfig ~/.kube/talos-config get talosupgrade,kubernetesupgrade` and `talosctl --talosconfig ~/.talos/config version`.
 
-The installer image and schematic (qemu-guest-agent extension) are taken from each node's current install image, so extensions are preserved. If the schematic itself changes (new extension), change it in `talos_tf/image.tf` and use the `factory-url`/`schematic` annotations described in the Tuppr docs. The Talos API access Tuppr needs (`kubernetesTalosAPIAccess`, namespace `system-upgrade`) is part of the machine config in `talos_tf/talos.tf`; it is enabled on the control plane only (Talos rejects it on workers) and reaches the node only after a `make tf-apply`. On a fresh cluster the Tuppr HelmRelease fails until that feature exists (the chart creates a `talos.dev` ServiceAccount); once the apply is done, `flux reconcile hr tuppr -n system-upgrade --force`. Do not upgrade while the pve host update (Sunday 03:00) is running.
+The installer image and schematic (qemu-guest-agent extension) are taken from each node's current install image, so extensions are preserved. If the schematic itself changes (new extension), change it in `talos_tf/image.tf` and use the `factory-url`/`schematic` annotations described in the Tuppr docs. The GPU node has its own schematic (NVIDIA LTS driver + container toolkit, `talos_image_factory_schematic.gpu`); a schematic change on a running node needs `talosctl upgrade --image <new installer>`, a config apply alone does not reinstall extensions. The Talos API access Tuppr needs (`kubernetesTalosAPIAccess`, namespace `system-upgrade`) is part of the machine config in `talos_tf/talos.tf`; it is enabled on the control plane only (Talos rejects it on workers) and reaches the node only after a `make tf-apply`. On a fresh cluster the Tuppr HelmRelease fails until that feature exists (the chart creates a `talos.dev` ServiceAccount); once the apply is done, `flux reconcile hr tuppr -n system-upgrade --force`. Do not upgrade while the pve host update (Sunday 03:00) is running.
+
+Changing a node's CPU or memory (`nodes` in `talos_tf/variables.tf`) reboots the VM: drain it first, apply with `-target` one node at a time, then uncordon.
 
 ## Infrastructure
 
-- **Proxmox cluster**: nodes at `192.168.100.23` (pve_node3)
-- **k3s master**: `k3s-101` at `192.168.100.101`; agents at `.111`, `.112` (the GPU agent k3s-113 was removed; the GPU is on the Talos worker `talos-133`, `192.168.100.133`)
-- **Reverse proxy**: Traefik container on `ops` (`192.168.100.78`) — label discovery for Docker services, TLS passthrough (SNI) to the k8s ingress at `192.168.100.111:443`. kubectl and k3s agents talk to the master `192.168.100.101:6443` directly
-- **TrueNAS backup**: `truenas-backup.enricoruggieri.com` — use for NFS backup mounts or rclone targets
+- **Proxmox**: single node `pve_node3` at `192.168.100.23`
+- **Talos**: control plane `talos-121`, workers `talos-131`, `talos-132`, GPU worker `talos-133` (`192.168.100.133`, RTX 3060 `0000:0c:00.0` passed through; the GTX 970 at `0000:0b:00.0` is unused)
+- **Reverse proxy**: Traefik container on `ops` (`192.168.100.78`) — label discovery for Docker services, TLS passthrough (SNI) to the Talos Gateway at `192.168.100.202:443`
+- **TrueNAS backup**: `truenas-backup.enricoruggieri.com` — use for NFS backup mounts or rclone targets (restic repos for nextcloud, karakeep, arr-postgres)
 
 ## Rules
 
-- **Never use `kubectl` to create resources** — let ArgoCD manage all deployments. Only use kubectl for testing/debugging, never for persistent state changes.
-- **SOPS Encryption**: Always use `sops --encrypt --in-place`; never manually encrypt or bypass this workflow. For k3s (`k8s/`) add `--encrypted-regex '^(stringData)$'`; for Talos (`k8s-talos/`) the regex comes from `.sops.yaml`. Details in "SOPS + Age Key Management".
-- Every time a new application is added in Kubernetes, update the README.md. Exclude Sonarr, Radarr, and Transmission. Scope by cluster: an app added to k3s (`k8s/`) goes in the "Services Deployed" section; an app added to Talos (`k8s-talos/`) goes in the "Talos Cluster" section. An app migrated from k3s to Talos is moved between those sections once it runs on Talos, not listed in both.
+- **Never use `kubectl` to create resources** — let Flux manage everything from `k8s-talos/`. Only use kubectl for testing/debugging, never for persistent state changes.
+- **SOPS Encryption**: Always use `sops --encrypt --in-place`; never manually encrypt or bypass this workflow. The regex comes from `.sops.yaml`. Details in "SOPS + Age Key Management".
+- Every time a new application is added in Kubernetes, update the "Talos Cluster" section of README.md. Exclude Sonarr, Radarr, and Transmission.

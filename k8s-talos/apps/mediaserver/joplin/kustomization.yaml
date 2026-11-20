@@ -5,4 +5,3 @@ resources:
 - manifests.yaml
 - sops_secret.yaml
 - httproute.yaml
-- migrate-import.yaml

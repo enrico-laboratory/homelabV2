@@ -6,4 +6,3 @@ resources:
 - sops_secret_redis.yaml
 - helmrelease.yaml
 - httproute.yaml
-- migrate-restore.yaml
