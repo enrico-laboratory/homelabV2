@@ -17,4 +17,3 @@ resources:
 - karakeep-backup
 - arr-postgres
 - arr-postgres-backup
-- sonarr-pg-migrate
