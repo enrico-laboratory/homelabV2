@@ -33,6 +33,9 @@ spec:
     node:
       nodeSelector:
         kubernetes.io/os: linux
+      # every node needs the node plugin (volume attach + topology), tainted GPU nodes included
+      tolerations:
+        - operator: Exists
     # Ported from k8s/argocd-apps/tooling/proxmox-csi-plugin.yaml; the vmimages class is dropped on purpose
     storageClass:
       - name: proxmox-zfs-nvme

@@ -130,14 +130,7 @@ resource "proxmox_virtual_environment_vm" "win_11" {
     datastore_id = var.vm_images_datastore
     version      = "v2.0"
   }
-  hostpci {
-    device   = "hostpci0"
-    id       = "0000:0c:00"
-    pcie     = true
-    rom_file = "patched_gpu.rom"
-    xvga     = true
-    rombar   = true
-  }
+  # the RTX 3060 (0000:0c:00) moved to the Talos GPU worker talos-133 (talos_tf/variables.tf, var.gpu)
   hostpci {
     device = "hostpci1"
     id     = "0000:04:00.0"

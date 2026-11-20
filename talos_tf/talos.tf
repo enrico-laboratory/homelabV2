@@ -165,7 +165,8 @@ resource "talos_cluster_kubeconfig" "this" {
 
 # Kubernetes-level checks are skipped: nodes stay NotReady until Cilium is installed
 data "talos_cluster_health" "control_plane" {
-  depends_on = [talos_cluster_kubeconfig.this]
+  # also after the config apply: a node added to var.nodes is only reachable once it is configured
+  depends_on = [talos_cluster_kubeconfig.this, talos_machine_configuration_apply.this]
 
   client_configuration   = data.talos_client_configuration.this.client_configuration
   control_plane_nodes    = [local.controlplane_ip]

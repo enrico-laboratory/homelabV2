@@ -14,7 +14,8 @@ data "talos_image_factory_urls" "this" {
   platform      = "nocloud"
 }
 
-# GPU nodes: NVIDIA driver (LTS "production" branch) and container toolkit. They boot the common ISO;
+# GPU nodes: NVIDIA driver and container toolkit, LTS branch (580, supports Maxwell to current).
+# They boot the common ISO;
 # the installer from this schematic brings the extensions in at install time.
 resource "talos_image_factory_schematic" "gpu" {
   schematic = yamlencode({
@@ -22,8 +23,8 @@ resource "talos_image_factory_schematic" "gpu" {
       systemExtensions = {
         officialExtensions = [
           "siderolabs/qemu-guest-agent",
-          "siderolabs/nonfree-kmod-nvidia-production",
-          "siderolabs/nvidia-container-toolkit-production",
+          "siderolabs/nonfree-kmod-nvidia-lts",
+          "siderolabs/nvidia-container-toolkit-lts",
         ]
       }
     }
