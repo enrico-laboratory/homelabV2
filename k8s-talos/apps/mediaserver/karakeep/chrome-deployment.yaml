@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: chrome
-        image: gcr.io/zenika-hub/alpine-chrome:123
+        image: docker.io/zenika/alpine-chrome:123 # gcr.io/zenika-hub returns 403; same digest sha256:e38563d4
         command:
         - chromium-browser
         - --headless
