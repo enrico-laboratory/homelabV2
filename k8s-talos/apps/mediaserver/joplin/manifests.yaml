@@ -58,7 +58,7 @@ spec:
       - name: postgres-storage
         persistentVolumeClaim:
           claimName: postgres-data
-  replicas: 0
+  replicas: 1
 ---
 apiVersion: v1
 kind: Service
@@ -112,4 +112,4 @@ spec:
           value: '5432'
         - name: POSTGRES_HOST
           value: postgres
-  replicas: 0
+  replicas: 1
