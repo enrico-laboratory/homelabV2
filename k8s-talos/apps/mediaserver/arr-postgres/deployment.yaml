@@ -1,0 +1,64 @@
+# One Postgres shared by Sonarr, Radarr and Prowlarr (a role + main/log databases each).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arr-postgres
+  labels:
+    app: arr-postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # RWO volume
+  selector:
+    matchLabels:
+      app: arr-postgres
+  template:
+    metadata:
+      labels:
+        app: arr-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:17.6
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: arr-postgres-credentials, key: postgres-password}
+        - name: SONARR_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: arr-postgres-credentials, key: sonarr-password}
+        - name: RADARR_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: arr-postgres-credentials, key: radarr-password}
+        - name: PROWLARR_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: arr-postgres-credentials, key: prowlarr-password}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: initdb
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 1Gi
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: arr-postgres-data
+      - name: initdb
+        configMap:
+          name: arr-postgres-initdb
+          defaultMode: 0555

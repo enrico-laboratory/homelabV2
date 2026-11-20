@@ -1,0 +1,21 @@
+# Runs once, on an empty data dir. Each app gets its own role and a main + log database
+# (the apps do not create them). Passwords come from the arr-postgres-credentials Secret.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arr-postgres-initdb
+data:
+  10-arr-databases.sh: |
+    #!/bin/bash
+    set -euo pipefail
+    create() {
+      app="$1"; pass="$2"
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname postgres <<SQL
+    CREATE ROLE "$app" LOGIN PASSWORD '$pass';
+    CREATE DATABASE "$app-main" OWNER "$app";
+    CREATE DATABASE "$app-log" OWNER "$app";
+    SQL
+    }
+    create sonarr   "$SONARR_PASSWORD"
+    create radarr   "$RADARR_PASSWORD"
+    create prowlarr "$PROWLARR_PASSWORD"

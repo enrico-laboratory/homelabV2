@@ -4,7 +4,7 @@ metadata:
   name: cloudflared
   namespace: cloudflare
 spec:
-  replicas: 2
+  replicas: 0 # migrated to Talos (k8s-talos/apps/cloudflare/cloudflared)
   selector:
     matchLabels:
       app: cloudflared

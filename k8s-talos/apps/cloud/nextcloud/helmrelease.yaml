@@ -50,7 +50,7 @@ spec:
             'overwrite.cli.url' => 'https://nextcloud.enricoruggieri.com',
             // Cilium's Envoy (Gateway API) connects from the pod CIDR
             'trusted_proxies' => array('10.244.0.0/16'),
-            'twofactor_enforced' => 'yes',
+            'twofactor_enforced' => 'true', // must be the string 'true' ('yes' is ignored)
             'twofactor_enforced_groups' => array(),
             'twofactor_enforced_excluded_groups' => array(),
           );

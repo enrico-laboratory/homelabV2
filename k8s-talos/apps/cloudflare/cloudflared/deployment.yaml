@@ -4,7 +4,7 @@ metadata:
   name: cloudflared
   namespace: cloudflare
 spec:
-  replicas: 0 # 2 once the tunnel origin points at nextcloud.cloud.svc.cluster.local:8080 (Cloudflare dashboard)
+  replicas: 2 # tunnel origin (Cloudflare dashboard): http://nextcloud.cloud.svc.cluster.local:8080
   selector:
     matchLabels:
       app: cloudflared

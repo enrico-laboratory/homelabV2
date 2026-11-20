@@ -15,3 +15,5 @@ resources:
 - jellyfin
 - karakeep
 - karakeep-backup
+- arr-postgres
+- arr-postgres-backup
