@@ -1,0 +1,43 @@
+# Job queue and cache only: nothing to persist.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-valkey
+  labels:
+    app: immich-valkey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-valkey
+  template:
+    metadata:
+      labels:
+        app: immich-valkey
+    spec:
+      containers:
+      - name: valkey
+        image: docker.io/valkey/valkey:9@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
+        ports:
+        - containerPort: 6379
+        readinessProbe:
+          exec:
+            command: ["valkey-cli", "ping"]
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 20m
+          limits:
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-valkey
+spec:
+  selector:
+    app: immich-valkey
+  ports:
+  - port: 6379
+    targetPort: 6379

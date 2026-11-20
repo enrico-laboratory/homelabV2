@@ -1,0 +1,75 @@
+# The library (originals) is the NAS dataset tank-fast/immich-library; thumbs and encoded-video
+# are overlaid from a block PVC. Immich also writes its automatic DB dumps to /data/backups (on the NFS dataset).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+  labels:
+    app: immich-server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # RWO cache volume
+  selector:
+    matchLabels:
+      app: immich-server
+  template:
+    metadata:
+      labels:
+        app: immich-server
+    spec:
+      containers:
+      - name: server
+        image: ghcr.io/immich-app/immich-server:v3.4.2
+        ports:
+        - containerPort: 2283
+        env:
+        - name: DB_HOSTNAME
+          value: immich-postgres
+        - name: DB_USERNAME
+          value: immich
+        - name: DB_DATABASE_NAME
+          value: immich
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: immich-db, key: password}
+        - name: REDIS_HOSTNAME
+          value: immich-valkey
+        - name: IMMICH_MACHINE_LEARNING_URL
+          value: http://immich-machine-learning:3003
+        volumeMounts:
+        - {name: library, mountPath: /data}
+        - {name: cache, mountPath: /data/thumbs, subPath: thumbs}
+        - {name: cache, mountPath: /data/encoded-video, subPath: encoded-video}
+        readinessProbe:
+          httpGet: {path: /api/server/ping, port: 2283}
+          periodSeconds: 10
+        startupProbe:
+          httpGet: {path: /api/server/ping, port: 2283}
+          periodSeconds: 10
+          failureThreshold: 60 # DB migrations on first start
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 200m
+          limits:
+            memory: 4Gi
+      volumes:
+      - name: library
+        nfs:
+          server: nas.enricoruggieri.com
+          path: /tank-fast/immich-library
+      - name: cache
+        persistentVolumeClaim:
+          claimName: immich-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-server
+spec:
+  selector:
+    app: immich-server
+  ports:
+  - port: 2283
+    targetPort: 2283

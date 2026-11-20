@@ -1,0 +1,34 @@
+# Block storage only for what must not live on the NFS library: the database, the
+# thumbnails/transcodes (many small files, read on every page view) and the ML model cache.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-postgres-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 15Gi
+  storageClassName: proxmox-zfs-nvme
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-cache
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 40Gi # thumbs + encoded-video; the class allows expansion
+  storageClassName: proxmox-zfs-nvme
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-ml-cache
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: proxmox-zfs-nvme

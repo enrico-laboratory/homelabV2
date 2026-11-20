@@ -1,0 +1,61 @@
+# CUDA variant on the GPU worker (talos-133), shared with ollama and comfyui.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-machine-learning
+  labels:
+    app: immich-machine-learning
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # RWO model cache
+  selector:
+    matchLabels:
+      app: immich-machine-learning
+  template:
+    metadata:
+      labels:
+        app: immich-machine-learning
+    spec:
+      runtimeClassName: nvidia
+      tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+      - name: machine-learning
+        image: ghcr.io/immich-app/immich-machine-learning:v3.4.2-cuda
+        ports:
+        - containerPort: 3003
+        env:
+        - name: TRANSFORMERS_CACHE
+          value: /cache
+        volumeMounts:
+        - mountPath: /cache
+          name: cache
+        startupProbe:
+          httpGet: {path: /ping, port: 3003}
+          periodSeconds: 10
+          failureThreshold: 60 # first start downloads the models
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 200m
+          limits:
+            memory: 6Gi
+            nvidia.com/gpu: "1"
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: immich-ml-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-machine-learning
+spec:
+  selector:
+    app: immich-machine-learning
+  ports:
+  - port: 3003
+    targetPort: 3003

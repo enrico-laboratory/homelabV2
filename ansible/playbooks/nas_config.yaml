@@ -18,6 +18,13 @@
         pool: "tank-data"
       - name: "audio"
         pool: "tank-data"
+      # Immich originals (Postgres and thumbnails live on block PVCs). no_root_squash: the server runs as root
+      # and the dataset root is root-owned, so all_squash (uid 1000) could not write.
+      - name: "immich-library"
+        pool: "tank-fast"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
       - name: "media"
         pool: "tank-data"
         nfs:
