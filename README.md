@@ -67,7 +67,6 @@ homelabV2/
 - Navidrome (music streaming)
 - Joplin (notes)
 - Karakeep (bookmarks and notes), with nightly restic backup to TrueNAS
-- Meal Plan (personal dashboard at personal.enricoruggieri.com)
 
 ### AI & ML Services
 - Ollama (LLM inference)
@@ -114,6 +113,8 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Hubble UI (flow visibility) on `https://hubble.enricoruggieri.com` via HTTPRoute, LAN only, no authentication
 - Upgrades: Tuppr (`system-upgrade`) rolls Talos and Kubernetes one node at a time; bump the versions in `k8s-talos/infrastructure-config/tuppr/upgrades.yaml` (and `talos_tf/variables.tf`)
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
+- Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group, ported from k3s with `scripts/k3s2talos.py`):
+  - mediaserver: Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), FlareSolverr (Cloudflare challenge solver for the indexers)
 
 ```bash
 cd talos_tf
