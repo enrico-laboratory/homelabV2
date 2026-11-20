@@ -60,9 +60,9 @@ variable "nodes" {
   }))
   default = {
     "talos-121" = { role = "controlplane", vm_id = 121, cpu = 2, memory = 4096, disk_size = 32 }
-    # memory kept small while k3s is still running on the same host (~17 GB free); raise once k3s is decommissioned
-    "talos-131" = { role = "worker", vm_id = 131, cpu = 4, memory = 4096, disk_size = 48 }
-    "talos-132" = { role = "worker", vm_id = 132, cpu = 4, memory = 4096, disk_size = 48 }
+    # 7 GB after k3s-112/113 were removed; raise again once k3s is fully decommissioned
+    "talos-131" = { role = "worker", vm_id = 131, cpu = 4, memory = 7168, disk_size = 48 }
+    "talos-132" = { role = "worker", vm_id = 132, cpu = 4, memory = 7168, disk_size = 48 }
     # replaces k3s-113 (same 6 vCPU / 20 GB); gets the RTX 3060 that win-11 used to have
     "talos-133" = { role = "worker", vm_id = 133, cpu = 6, memory = 20480, disk_size = 64, gpu = true }
   }
