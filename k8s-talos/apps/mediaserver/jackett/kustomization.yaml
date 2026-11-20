@@ -6,3 +6,4 @@ resources:
 - service-internal.yaml
 - service.yaml
 - httproute.yaml
+- migrate-import.yaml
