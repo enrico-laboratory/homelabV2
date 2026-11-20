@@ -6,7 +6,7 @@ metadata:
   labels:
     app: radarr
 spec:
-  replicas: 0 # temporarily off: radarr-pg-migrate loads the SQLite data into Postgres
+  replicas: 1
   strategy:
     type: Recreate # RWO volume: a rolling update deadlocks when the new pod lands on another node
     rollingUpdate: null
