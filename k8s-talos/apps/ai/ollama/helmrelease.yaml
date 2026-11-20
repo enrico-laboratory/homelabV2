@@ -59,11 +59,10 @@ spec:
           - dolphin3:8b
           - dolphin-phi
 
+    # OLLAMA_HOST is set by the chart (a duplicate entry fails Flux's server-side apply)
     extraEnv:
       - name: OLLAMA_KEEP_ALIVE
         value: "24h"
-      - name: OLLAMA_HOST
-        value: "0.0.0.0"
       - name: OLLAMA_CONTEXT_LENGTH
         value: "64000"
       - name: OLLAMA_FLASH_ATTENTION
