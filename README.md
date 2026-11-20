@@ -62,11 +62,7 @@ homelabV2/
 - MetalLB (load balancer)
 
 ### Media & Applications
-- Jellyfin (media streaming)
 - Nextcloud (cloud storage), with nightly restic backup to TrueNAS
-- Navidrome (music streaming)
-- Joplin (notes)
-- Karakeep (bookmarks and notes), with nightly restic backup to TrueNAS
 
 ## Quick Start
 
@@ -109,7 +105,7 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Upgrades: Tuppr (`system-upgrade`) rolls Talos and Kubernetes one node at a time; bump the versions in `k8s-talos/infrastructure-config/tuppr/upgrades.yaml` (and `talos_tf/variables.tf`)
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
 - Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group, ported from k3s with `scripts/k3s2talos.py`):
-  - mediaserver: Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), FlareSolverr (Cloudflare challenge solver for the indexers)
+  - mediaserver: Jellyfin (media streaming), Navidrome (music streaming), Joplin (notes, with its Postgres), Karakeep (bookmarks and notes, with nightly restic backup to TrueNAS), Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), FlareSolverr (Cloudflare challenge solver for the indexers)
   - ai: Ollama (LLM inference), Open WebUI (chat UI for Ollama), Qdrant (vector database for Open WebUI), ComfyUI (image generation; created at 0 replicas and scaled by hand, outputs on the NAS)
 - GPU: worker `talos-133` with the RTX 3060 passed through (`gpu = true` in `talos_tf/variables.tf`), NVIDIA LTS driver + container toolkit as Talos extensions, RuntimeClass `nvidia`, nvidia-device-plugin and dcgm-exporter in `nvidia`
 
