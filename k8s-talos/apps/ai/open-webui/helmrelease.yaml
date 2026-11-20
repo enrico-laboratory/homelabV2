@@ -1,0 +1,60 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: open-webui
+  namespace: ai
+spec:
+  interval: 1h
+  url: https://helm.openwebui.com/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+  namespace: ai
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: open-webui
+      version: 14.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: open-webui
+  values:
+    # 0 until migrate-import.yaml has restored webui.db
+    replicaCount: 0
+
+    ollama:
+      enabled: false
+
+    ollamaUrls:
+      - "http://ollama.ai.svc.cluster.local:11434"
+
+    pipelines:
+      enabled: false
+
+    persistence:
+      enabled: true
+      existingClaim: open-webui
+
+    # exposed through httproute.yaml
+    ingress:
+      enabled: false
+
+    extraEnvVars:
+      - name: VECTOR_DB
+        value: "qdrant"
+      - name: QDRANT_URI
+        value: "http://qdrant.ai.svc.cluster.local:6333"
+      - name: QDRANT_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: qdrant-api-key-secret
+            key: api-key
+      - name: ENABLE_RETRIEVAL_UNSCOPED_COLLECTIONS
+        value: "true"
+    tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"

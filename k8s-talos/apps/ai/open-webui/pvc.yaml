@@ -1,0 +1,13 @@
+# Own claim (chart: persistence.existingClaim) so the import Job can fill it before the StatefulSet starts
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: open-webui
+  namespace: ai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: proxmox-zfs-nvme
+  resources:
+    requests:
+      storage: 2Gi

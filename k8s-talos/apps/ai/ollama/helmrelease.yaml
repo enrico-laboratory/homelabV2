@@ -1,0 +1,74 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: otwld
+  namespace: ai
+spec:
+  interval: 1h
+  url: https://helm.otwld.com/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ollama
+  namespace: ai
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: ollama
+      version: 1.40.0
+      sourceRef:
+        kind: HelmRepository
+        name: otwld
+  values:
+    runtimeClassName: nvidia
+    image:
+      repository: ollama/ollama
+      tag: "0.15.0"
+
+    persistentVolume:
+      enabled: true
+      storageClass: "proxmox-zfs-kubedata-ext4"
+      size: 100Gi
+
+    tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+    ollama:
+      gpu:
+        enabled: true
+        type: nvidia
+        number: 1
+
+      # Models pulled at startup (no-op when already on the PVC).
+      # Additive only: removing an entry does not delete the model.
+      models:
+        pull:
+          - llama3.2:1b
+          - llama3.2:3b
+          - llama3.2-vision
+          - nomic-embed-text
+          - qwen3:4b
+          - qwen2.5-coder:7b
+          - qwen2.5-coder:14b
+          - mistral-small
+          - gemma3:12b
+          - orieg/gemma3-tools:12b-ft
+          - dolphin3:8b
+          - dolphin-phi
+
+    extraEnv:
+      - name: OLLAMA_KEEP_ALIVE
+        value: "24h"
+      - name: OLLAMA_HOST
+        value: "0.0.0.0"
+      - name: OLLAMA_CONTEXT_LENGTH
+        value: "64000"
+      - name: OLLAMA_FLASH_ATTENTION
+        value: '1'
+
+    # exposed through httproute.yaml
+    ingress:
+      enabled: false

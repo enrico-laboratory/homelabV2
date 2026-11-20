@@ -1,0 +1,50 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: qdrant
+  namespace: ai
+spec:
+  interval: 1h
+  url: https://qdrant.github.io/qdrant-helm
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: qdrant
+  namespace: ai
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: qdrant
+      version: 1.16.3
+      sourceRef:
+        kind: HelmRepository
+        name: qdrant
+  values:
+    persistence:
+      enabled: true
+      storageClassName: "proxmox-zfs-nvme"
+      size: 30Gi
+
+    tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    # cluster-internal only (k3s exposed a NodePort 30333; dropped with the other direct-access services)
+    service:
+      type: ClusterIP
+
+    apiKey:
+      valueFrom:
+        secretKeyRef:
+          name: qdrant-api-key-secret
+          key: api-key
+
+    config:
+      service:
+        enable_tls: false
+
+    ingress:
+      enabled: false
