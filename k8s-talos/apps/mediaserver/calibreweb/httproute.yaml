@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: calibreweb
+  namespace: mediaserver
+spec:
+  parentRefs:
+  - name: main
+    namespace: gateway
+    sectionName: https
+  hostnames:
+  - calibreweb.enricoruggieri.com
+  rules:
+  - backendRefs:
+    - name: calibreweb-service
+      port: 8083

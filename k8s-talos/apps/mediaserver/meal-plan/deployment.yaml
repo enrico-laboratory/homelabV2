@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meal-plan
+  namespace: mediaserver
+  labels:
+    app: meal-plan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meal-plan
+  template:
+    metadata:
+      labels:
+        app: meal-plan
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html
+          configMap:
+            name: meal-plan-html

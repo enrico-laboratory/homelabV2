@@ -93,6 +93,14 @@
           options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
         snapshot:
           enabled: false
+      # Staging for the k3s -> Talos PVC copies (scripts/k3s2talos.py migrate-jobs); remove after the migration
+      - name: "k8s-migration"
+        pool: "tank-data"
+        nfs:
+          enabled: true
+          options: "sync,wdelay,nohide,no_subtree_check,mountpoint,rw=@192.168.100.0/24,insecure,no_root_squash"
+        snapshot:
+          enabled: false
     nfs_default_options: "all_squash,anonuid=1000,anongid=1000,insecure,nohide,rw=@192.168.100.0/24,no_subtree_check"
     backup_perms: [send, snapshot, hold, release]
   roles:
