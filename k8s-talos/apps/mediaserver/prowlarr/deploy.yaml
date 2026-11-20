@@ -28,6 +28,21 @@ spec:
           value: '1000'
         - name: TZ
           value: Europe/Amsterdam
+        - name: PROWLARR__POSTGRES__HOST
+          value: arr-postgres
+        - name: PROWLARR__POSTGRES__PORT
+          value: '5432'
+        - name: PROWLARR__POSTGRES__USER
+          value: prowlarr
+        - name: PROWLARR__POSTGRES__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: arr-postgres-credentials
+              key: prowlarr-password
+        - name: PROWLARR__POSTGRES__MAINDB
+          value: prowlarr-main
+        - name: PROWLARR__POSTGRES__LOGDB
+          value: prowlarr-log
         volumeMounts:
         - name: config
           mountPath: /config
