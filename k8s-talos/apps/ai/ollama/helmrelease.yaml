@@ -42,22 +42,23 @@ spec:
         type: nvidia
         number: 1
 
-      # Models pulled at startup (no-op when already on the PVC).
-      # Additive only: removing an entry does not delete the model.
+      # No models pulled at startup: the pull runs in a postStart hook and keeps the container from
+      # becoming ready for the whole download. Pull by hand (kubectl exec deploy/ollama -- ollama pull <model>).
+      # Previous list, kept for reference:
+      # - llama3.2:1b
+      # - llama3.2:3b
+      # - llama3.2-vision
+      # - nomic-embed-text
+      # - qwen3:4b
+      # - qwen2.5-coder:7b
+      # - qwen2.5-coder:14b
+      # - mistral-small
+      # - gemma3:12b
+      # - orieg/gemma3-tools:12b-ft
+      # - dolphin3:8b
+      # - dolphin-phi
       models:
-        pull:
-          - llama3.2:1b
-          - llama3.2:3b
-          - llama3.2-vision
-          - nomic-embed-text
-          - qwen3:4b
-          - qwen2.5-coder:7b
-          - qwen2.5-coder:14b
-          - mistral-small
-          - gemma3:12b
-          - orieg/gemma3-tools:12b-ft
-          - dolphin3:8b
-          - dolphin-phi
+        pull: []
 
     # OLLAMA_HOST is set by the chart (a duplicate entry fails Flux's server-side apply)
     extraEnv:

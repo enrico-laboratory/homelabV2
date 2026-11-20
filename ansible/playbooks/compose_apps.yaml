@@ -81,26 +81,26 @@
         talos_gateway_ip: "192.168.100.202"
         talos_hostnames:
           - calibreweb.enricoruggieri.com
+          - comfyui.enricoruggieri.com
           - headlamp.enricoruggieri.com
           - hubble.enricoruggieri.com
           - jackett.enricoruggieri.com
+          - ollama.enricoruggieri.com
           - personal.enricoruggieri.com
           - prowlarr.enricoruggieri.com
           - radarr.enricoruggieri.com
           - sonarr.enricoruggieri.com
           - transmission.enricoruggieri.com
+          - webui.enricoruggieri.com
         k8s_hostnames:
           - argocd.enricoruggieri.com
-          - comfyui.enricoruggieri.com
           - grafana-kube.enricoruggieri.com
           - jellyfin.enricoruggieri.com
           - joplin.enricoruggieri.com
           - karakeep.enricoruggieri.com
           - navidrome.enricoruggieri.com
           - nextcloud.enricoruggieri.com
-          - ollama.enricoruggieri.com
           - onlyoffice.enricoruggieri.com
-          - webui.enricoruggieri.com
         host_services:
           - { "name": "netalertx", "port": 20211 }
           - { "name": "zigbee2mqtt", "url": "http://zigbee2mqtt:8099" }
