@@ -1,0 +1,69 @@
+# Nightly one-way copy of the NAS library into the Nextcloud user "admin".
+#   1. sync : rclone sync NFS (read-only) -> data/admin/files/Library, then chown to www-data
+#   2. scan : occ files:scan so Nextcloud picks up the changes
+# The Library folder lives in the admin user's files; the copy is overwritten on every run,
+# so do not edit it.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nextcloud-library-sync
+  namespace: cloud
+spec:
+  schedule: "0 2 * * *"
+  suspend: true # until Nextcloud runs on Talos from the restore
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 21600
+      template:
+        spec:
+          restartPolicy: Never
+          # The data PVC is ReadWriteOnce: run on the same node as Nextcloud.
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: nextcloud
+                      app.kubernetes.io/component: app
+          initContainers:
+            - name: rclone-sync
+              image: rclone/rclone:1.68.2
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  mkdir -p /data/admin/files/Library
+                  rclone sync /source /data/admin/files/Library --transfers 4 --stats-one-line -v
+                  chown -R 33:33 /data/admin/files/Library
+              volumeMounts:
+                - { name: library-nfs, mountPath: /source, readOnly: true }
+                - { name: nextcloud-data, mountPath: /data, subPath: data }
+          containers:
+            - name: files-scan
+              image: nextcloud:35.0.2-apache
+              command: ["/bin/sh", "-c"]
+              args:
+                - su -s /bin/sh www-data -c 'php /var/www/html/occ files:scan --path="admin/files/Library"'
+              # Same subPath layout as the Nextcloud chart: the PVC root is not the web root.
+              volumeMounts:
+                - { name: nextcloud-data, mountPath: /var/www, subPath: root }
+                - { name: nextcloud-data, mountPath: /var/www/html, subPath: html }
+                - { name: nextcloud-data, mountPath: /var/www/html/data, subPath: data }
+                - { name: nextcloud-data, mountPath: /var/www/html/config, subPath: config }
+                - { name: nextcloud-data, mountPath: /var/www/html/custom_apps, subPath: custom_apps }
+                - { name: nextcloud-data, mountPath: /var/www/html/themes, subPath: themes }
+                - { name: nextcloud-data, mountPath: /var/www/tmp, subPath: tmp }
+          volumes:
+            - name: nextcloud-data
+              persistentVolumeClaim:
+                claimName: nextcloud-nextcloud
+            - name: library-nfs
+              nfs:
+                server: nas.enricoruggieri.com
+                path: /tank-data/media/library
+                readOnly: true

@@ -1,0 +1,119 @@
+# Ported from k8s/argocd-apps/cloud/nextcloud.yaml (same chart and values, ingress replaced by httproute.yaml).
+# Data restored from the restic backup of k3s (migrate-restore.yaml), not copied.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: nextcloud
+  namespace: cloud
+spec:
+  interval: 1h
+  url: https://nextcloud.github.io/helm/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: cloud
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: nextcloud
+      version: 9.4.1
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud
+  # The data PVC is WaitForFirstConsumer and stays Pending while Nextcloud is scaled to 0,
+  # which a Helm wait would time out on.
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
+  values:
+    # 0 until migrate-restore.yaml has filled the PVC and the database: on an empty
+    # volume the image would run a fresh install against the new database.
+    replicaCount: 0
+
+    nextcloud:
+      host: nextcloud.enricoruggieri.com
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-admin-credentials
+        usernameKey: nextcloud-username
+        passwordKey: nextcloud-password
+      configs:
+        z_custom.config.php: |
+          <?php
+          $CONFIG = array(
+            'allow_local_remote_servers' => true,
+            'overwriteprotocol' => 'https',
+            'overwrite.cli.url' => 'https://nextcloud.enricoruggieri.com',
+            // Cilium's Envoy (Gateway API) connects from the pod CIDR
+            'trusted_proxies' => array('10.244.0.0/16'),
+            'twofactor_enforced' => 'yes',
+            'twofactor_enforced_groups' => array(),
+            'twofactor_enforced_excluded_groups' => array(),
+          );
+
+    persistence:
+      enabled: true
+      storageClass: proxmox-zfs-nvme
+      size: 120Gi # 200Gi on k3s with ~67G used; the class allows expansion
+
+    internalDatabase:
+      enabled: false
+
+    externalDatabase:
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-postgres-credentials
+        usernameKey: db-username
+        passwordKey: password
+
+    postgresql:
+      enabled: true
+      global:
+        postgresql:
+          auth:
+            database: nextcloud
+            username: nextcloud
+            existingSecret: nextcloud-postgres-credentials
+            secretKeys:
+              userPasswordKey: password
+              adminPasswordKey: postgres-password
+      primary:
+        persistence:
+          enabled: true
+          storageClass: proxmox-zfs-nvme
+
+    # Redis provides file locking (memcache.locking) and distributed cache.
+    # The nextcloud image enables both when REDIS_HOST is set (chart sets it).
+    redis:
+      enabled: true
+      architecture: standalone
+      auth:
+        enabled: true
+        existingSecret: nextcloud-redis-credentials
+        existingSecretPasswordKey: redis-password
+      global:
+        storageClass: proxmox-zfs-nvme
+      master:
+        persistence:
+          enabled: true
+          size: 1Gi # cache and locks only, recreated empty
+
+    # Background jobs (also purges expired rows from oc_file_locks)
+    cronjob:
+      enabled: true
+      type: sidecar
+
+    # Switch Nextcloud from AJAX to cron background-job mode (idempotent).
+    # Must be top-level: the chart ignores nextcloud.lifecycle.
+    lifecycle:
+      postStartCommand:
+        - "/bin/sh"
+        - "-c"
+        - "su -s /bin/sh www-data -c 'php /var/www/html/occ background:cron' || true"
+
+    ingress:
+      enabled: false

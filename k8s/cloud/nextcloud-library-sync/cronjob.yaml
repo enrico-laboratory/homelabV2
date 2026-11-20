@@ -10,6 +10,7 @@ metadata:
   namespace: cloud
 spec:
   schedule: "0 2 * * *"
+  suspend: true # migrated to Talos (k8s-talos/apps/cloud)
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

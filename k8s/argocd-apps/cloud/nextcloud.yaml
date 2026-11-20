@@ -11,6 +11,7 @@ spec:
     targetRevision: 9.4.1
     helm:
       values: |
+        replicaCount: 0 # migrated to Talos (k8s-talos/apps/cloud/nextcloud), volume kept for rollback
         nextcloud:
           host: nextcloud.enricoruggieri.com
           existingSecret:

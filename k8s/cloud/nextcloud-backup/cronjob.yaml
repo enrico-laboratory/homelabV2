@@ -12,6 +12,7 @@ metadata:
   namespace: cloud
 spec:
   schedule: "30 3 * * *"
+  suspend: true # migrated to Talos (k8s-talos/apps/cloud); one writer per restic repo
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

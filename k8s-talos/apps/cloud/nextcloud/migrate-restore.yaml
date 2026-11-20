@@ -1,0 +1,78 @@
+# One-off: fill the Talos Nextcloud PVC and database from the latest "final" restic snapshot
+# of the k3s backup (k8s/cloud/nextcloud-backup). Doubles as a restore test. Remove after the cutover.
+#   1. files : snapshot path /var/www/html (the PVC root: root/, html/, data/, config/...) -> PVC root
+#   2. db    : pg_restore of dump/nextcloud.dump into the empty chart database
+# Skips itself once /data/.restored exists, so a re-created Job does not overwrite live data.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nextcloud-restore
+  namespace: cloud
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: restore-files
+          image: restic/restic:0.18.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if [ -e /data/.restored ]; then echo "already restored"; exit 0; fi
+              restic snapshots --no-lock --host nextcloud --tag final --latest 1
+              restic restore --no-lock --exclude-xattr "security.*" --host nextcloud --tag final \
+                latest:/var/www/html --target /data
+              restic restore --no-lock --exclude-xattr "security.*" --host nextcloud --tag final \
+                latest:/dump --target /dump
+              ls -la /data /dump
+          env: &resticEnv
+            - { name: RESTIC_REPOSITORY, value: /repo }
+            - { name: RESTIC_CACHE_DIR, value: /cache }
+            - name: RESTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-backup-restic
+                  key: password
+          volumeMounts:
+            - { name: data, mountPath: /data }
+            - { name: dump, mountPath: /dump }
+            - { name: repo, mountPath: /repo, readOnly: true }
+            - { name: cache, mountPath: /cache }
+      containers:
+        - name: restore-db
+          image: postgres:17-alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if [ -e /data/.restored ]; then echo "already restored"; exit 0; fi
+              until pg_isready -h nextcloud-postgresql -U nextcloud -d nextcloud; do sleep 5; done
+              pg_restore -h nextcloud-postgresql -U nextcloud -d nextcloud \
+                --no-owner --role=nextcloud --exit-on-error /dump/nextcloud.dump
+              psql -h nextcloud-postgresql -U nextcloud -d nextcloud -tAc \
+                "select count(*) as files from oc_filecache; select count(*) as users from oc_users;"
+              date -u > /data/.restored
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-postgres-credentials
+                  key: password
+          volumeMounts:
+            - { name: data, mountPath: /data }
+            - { name: dump, mountPath: /dump }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: nextcloud-nextcloud
+        - name: repo
+          nfs:
+            server: truenas-backup.enricoruggieri.com
+            path: /mnt/backup-pool-2/nextcloud
+            readOnly: true
+        - name: dump
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}

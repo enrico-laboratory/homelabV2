@@ -172,6 +172,8 @@ def cmd_convert(args):
     src = Path(args.src)
     app = args.name or src.name
     dest = TALOS_APPS / args.group / app
+    if not (TALOS_APPS / args.group / "kustomization.yaml").exists():
+        sys.exit(f"{TALOS_APPS / args.group}/kustomization.yaml missing: create the group (namespace + kustomization) first")
     if dest.exists() and not args.force:
         sys.exit(f"{dest} exists (use --force to overwrite)")
     dest.mkdir(parents=True, exist_ok=True)
@@ -188,7 +190,7 @@ def cmd_convert(args):
         if "SopsSecret" in kinds:
             if set(kinds) != {"SopsSecret"}:
                 sys.exit(f"{f}: SopsSecret mixed with other kinds, split it first")
-            out = dest / "sops_secret.yaml"
+            out = dest / f.name  # keep the name: an app can have several (sops_secret_redis.yaml)
             write_encrypted(out, sops_secret_to_secrets(f))
             resources.append(out.name)
             continue
