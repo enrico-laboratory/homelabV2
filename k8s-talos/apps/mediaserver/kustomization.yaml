@@ -7,3 +7,6 @@ resources:
 - jackett
 - prowlarr
 - calibreweb
+- sonarr
+- radarr
+- transmission

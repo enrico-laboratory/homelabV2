@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  namespace: mediaserver
+  labels:
+    app: transmission
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      tolerations:
+      - key: arm
+        operator: Equal
+        value: 'true'
+        effect: NoSchedule
+      containers:
+      - name: transmission
+        image: ghcr.io/linuxserver/transmission:4.0.6
+        env:
+        - name: PUID
+          value: '1000'
+        - name: PGID
+          value: '1000'
+        - name: TZ
+          value: Europe/Amsterdam
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /downloads
+          name: downloads
+        - mountPath: /watch
+          name: watch
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: transmission-pvc-pve
+      - name: downloads
+        nfs:
+          server: nas.enricoruggieri.com
+          path: /tank-data/media/torrents/
+      - name: watch
+        nfs:
+          server: nas.enricoruggieri.com
+          path: /tank-data/media/torrent-watch/

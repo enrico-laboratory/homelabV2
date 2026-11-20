@@ -54,9 +54,10 @@ def warn(msg):
 
 
 def split_docs(text):
-    """Split a multi-document YAML file, keeping each document's original text."""
+    """Split a multi-document YAML file, keeping each document's original text.
+    Empty and comment-only documents are dropped."""
     docs = re.split(r"^---[ \t]*\n", text, flags=re.M)
-    return [d for d in docs if d.strip()]
+    return [d for d in docs if yaml.safe_load(d)]
 
 
 def tracked_files(src):
@@ -177,7 +178,11 @@ def cmd_convert(args):
 
     resources, routes = [], []
     for f in tracked_files(src):
+        if f.name in args.exclude:
+            continue
         docs = split_docs(f.read_text())
+        if not docs:
+            continue
         kinds = [yaml.safe_load(d).get("kind") for d in docs]
         if "SopsSecret" in kinds:
             if set(kinds) != {"SopsSecret"}:
@@ -303,6 +308,7 @@ def main():
     c.add_argument("group", help="Talos group under k8s-talos/apps/")
     c.add_argument("--name", help="app folder name (default: source folder name)")
     c.add_argument("--replicas", type=int, help="override replicas of Deployments/StatefulSets")
+    c.add_argument("--exclude", action="append", default=[], help="file name to skip (repeatable)")
     c.add_argument("--force", action="store_true")
     c.set_defaults(func=cmd_convert)
 
