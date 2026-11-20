@@ -1,4 +1,4 @@
-# CUDA variant on the GPU worker (talos-133), shared with ollama and comfyui.
+# CPU variant: the single GPU on talos-133 is held by ollama (no time-slicing), so ML runs on the CPU workers.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,14 +17,9 @@ spec:
       labels:
         app: immich-machine-learning
     spec:
-      runtimeClassName: nvidia
-      tolerations:
-      - key: "nvidia.com/gpu"
-        operator: "Exists"
-        effect: "NoSchedule"
       containers:
       - name: machine-learning
-        image: ghcr.io/immich-app/immich-machine-learning:v3.4.2-cuda
+        image: ghcr.io/immich-app/immich-machine-learning:v3.4.2
         ports:
         - containerPort: 3003
         env:
@@ -42,8 +37,7 @@ spec:
             memory: 1Gi
             cpu: 200m
           limits:
-            memory: 6Gi
-            nvidia.com/gpu: "1"
+            memory: 4Gi
       volumes:
       - name: cache
         persistentVolumeClaim:
