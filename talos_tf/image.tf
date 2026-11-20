@@ -14,6 +14,28 @@ data "talos_image_factory_urls" "this" {
   platform      = "nocloud"
 }
 
+# GPU nodes: NVIDIA driver (LTS "production" branch) and container toolkit. They boot the common ISO;
+# the installer from this schematic brings the extensions in at install time.
+resource "talos_image_factory_schematic" "gpu" {
+  schematic = yamlencode({
+    customization = {
+      systemExtensions = {
+        officialExtensions = [
+          "siderolabs/qemu-guest-agent",
+          "siderolabs/nonfree-kmod-nvidia-production",
+          "siderolabs/nvidia-container-toolkit-production",
+        ]
+      }
+    }
+  })
+}
+
+data "talos_image_factory_urls" "gpu" {
+  talos_version = var.talos_version
+  schematic_id  = talos_image_factory_schematic.gpu.id
+  platform      = "nocloud"
+}
+
 resource "proxmox_download_file" "talos_iso" {
   content_type = "iso"
   datastore_id = var.iso_datastore

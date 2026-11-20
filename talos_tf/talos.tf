@@ -67,11 +67,11 @@ data "talos_machine_configuration" "this" {
       auto       = "off"
       hostname   = each.key
     }),
-    # installer image from our schematic (qemu-guest-agent extension)
+    # installer image from our schematic (qemu-guest-agent extension; + NVIDIA on GPU nodes)
     yamlencode({
       apiVersion = "v1alpha1"
       kind       = "UnattendedInstallConfig"
-      installer  = { image = data.talos_image_factory_urls.this.urls.installer }
+      installer  = { image = each.value.gpu ? data.talos_image_factory_urls.gpu.urls.installer : data.talos_image_factory_urls.this.urls.installer }
       provisioning = {
         diskSelector = { match = "disk.dev_path == \"/dev/sda\"" }
         wipe         = false
@@ -82,15 +82,16 @@ data "talos_machine_configuration" "this" {
       kind        = "ResolverConfig"
       nameservers = [for ns in var.nameservers : { address = ns }]
     }),
-    # proxmox-csi-plugin matches nodes to VMs by these labels
-    yamlencode({
+    # proxmox-csi-plugin matches nodes to VMs by these labels. GPU nodes: the label selects the
+    # nvidia-device-plugin/dcgm DaemonSets, the taint keeps non-GPU workloads off the node.
+    yamlencode(merge({
       apiVersion = "v1alpha1"
       kind       = "KubeNodeConfig"
-      labels = {
+      labels = merge({
         "topology.kubernetes.io/region" = var.proxmox_region
         "topology.kubernetes.io/zone"   = var.node_name
-      }
-    }),
+      }, each.value.gpu ? { "nvidia.com/gpu.present" = "true" } : {})
+    }, each.value.gpu ? { taints = { "nvidia.com/gpu" = ":NoSchedule" } } : {})),
     # Cilium replaces flannel and kube-proxy
     yamlencode({
       apiVersion = "v1alpha1"
@@ -119,6 +120,15 @@ data "talos_machine_configuration" "this" {
         apiVersion = "v1alpha1"
         kind       = "KubeSchedulerConfig"
         extraArgs  = { "bind-address" = "0.0.0.0" }
+      }),
+    ] : [],
+    # NVIDIA driver modules from the gpu schematic's extension; bpf_jit_harden as the Talos NVIDIA guide sets it
+    each.value.gpu ? [
+      yamlencode({
+        machine = {
+          kernel = { modules = [for m in ["nvidia", "nvidia_uvm", "nvidia_drm", "nvidia_modeset"] : { name = m }] }
+          sysctls = { "net.core.bpf_jit_harden" = "1" }
+        }
       }),
     ] : [],
   )

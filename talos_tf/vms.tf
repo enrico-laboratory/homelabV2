@@ -39,6 +39,18 @@ resource "proxmox_virtual_environment_vm" "talos" {
     interface = "ide3"
   }
 
+  dynamic "hostpci" {
+    for_each = each.value.gpu ? [var.gpu] : []
+    content {
+      device   = "hostpci0"
+      id       = hostpci.value.id
+      pcie     = true
+      rombar   = true
+      rom_file = hostpci.value.rom_file
+      xvga     = false
+    }
+  }
+
   network_device {
     bridge = var.network_bridge
   }
