@@ -42,6 +42,7 @@ kind: Deployment
 metadata:
   name: postgres
 spec:
+  replicas: 0 # moving to Talos
   selector:
     matchLabels:
       app: postgres
@@ -92,6 +93,7 @@ kind: Deployment
 metadata:
   name: joplin
 spec:
+  replicas: 0 # moving to Talos
   selector:
     matchLabels:
       app: joplin

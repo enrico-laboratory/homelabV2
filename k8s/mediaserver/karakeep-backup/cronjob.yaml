@@ -10,6 +10,8 @@ metadata:
   namespace: mediaserver
 spec:
   schedule: "0 3 * * *"
+  # moved to Talos (k8s-talos/apps/mediaserver/karakeep-backup); only one cluster may write the restic repo
+  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

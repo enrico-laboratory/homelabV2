@@ -10,3 +10,8 @@ resources:
 - sonarr
 - radarr
 - transmission
+- navidrome
+- joplin
+- jellyfin
+- karakeep
+- karakeep-backup

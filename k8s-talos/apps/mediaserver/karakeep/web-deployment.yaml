@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: karakeep-web
+  template:
+    metadata:
+      labels:
+        app: karakeep-web
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/karakeep-app/karakeep
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MEILI_ADDR
+          value: http://meilisearch:7700
+        - name: BROWSER_WEB_URL
+          value: http://chrome:9222
+        - name: DATA_DIR
+          value: /data
+        - name: OPENAI_API_KEY
+          value: ''
+        - name: OLLAMA_BASE_URL
+          value: http://ollama.ai.svc:11434
+        - name: INFERENCE_TEXT_MODEL
+          value: llama3.2:3b
+        - name: INFERENCE_CONTEXT_LENGTH
+          value: '8192'
+        - name: INFERENCE_JOB_TIMEOUT_SEC
+          value: '120'
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        envFrom:
+        - secretRef:
+            name: karakeep-secrets
+        - configMapRef:
+            name: karakeep-configuration
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: web-data-pvc

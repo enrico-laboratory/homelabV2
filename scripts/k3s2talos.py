@@ -67,7 +67,7 @@ def tracked_files(src):
     return sorted(Path(f) for f in out if f.endswith((".yaml", ".yml")))
 
 
-def ingress_to_httproutes(ing):
+def ingress_to_httproutes(ing, namespace):
     meta = ing["metadata"]
     ann = meta.get("annotations") or {}
     for key in ann:
@@ -96,7 +96,7 @@ def ingress_to_httproutes(ing):
             {
                 "apiVersion": "gateway.networking.k8s.io/v1",
                 "kind": "HTTPRoute",
-                "metadata": {"name": name, "namespace": meta["namespace"]},
+                "metadata": {"name": name, "namespace": meta.get("namespace", namespace)},
                 "spec": {
                     "parentRefs": [GATEWAY],
                     "hostnames": [rule["host"]],
@@ -175,6 +175,7 @@ def cmd_convert(args):
     if dest.exists() and not args.force:
         sys.exit(f"{dest} exists (use --force to overwrite)")
     dest.mkdir(parents=True, exist_ok=True)
+    namespace = args.namespace or args.group
 
     resources, routes = [], []
     for f in tracked_files(src):
@@ -196,7 +197,7 @@ def cmd_convert(args):
         for text in docs:
             obj = yaml.safe_load(text)
             if obj.get("kind") == "Ingress":
-                routes += ingress_to_httproutes(obj)
+                routes += ingress_to_httproutes(obj, namespace)
                 continue
             kept.append(convert_doc(text, args.replicas))
         if kept:
@@ -209,6 +210,8 @@ def cmd_convert(args):
     kustomization = {
         "apiVersion": "kustomize.config.k8s.io/v1beta1",
         "kind": "Kustomization",
+        # ArgoCD injected the namespace on k3s; some manifests rely on that
+        "namespace": namespace,
         "resources": resources,
     }
     (dest / "kustomization.yaml").write_text(dump(kustomization))
@@ -308,6 +311,7 @@ def main():
     c.add_argument("group", help="Talos group under k8s-talos/apps/")
     c.add_argument("--name", help="app folder name (default: source folder name)")
     c.add_argument("--replicas", type=int, help="override replicas of Deployments/StatefulSets")
+    c.add_argument("--namespace", help="namespace for objects without one (default: the group name)")
     c.add_argument("--exclude", action="append", default=[], help="file name to skip (repeatable)")
     c.add_argument("--force", action="store_true")
     c.set_defaults(func=cmd_convert)
