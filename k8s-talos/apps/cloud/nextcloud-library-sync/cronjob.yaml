@@ -10,7 +10,6 @@ metadata:
   namespace: cloud
 spec:
   schedule: "0 2 * * *"
-  suspend: true # until Nextcloud runs on Talos from the restore
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
