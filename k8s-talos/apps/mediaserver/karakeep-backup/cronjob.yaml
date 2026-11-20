@@ -10,8 +10,6 @@ metadata:
   namespace: mediaserver
 spec:
   schedule: "0 3 * * *"
-  # suspended until the Talos web-data-pvc is restored (karakeep-restore); only one cluster may write the restic repo
-  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

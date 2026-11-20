@@ -85,6 +85,10 @@
           - headlamp.enricoruggieri.com
           - hubble.enricoruggieri.com
           - jackett.enricoruggieri.com
+          - jellyfin.enricoruggieri.com
+          - joplin.enricoruggieri.com
+          - karakeep.enricoruggieri.com
+          - navidrome.enricoruggieri.com
           - ollama.enricoruggieri.com
           - personal.enricoruggieri.com
           - prowlarr.enricoruggieri.com
@@ -95,10 +99,6 @@
         k8s_hostnames:
           - argocd.enricoruggieri.com
           - grafana-kube.enricoruggieri.com
-          - jellyfin.enricoruggieri.com
-          - joplin.enricoruggieri.com
-          - karakeep.enricoruggieri.com
-          - navidrome.enricoruggieri.com
           - nextcloud.enricoruggieri.com
           - onlyoffice.enricoruggieri.com
         host_services:
