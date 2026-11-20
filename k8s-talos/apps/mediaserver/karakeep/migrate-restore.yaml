@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: karakeep-restore
+  name: karakeep-restore-2 # -2: the first run failed on SELinux xattrs (Job specs are immutable)
   namespace: mediaserver
 spec:
   backoffLimit: 2
@@ -20,7 +20,7 @@ spec:
               set -eu
               if [ -e /data/.restored ]; then echo "already restored"; exit 0; fi
               restic snapshots --no-lock --host karakeep --latest 1
-              restic restore --no-lock latest --host karakeep --target /restore
+              restic restore --no-lock --exclude-xattr "security.*" latest --host karakeep --target /restore
               ls -la /restore/dump /restore/data
               cp /restore/dump/db.db /data/db.db
               rm -f /data/db.db-wal /data/db.db-shm
