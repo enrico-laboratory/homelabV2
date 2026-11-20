@@ -16,7 +16,7 @@ variable "k3s_master_first_host" {
 
 variable "k3s_workers_count" {
   type = number
-  default = 3
+  default = 2 # k3s-113 (GPU agent) removed; its GPU moved to the Talos worker talos-133
 }
 
 variable "k3s_worker_first_host" {

@@ -39,4 +39,5 @@
     taints:
       - key: "nvidia.com/gpu"
         effect: "NoSchedule"
-  loop: "{{ groups['gpu'] }}"
+  # no k3s GPU node any more (the GPU is on the Talos worker talos-133)
+  loop: "{{ groups['gpu'] | default([]) }}"

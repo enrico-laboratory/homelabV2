@@ -68,12 +68,6 @@ homelabV2/
 - Joplin (notes)
 - Karakeep (bookmarks and notes), with nightly restic backup to TrueNAS
 
-### AI & ML Services
-- Ollama (LLM inference)
-- ComfyUI (image generation — text-to-image, img2img, ControlNet)
-- Qdrant (vector database)
-- Open WebUI (AI model management interface)
-
 ## Quick Start
 
 ### Prerequisites
@@ -102,7 +96,7 @@ Personal homelab setup. Adapt as needed for your environment.
 
 ## Talos Cluster (in progress)
 
-A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `talos-121`, 2 workers `talos-131/132`), fully provisioned by `talos_tf/`:
+A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `talos-121`, 2 workers `talos-131/132`, GPU worker `talos-133`), fully provisioned by `talos_tf/`:
 
 - VMs, machine config, bootstrap and kubeconfig via the `bpg/proxmox` and `siderolabs/talos` providers
 - Cilium as CNI (kube-proxy replacement, L2 LB-IPAM pool 192.168.100.200-219)
@@ -116,6 +110,8 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
 - Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group, ported from k3s with `scripts/k3s2talos.py`):
   - mediaserver: Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), FlareSolverr (Cloudflare challenge solver for the indexers)
+  - ai: Ollama (LLM inference), Open WebUI (chat UI for Ollama), Qdrant (vector database for Open WebUI), ComfyUI (image generation; created at 0 replicas and scaled by hand, outputs on the NAS)
+- GPU: worker `talos-133` with the RTX 3060 passed through (`gpu = true` in `talos_tf/variables.tf`), NVIDIA LTS driver + container toolkit as Talos extensions, RuntimeClass `nvidia`, nvidia-device-plugin and dcgm-exporter in `nvidia`
 
 ```bash
 cd talos_tf

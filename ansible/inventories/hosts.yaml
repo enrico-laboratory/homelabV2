@@ -22,11 +22,7 @@ k3s_cluster:
           ansible_host: 192.168.100.111
         k3s-112:
           ansible_host: 192.168.100.112
-        k3s-113:
-          ansible_host: 192.168.100.113
-    gpu:
-      hosts:
-        k3s-113:
+    # k3s-113 (GPU agent) removed: the GPU moved to the Talos worker talos-133
 
 storage:
   hosts:
