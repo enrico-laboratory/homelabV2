@@ -111,6 +111,7 @@ A second Kubernetes cluster running Talos Linux on Proxmox (1 control plane `tal
 - Ingress: Cilium native Gateway API (GatewayClass `cilium`, shared Gateway `gateway/main` on `192.168.100.202`); Gateway API CRDs are installed by Terraform before Cilium. Reached only through Traefik on `ops` (TLS passthrough by SNI + PROXY protocol v2, so the client source IP is preserved); direct connections to the Gateway IP are rejected
 - cert-manager (Gateway API support) with the `letsencrypt-cloudflare` ClusterIssuer (DNS01) issuing a wildcard certificate for `*.enricoruggieri.com`
 - Hubble UI (flow visibility) on `https://hubble.enricoruggieri.com` via HTTPRoute, LAN only, no authentication
+- Headlamp (cluster dashboard with the Flux plugin) on `https://headlamp.enricoruggieri.com` via HTTPRoute, LAN only, login with the `headlamp-admin` ServiceAccount token
 - Upgrades: Tuppr (`system-upgrade`) rolls Talos and Kubernetes one node at a time; bump the versions in `k8s-talos/infrastructure-config/tuppr/upgrades.yaml` (and `talos_tf/variables.tf`)
 - Monitoring: kube-prometheus-stack (Prometheus + Alertmanager with Telegram, Cilium/Hubble metrics) in `monitoring`; no in-cluster Grafana, Prometheus is exposed on `192.168.100.200:9090` and visualised from the Grafana on `ops`
 - Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group, ported from k3s with `scripts/k3s2talos.py`):

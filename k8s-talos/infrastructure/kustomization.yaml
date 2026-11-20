@@ -4,6 +4,7 @@ resources:
   - cert-manager
   - cilium-config
   - gateway
+  - headlamp
   - monitoring
   - nvidia
   - proxmox-csi
