@@ -7,6 +7,9 @@ metadata:
     app: radarr
 spec:
   replicas: 1
+  strategy:
+    type: Recreate # RWO volume: a rolling update deadlocks when the new pod lands on another node
+    rollingUpdate: null
   selector:
     matchLabels:
       app: radarr
@@ -25,6 +28,21 @@ spec:
           value: '1000'
         - name: TZ
           value: Europe/Amsterdam
+        - name: RADARR__POSTGRES__HOST
+          value: arr-postgres
+        - name: RADARR__POSTGRES__PORT
+          value: '5432'
+        - name: RADARR__POSTGRES__USER
+          value: radarr
+        - name: RADARR__POSTGRES__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: arr-postgres-credentials
+              key: radarr-password
+        - name: RADARR__POSTGRES__MAINDB
+          value: radarr-main
+        - name: RADARR__POSTGRES__LOGDB
+          value: radarr-log
         volumeMounts:
         - mountPath: /config
           name: config
