@@ -6,7 +6,7 @@ metadata:
   labels:
     app: sonarr
 spec:
-  replicas: 1
+  replicas: 0 # temporarily off: sonarr-pg-migrate loads the SQLite data into Postgres
   strategy:
     type: Recreate # RWO volume: a rolling update deadlocks when the new pod lands on another node
     rollingUpdate: null

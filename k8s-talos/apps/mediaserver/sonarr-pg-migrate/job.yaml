@@ -1,0 +1,59 @@
+# One-shot: load Sonarr's SQLite data (sonarr.db) into the shared arr-postgres.
+# Sonarr must be scaled to 0 (it owns the RWO config volume) and must already have run once
+# against Postgres so the schema exists (pgloader "data only"). Logs (logs.db) are not migrated.
+# pgloader truncates the tables first and resets the sequences itself.
+# Remove this directory once the migration is verified.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sonarr-pg-migrate
+  namespace: mediaserver
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1800
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: pgloader
+          image: ghcr.io/roxedus/pgloader@sha256:1a7a86ad56623c00ee714ee4969913ed5c6f59ac9785073e2ffd1bea9cc54d31
+          args:
+            - --with
+            - quote identifiers
+            - --with
+            - data only
+            - --with
+            - truncate
+            - --with
+            - prefetch rows = 100
+            - --with
+            - batch size = 1MB
+            - /config/sonarr.db
+            - postgresql://sonarr:$(PGPASSWORD)@arr-postgres:5432/sonarr-main
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef: {name: arr-postgres-credentials, key: sonarr-password}
+          resources:
+            requests: {memory: 512Mi}
+            limits: {memory: 2Gi}
+          volumeMounts:
+            - { name: config, mountPath: /config }
+      containers:
+        - name: counts
+          image: postgres:17.6
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export PGHOST=arr-postgres PGUSER=sonarr PGDATABASE=sonarr-main
+              for t in Series Episodes EpisodeFiles History Indexers DownloadClients QualityProfiles Config; do
+                printf '%s: ' "$t"; psql -Atc "SELECT count(*) FROM \"$t\""
+              done
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef: {name: arr-postgres-credentials, key: sonarr-password}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: sonarr-pvc-pve
