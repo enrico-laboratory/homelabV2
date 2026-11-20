@@ -1,0 +1,41 @@
+# One-off PVC copy to Talos (scripts/k3s2talos.py migrate-jobs). Remove after the cutover.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-export-postgres-data
+  namespace: mediaserver
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: copy
+        image: alpine:3.22
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          set -eu
+          apk add --no-cache tar >/dev/null
+          out=/staging/joplin/postgres-data.tar
+          if [ -e "$out.done" ]; then echo "already exported"; exit 0; fi
+          mkdir -p /staging/joplin
+          tar --numeric-owner --xattrs -C /src -cf "$out" .
+          sha256sum "$out" > "$out.sha256"
+          touch "$out.done"
+          ls -l "$out"
+        volumeMounts:
+        - name: data
+          mountPath: /src
+        - name: staging
+          mountPath: /staging
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: postgres-data
+      - name: staging
+        nfs:
+          server: nas.enricoruggieri.com
+          path: /tank-data/k8s-migration
