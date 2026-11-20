@@ -31,8 +31,9 @@ resource "helm_release" "cilium" {
   values = [yamlencode({
     ipam                 = { mode = "kubernetes" }
     kubeProxyReplacement = true
-    k8sServiceHost       = local.controlplane_ip
-    k8sServicePort       = 6443
+    # KubePrism: Talos' per-node API load balancer, so Cilium does not depend on a single control plane
+    k8sServiceHost = "localhost"
+    k8sServicePort = 7445
 
     l2announcements    = { enabled = true }
     externalIPs        = { enabled = true }

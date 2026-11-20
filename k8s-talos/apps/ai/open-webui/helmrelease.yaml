@@ -22,8 +22,7 @@ spec:
         kind: HelmRepository
         name: open-webui
   values:
-    # 0 until migrate-import.yaml has restored webui.db
-    replicaCount: 0
+    replicaCount: 1
 
     ollama:
       enabled: false
