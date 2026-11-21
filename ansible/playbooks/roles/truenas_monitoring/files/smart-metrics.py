@@ -62,7 +62,15 @@ def main():
     for dev in smartctl_json("--scan").get("devices", []):
         name = os.path.basename(dev["name"])
         try:
-            lines += render(name, smartctl_json("-a", "-d", dev["type"], dev["name"]))
+            # `smartctl --scan` may report SATA disks behind a SAT layer as plain "scsi", which hides
+            # the ATA data: try autodetect first, then sat, then the scanned type.
+            doc = {}
+            for dtype in (None, "sat", dev["type"]):
+                args = ["-a"] + (["-d", dtype] if dtype else []) + [dev["name"]]
+                doc = smartctl_json(*args)
+                if "smart_status" in doc and (doc.get("ata_smart_attributes") or doc.get("nvme_smart_health_information_log")):
+                    break
+            lines += render(name, doc)
         except Exception as e:  # one bad disk must not hide the others
             print(f"{name}: {e}", file=sys.stderr)
     lines.append("# TYPE smartctl_textfile_timestamp_seconds gauge")
