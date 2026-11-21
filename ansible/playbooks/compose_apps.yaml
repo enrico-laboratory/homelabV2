@@ -15,6 +15,7 @@
           - { "name": 'alertmanager', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
           - { "name": 'gatus', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
           - { "name": 'grafana/provisioning/datasources', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
+          - { "name": 'grafana/provisioning/dashboards', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
           - { "name": 'netalertx/config/', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
           - { "name": 'netalertx/db/', "owner": "{{ main_user }}", "group": "{{ main_user }}", "mode": "0755" }
         templates:
@@ -22,6 +23,8 @@
           - { "src": "alertmanager/alertmanager.yml", "dest": "alertmanager/alertmanager.yml" }
           - { "src": "gatus/config.yaml", "dest": "gatus/config.yaml" }
           - { "src": 'grafana/grafana_datasource_provisioning.yml', "dest": 'grafana/provisioning/datasources/datasource.yml' }
+          - { "src": 'grafana/dashboards_provisioning.yml', "dest": 'grafana/provisioning/dashboards/dashboards.yml' }
+          - { "src": 'grafana/nas-storage-dashboard.json', "dest": 'grafana/provisioning/dashboards/nas-storage.json' }
         copy_folder_content:
           name: "prometheus/rules"
           glob: "prometheus/rules/*.yml"
