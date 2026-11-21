@@ -8,13 +8,18 @@
   community.general.zfs:
     name: "{{ zfs_dataset.pool }}/{{ zfs_dataset.name }}"
     state: present
-    extra_zfs_properties:
-      sharenfs: >-
-        {%- if zfs_dataset.nfs.enabled | default(true) | bool or zfs_dataset.nfs.options is defined -%}
-          {{ zfs_dataset.nfs.options | default(nfs_default_options) }}
-        {%- else -%}
-          off
-        {%- endif -%}
+    # quota / refquota are optional per dataset (refquota ignores snapshots)
+    extra_zfs_properties: >-
+      {{ {'sharenfs': sharenfs_value | trim}
+         | combine({'quota': zfs_dataset.quota} if zfs_dataset.quota is defined else {},
+                   {'refquota': zfs_dataset.refquota} if zfs_dataset.refquota is defined else {}) }}
+  vars:
+    sharenfs_value: >-
+      {%- if zfs_dataset.nfs.enabled | default(true) | bool or zfs_dataset.nfs.options is defined -%}
+        {{ zfs_dataset.nfs.options | default(nfs_default_options) }}
+      {%- else -%}
+        off
+      {%- endif -%}
   when: >
     (dataset_check.ansible_facts.ansible_zfs_datasets | default([]) | length == 0) or
     (dataset_check.ansible_facts.ansible_zfs_datasets[0].type == 'filesystem')

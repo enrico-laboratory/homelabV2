@@ -1,0 +1,6 @@
+#!/bin/bash
+# Called by smartd (-M exec). smartd exports SMARTD_DEVICE, SMARTD_FAILTYPE and SMARTD_MESSAGE.
+curl -sS --max-time 20 \
+  --data-urlencode "chat_id={{ telegram_chat_id }}" \
+  --data-urlencode "text=⚠️ smartd on $(hostname): ${SMARTD_DEVICE:-?} ${SMARTD_FAILTYPE:-}: ${SMARTD_MESSAGE:-no message}" \
+  "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage" >/dev/null

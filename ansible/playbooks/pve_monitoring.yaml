@@ -1,0 +1,56 @@
+# Disk health monitoring on the Proxmox host: it is the only place that sees the physical disks
+# behind the NAS VM (tank-data / tank-fast are passed through with qm set).
+#   - node_exporter (:9100), scraped by the ops Prometheus
+#   - smartctl_exporter (:9633), scraped by the ops Prometheus (job "smartctl")
+#   - smartd with a real self-test schedule and Telegram notifications
+#     (DEVICESCAN had no -s schedule, so no self-test ran after Jan 2026)
+- name: PVE disk monitoring
+  hosts: pve_node3
+  vars:
+    smartd_schedule: "(S/../.././02|L/../01/./04)"   # short daily 02:00, long on the 1st at 04:00
+  roles:
+    - prometheus.prometheus.node_exporter
+    - prometheus.prometheus.smartctl_exporter
+  tasks:
+    - name: Create the systemd drop-in directory for smartctl_exporter
+      ansible.builtin.file:
+        path: /etc/systemd/system/smartctl_exporter.service.d
+        state: directory
+        mode: "0755"
+
+    - name: Run smartctl_exporter as root (reading SMART needs raw device access)
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/smartctl_exporter.service.d/override.conf
+        mode: "0644"
+        content: |
+          [Service]
+          User=root
+          Group=root
+      notify: Restart smartctl_exporter
+
+    - name: Create the smartd notification script (Telegram)
+      ansible.builtin.template:
+        src: smartd-telegram.sh.j2
+        dest: /usr/local/bin/smartd-telegram
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Schedule SMART self-tests and notify through Telegram
+      ansible.builtin.lineinfile:
+        path: /etc/smartd.conf
+        regexp: '^DEVICESCAN'
+        line: "DEVICESCAN -d removable -a -n standby,q -s {{ smartd_schedule }} -m root -M exec /usr/local/bin/smartd-telegram"
+      notify: Restart smartd
+
+  handlers:
+    - name: Restart smartctl_exporter
+      ansible.builtin.systemd:
+        name: smartctl_exporter
+        state: restarted
+        daemon_reload: true
+
+    - name: Restart smartd
+      ansible.builtin.systemd:
+        name: smartmontools
+        state: restarted

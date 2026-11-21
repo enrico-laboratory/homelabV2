@@ -1,0 +1,39 @@
+- name: Install maintenance scripts
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "/usr/local/bin/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - { src: nas-storage-metrics.sh, dest: nas-storage-metrics }
+    - { src: zfs-scrub.sh, dest: zfs-scrub }
+
+- name: Make sure the node_exporter textfile directory exists
+  ansible.builtin.file:
+    path: /var/lib/node_exporter
+    state: directory
+
+# Metrics for the ops Prometheus (rules in monitor-stack/prometheus/rules/nas-storage.yml)
+- name: Export ZFS pool and quota metrics every 5 minutes
+  ansible.builtin.cron:
+    name: "nas storage metrics"
+    cron_file: nas-maintenance
+    user: root
+    minute: "*/5"
+    job: "/usr/local/bin/nas-storage-metrics"
+
+# The NAS had no scrub schedule at all (last scrub: 2026-01-11). A scrub survives a reboot, so
+# overlapping the Sunday 03:00 host update is harmless.
+- name: Monthly scrub of each pool
+  ansible.builtin.cron:
+    name: "zfs scrub {{ item.pool }}"
+    cron_file: nas-maintenance
+    user: root
+    minute: "0"
+    hour: "1"
+    day: "{{ item.day }}"
+    job: "/usr/local/bin/zfs-scrub {{ item.pool }}"
+  loop:
+    - { pool: tank-data, day: "1" }
+    - { pool: tank-fast, day: "2" }

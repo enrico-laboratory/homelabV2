@@ -35,6 +35,7 @@
         pool: "tank-data"
       - name: "media/movies"
         pool: "tank-data"
+        quota: "500G"
       - name: "media/music"
         pool: "tank-data"
       - name: "media/podcasts"
@@ -43,8 +44,11 @@
         pool: "tank-data"
         snapshot:
           enabled: false
+      # Transmission downloads are imported (copied) by Sonarr/Radarr and then removed, so no snapshots and a hard
+      # cap: when full Transmission stops instead of filling the pool.
       - name: "media/torrents"
         pool: "tank-data"
+        refquota: "150G"
         snapshot:
           enabled: false
       - name: "media/torrents-2"
@@ -53,6 +57,7 @@
           enabled: false
       - name: "media/tv-shows"
         pool: "tank-data"
+        quota: "1T"
       - name: "media/tv-shows-2"
         pool: "tank-data"
         snapshot:
@@ -104,10 +109,11 @@
     backup_perms: [send, snapshot, hold, release]
   roles:
 #    - update_host
-#    - prometheus.prometheus.node_exporter
 #    - packages_install
+    - prometheus.prometheus.node_exporter
     - nas_zfs
     - nas_sanoid
+    - nas_maintenance
 # The first time you run this plabook it needs the following to map the main user to the sambe user
 # sudo smbpasswd -a username
     - nas_smb

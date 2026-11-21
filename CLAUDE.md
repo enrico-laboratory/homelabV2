@@ -135,6 +135,8 @@ All NFS datasets are exported with:
 - `no_root_squash`: Allow containers running as root to write (required for many k8s apps)
 - `nohide, no_subtree_check`: Standard k8s-friendly options
 
+**NAS maintenance and alerts:** the `nas_maintenance` role (in `nas_config.yaml`) installs a monthly `zpool scrub` cron (tank-data on the 1st, tank-fast on the 2nd, 01:00) and a 5-minute ZFS metrics exporter for the node_exporter textfile collector. Physical-disk SMART lives on `pve_node3` (`make pve_monitoring`: smartd with a self-test schedule, smartctl_exporter, Telegram hook), because the NAS VM only sees virtual disks. Alert rules are in `roles/compose_apps/files/monitor-stack/prometheus/rules/nas-storage.yml`; Prometheus and Alertmanager (Telegram) run on ops (`make compose_apps`). Datasets accept `quota` / `refquota` in `zfs_datasets` (`media/torrents` has `refquota: 150G`, no snapshots).
+
 **To add a new NFS dataset:**
 1. Add entry to `zfs_datasets` in `nas_config.yaml` with `nfs: enabled: true`
 2. Specify NFS options (use `ollama-models` or `comfyui-output` as templates)
