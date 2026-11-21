@@ -45,6 +45,12 @@ services:
       - '--storage.path=/alertmanager'
     ports:
       - "9093:9093"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.alertmanager.rule=Host(`alertmanager.enricoruggieri.com`)
+      - traefik.http.routers.alertmanager.entrypoints=websecure
+      - traefik.http.routers.alertmanager.tls.certresolver=cf
+      - traefik.http.services.alertmanager.loadbalancer.server.port=9093
     restart: unless-stopped
 
   grafana:
