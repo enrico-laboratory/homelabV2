@@ -79,7 +79,7 @@ groups:
   - name: exporters
     rules:
       - alert: ExporterDown
-        expr: up{job=~"smartctl|alertmanager"} == 0 or up{job="all_nodes", instance=~"192.168.100.(160|23):9100"} == 0
+        expr: up{job=~"smartctl|alertmanager"} == 0 or up{job="all_nodes", instance=~"192.168.100.(160|23):9100|truenas-backup.enricoruggieri.com:9100"} == 0
         for: 10m
         labels: {severity: warning}
         annotations:

@@ -16,8 +16,8 @@ services:
     networks:
       - main
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/rules:/etc/prometheus/rules:ro
+      # directory mount: a single-file bind mount keeps the old inode after Ansible replaces the file
+      - ./prometheus:/etc/prometheus:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -38,7 +38,7 @@ services:
     networks:
       - main
     volumes:
-      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./alertmanager:/etc/alertmanager:ro
       - alertmanager_data:/alertmanager
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'

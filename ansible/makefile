@@ -22,3 +22,4 @@ website_update: ; $(MAKE) run play=compose_website_update
 nas_config:     ; $(MAKE) run play=nas_config
 pve_bootstrap:  ; $(MAKE) run play=pve_1_bootstrap_node3 ansible_user="--user root"
 pve_monitoring: ; $(MAKE) run play=pve_monitoring ansible_user="--user root"
+truenas_monitoring: ; $(MAKE) run play=truenas_monitoring

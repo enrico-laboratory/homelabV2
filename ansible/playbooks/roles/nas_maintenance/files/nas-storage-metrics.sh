@@ -1,8 +1,9 @@
 #!/bin/bash
-# Writes ZFS pool/quota metrics for the node_exporter textfile collector (run as root from cron).
+# Writes ZFS pool/quota metrics for the node_exporter textfile collector (from cron; reading ZFS needs no root).
 # Metric names are consumed by prometheus/rules/nas-storage.yml in the monitor-stack.
 set -u
-OUT_DIR=/var/lib/node_exporter
+export PATH="$PATH:/usr/sbin:/sbin"   # zpool/zfs are not on PATH for non-root users (TrueNAS)
+OUT_DIR="${OUT_DIR:-/var/lib/node_exporter}"
 OUT="$OUT_DIR/nas_storage.prom"
 TMP=$(mktemp "$OUT_DIR/.nas_storage.XXXXXX") || exit 1
 trap 'rm -f "$TMP"' EXIT

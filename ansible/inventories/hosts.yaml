@@ -11,3 +11,10 @@ storage:
   hosts:
     nas:
       ansible_host: 192.168.100.160
+
+# TrueNAS SCALE backup box: only reachable as a normal user (no root over ssh), see truenas_monitoring.yaml
+truenas:
+  hosts:
+    truenas_backup:
+      ansible_host: truenas-backup.enricoruggieri.com
+      ansible_user: eruggieri
