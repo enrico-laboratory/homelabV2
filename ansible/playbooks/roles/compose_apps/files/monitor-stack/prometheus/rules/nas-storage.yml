@@ -1,0 +1,86 @@
+groups:
+  - name: nas-zfs
+    rules:
+      - alert: ZfsPoolNotOnline
+        expr: nas_zpool_health > 0
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "ZFS pool {{ $labels.pool }} on {{ $labels.instance }} is not ONLINE (health code {{ $value }})"
+
+      - alert: ZfsPoolErrors
+        expr: |
+          nas_zpool_errors_read_total > 0 or nas_zpool_errors_write_total > 0
+          or nas_zpool_errors_cksum_total > 0 or nas_zpool_data_errors > 0
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "ZFS pool {{ $labels.pool }} has read/write/checksum or permanent data errors (run zpool status -v)"
+
+      - alert: ZfsPoolFull
+        expr: nas_zpool_capacity_ratio > 0.80
+        for: 30m
+        labels: {severity: warning}
+        annotations:
+          summary: "ZFS pool {{ $labels.pool }} is {{ $value | humanizePercentage }} full (keep it under 80%)"
+
+      - alert: ZfsPoolCriticallyFull
+        expr: nas_zpool_capacity_ratio > 0.90
+        for: 10m
+        labels: {severity: critical}
+        annotations:
+          summary: "ZFS pool {{ $labels.pool }} is {{ $value | humanizePercentage }} full"
+
+      - alert: ZfsDatasetNearQuota
+        expr: nas_zfs_dataset_quota_usage_ratio > 0.85
+        for: 30m
+        labels: {severity: warning}
+        annotations:
+          summary: "Dataset {{ $labels.dataset }} uses {{ $value | humanizePercentage }} of its quota"
+
+      - alert: ZfsScrubOverdue
+        expr: (time() - nas_zpool_last_scrub_timestamp_seconds) > 45 * 86400 and nas_zpool_scrub_in_progress == 0
+        for: 1h
+        labels: {severity: warning}
+        annotations:
+          summary: "ZFS pool {{ $labels.pool }} has not been scrubbed for more than 45 days"
+
+      - alert: NasStorageMetricsStale
+        expr: (time() - nas_storage_textfile_timestamp_seconds) > 900
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "NAS ZFS metrics on {{ $labels.instance }} have not been refreshed for 15 minutes (cron job broken?)"
+
+  - name: nas-smart
+    rules:
+      - alert: SmartDiskUnhealthy
+        expr: smartctl_device_smart_status == 0
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "SMART overall status FAILED for {{ $labels.device }} on {{ $labels.instance }}"
+
+      - alert: SmartBadSectors
+        expr: |
+          smartctl_device_attribute{attribute_name=~"(?i)reallocated_sector_ct|current_pending_sector|offline_uncorrectable|reported_uncorrect",attribute_value_type="raw"} > 0
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.device }} on {{ $labels.instance }}: {{ $labels.attribute_name }} = {{ $value }}"
+
+      - alert: SmartDiskHot
+        expr: smartctl_device_temperature{temperature_type="current"} > 55
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.device }} on {{ $labels.instance }} is at {{ $value }}C"
+
+  - name: exporters
+    rules:
+      - alert: ExporterDown
+        expr: up{job=~"smartctl|alertmanager"} == 0 or up{job="all_nodes", instance=~"192.168.100.(160|23):9100"} == 0
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "Scrape target {{ $labels.instance }} (job {{ $labels.job }}) has been down for 10 minutes"

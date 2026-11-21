@@ -98,6 +98,34 @@ endpoints:
     conditions:
       - "[CONNECTED] == true"
 
+  - name: nas ssh
+    group: "servers"
+    url: tcp://nas.enricoruggieri.com:22
+    conditions:
+      - "[CONNECTED] == true"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  # NFS exports are lost on every NAS reboot until nas_config is re-applied
+  - name: nas nfs
+    group: "servers"
+    url: tcp://nas.enricoruggieri.com:2049
+    conditions:
+      - "[CONNECTED] == true"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
+  - name: alertmanager
+    group: "servers"
+    url: http://alertmanager:9093/-/healthy
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        send-on-resolved: true
+
   - name: truenas
     group: "vms"
     url: ssh://truenas.enricoruggieri.com:22

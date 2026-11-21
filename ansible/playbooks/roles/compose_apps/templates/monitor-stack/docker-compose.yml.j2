@@ -1,5 +1,6 @@
 volumes:
   prometheus_data:
+  alertmanager_data:
   grafana_data:
   gatus_db:
 
@@ -15,7 +16,8 @@ services:
     networks:
       - main
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -28,6 +30,21 @@ services:
       - traefik.http.routers.prometheus.entrypoints=websecure
       - traefik.http.routers.prometheus.tls.certresolver=cf
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    networks:
+      - main
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    ports:
+      - "9093:9093"
     restart: unless-stopped
 
   grafana:
