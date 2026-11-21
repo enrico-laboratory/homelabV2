@@ -25,6 +25,48 @@
         "regex": "/^Prometheus$/",
         "current": {},
         "hide": 0
+      },
+      {
+        "name": "host",
+        "label": "Host",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS}"
+        },
+        "query": {
+          "query": "label_values(nas_zpool_health, instance)",
+          "refId": "h"
+        },
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "sort": 1
+      },
+      {
+        "name": "pool",
+        "label": "Pool",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS}"
+        },
+        "query": {
+          "query": "label_values(nas_zpool_health{instance=~\"$host\"}, pool)",
+          "refId": "p"
+        },
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "sort": 1
       }
     ]
   },
@@ -45,7 +87,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "tank-data health",
+      "title": "$pool health",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS}"
@@ -62,11 +104,11 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "nas_zpool_health{pool=\"tank-data\"}",
-          "legendFormat": "",
+          "expr": "nas_zpool_health{instance=~\"$host\",pool=~\"$pool\"}",
+          "legendFormat": "{{instance}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -113,21 +155,26 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
-      }
+      },
+      "repeat": "pool",
+      "repeatDirection": "h",
+      "maxPerRow": 6
     },
     {
       "id": 3,
       "type": "stat",
-      "title": "tank-fast health",
+      "title": "$pool capacity",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS}"
       },
       "gridPos": {
-        "x": 4,
-        "y": 1,
+        "x": 0,
+        "y": 5,
         "w": 4,
         "h": 4
       },
@@ -137,47 +184,38 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "nas_zpool_health{pool=\"tank-fast\"}",
-          "legendFormat": "",
+          "expr": "nas_zpool_capacity_ratio{instance=~\"$host\",pool=~\"$pool\"}",
+          "legendFormat": "{{instance}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "none",
+          "unit": "percentunit",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.8
+              },
+              {
+                "color": "red",
+                "value": 0.9
               }
             ]
           },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "ONLINE",
-                  "color": "green"
-                },
-                "1": {
-                  "text": "DEGRADED",
-                  "color": "orange"
-                },
-                "2": {
-                  "text": "FAULTED",
-                  "color": "red"
-                }
-              }
-            }
-          ],
+          "mappings": [],
           "color": {
             "mode": "thresholds"
-          }
+          },
+          "decimals": 0
         },
         "overrides": []
       },
@@ -188,144 +226,17 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
-      }
+      },
+      "repeat": "pool",
+      "repeatDirection": "h",
+      "maxPerRow": 6
     },
     {
       "id": 4,
-      "type": "stat",
-      "title": "tank-data capacity",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS}"
-      },
-      "gridPos": {
-        "x": 8,
-        "y": 1,
-        "w": 4,
-        "h": 4
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS}"
-          },
-          "expr": "nas_zpool_capacity_ratio{pool=\"tank-data\"}",
-          "legendFormat": "",
-          "refId": "A",
-          "instant": false,
-          "range": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 0.8
-              },
-              {
-                "color": "red",
-                "value": 0.9
-              }
-            ]
-          },
-          "mappings": [],
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        }
-      }
-    },
-    {
-      "id": 5,
-      "type": "stat",
-      "title": "tank-fast capacity",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS}"
-      },
-      "gridPos": {
-        "x": 12,
-        "y": 1,
-        "w": 4,
-        "h": 4
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS}"
-          },
-          "expr": "nas_zpool_capacity_ratio{pool=\"tank-fast\"}",
-          "legendFormat": "",
-          "refId": "A",
-          "instant": false,
-          "range": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 0.8
-              },
-              {
-                "color": "red",
-                "value": 0.9
-              }
-            ]
-          },
-          "mappings": [],
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        }
-      }
-    },
-    {
-      "id": 6,
       "type": "stat",
       "title": "Pool errors (read+write+cksum+data)",
       "datasource": {
@@ -333,9 +244,9 @@
         "uid": "${DS}"
       },
       "gridPos": {
-        "x": 16,
-        "y": 1,
-        "w": 4,
+        "x": 0,
+        "y": 9,
+        "w": 8,
         "h": 4
       },
       "targets": [
@@ -344,11 +255,11 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "sum(nas_zpool_errors_read_total + nas_zpool_errors_write_total + nas_zpool_errors_cksum_total + nas_zpool_data_errors)",
-          "legendFormat": "",
+          "expr": "sum by (instance, pool) (nas_zpool_errors_read_total{instance=~\"$host\",pool=~\"$pool\"} + nas_zpool_errors_write_total{instance=~\"$host\",pool=~\"$pool\"} + nas_zpool_errors_cksum_total{instance=~\"$host\",pool=~\"$pool\"} + nas_zpool_data_errors{instance=~\"$host\",pool=~\"$pool\"})",
+          "legendFormat": "{{instance}} {{pool}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -381,12 +292,14 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
       }
     },
     {
-      "id": 7,
+      "id": 5,
       "type": "stat",
       "title": "Days since last scrub",
       "datasource": {
@@ -394,9 +307,9 @@
         "uid": "${DS}"
       },
       "gridPos": {
-        "x": 20,
-        "y": 1,
-        "w": 4,
+        "x": 8,
+        "y": 9,
+        "w": 8,
         "h": 4
       },
       "targets": [
@@ -405,11 +318,11 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "(time() - nas_zpool_last_scrub_timestamp_seconds) / 86400",
-          "legendFormat": "{{pool}}",
+          "expr": "(time() - nas_zpool_last_scrub_timestamp_seconds{instance=~\"$host\",pool=~\"$pool\"}) / 86400",
+          "legendFormat": "{{instance}} {{pool}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -447,12 +360,82 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
       }
     },
     {
-      "id": 8,
+      "id": 6,
+      "type": "stat",
+      "title": "NAS metrics age",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 9,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "time() - nas_storage_textfile_timestamp_seconds{instance=~\"$host\"}",
+          "legendFormat": "{{instance}}",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "mappings": [],
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 7,
       "type": "timeseries",
       "title": "Pool allocated",
       "datasource": {
@@ -461,7 +444,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 5,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -471,8 +454,8 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "nas_zpool_allocated_bytes",
-          "legendFormat": "{{pool}} allocated",
+          "expr": "nas_zpool_allocated_bytes{instance=~\"$host\",pool=~\"$pool\"}",
+          "legendFormat": "{{instance}} {{pool}} allocated",
           "refId": "A",
           "instant": false,
           "range": true
@@ -482,8 +465,8 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "nas_zpool_size_bytes",
-          "legendFormat": "{{pool}} size",
+          "expr": "nas_zpool_size_bytes{instance=~\"$host\",pool=~\"$pool\"}",
+          "legendFormat": "{{instance}} {{pool}} size",
           "refId": "B",
           "instant": false,
           "range": true
@@ -510,7 +493,7 @@
       }
     },
     {
-      "id": 9,
+      "id": 8,
       "type": "bargauge",
       "title": "Dataset quota usage (alert at 85%)",
       "datasource": {
@@ -519,7 +502,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 5,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -529,7 +512,7 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "nas_zfs_dataset_quota_usage_ratio",
+          "expr": "nas_zfs_dataset_quota_usage_ratio{instance=~\"$host\"}",
           "legendFormat": "{{dataset}}",
           "refId": "A",
           "instant": false,
@@ -575,20 +558,20 @@
       }
     },
     {
-      "id": 10,
+      "id": 9,
       "type": "row",
-      "title": "Physical disks (pve_node3)",
+      "title": "Physical disks (pve_node3 and truenas-backup)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 13,
+        "y": 21,
         "w": 24,
         "h": 1
       },
       "panels": []
     },
     {
-      "id": 11,
+      "id": 10,
       "type": "stat",
       "title": "SMART status",
       "datasource": {
@@ -597,7 +580,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 14,
+        "y": 22,
         "w": 6,
         "h": 4
       },
@@ -608,10 +591,10 @@
             "uid": "${DS}"
           },
           "expr": "smartctl_device_smart_status * on(instance,device) group_left(model_name) smartctl_device",
-          "legendFormat": "{{device}} {{model_name}}",
+          "legendFormat": "{{instance}} {{device}} {{model_name}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -658,12 +641,14 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
       }
     },
     {
-      "id": 12,
+      "id": 11,
       "type": "timeseries",
       "title": "Temperature",
       "datasource": {
@@ -672,7 +657,7 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 14,
+        "y": 22,
         "w": 9,
         "h": 8
       },
@@ -683,7 +668,7 @@
             "uid": "${DS}"
           },
           "expr": "smartctl_device_temperature{temperature_type=\"current\"} * on(instance,device) group_left(model_name) smartctl_device",
-          "legendFormat": "{{device}} {{model_name}}",
+          "legendFormat": "{{instance}} {{device}} {{model_name}}",
           "refId": "A",
           "instant": false,
           "range": true
@@ -726,7 +711,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 12,
       "type": "timeseries",
       "title": "Bad sector counters (should stay 0)",
       "datasource": {
@@ -735,7 +720,7 @@
       },
       "gridPos": {
         "x": 15,
-        "y": 14,
+        "y": 22,
         "w": 9,
         "h": 8
       },
@@ -746,7 +731,7 @@
             "uid": "${DS}"
           },
           "expr": "smartctl_device_attribute{attribute_name=~\"(?i)reallocated_sector_ct|current_pending_sector|offline_uncorrectable|reported_uncorrect\",attribute_value_type=\"raw\"}",
-          "legendFormat": "{{device}} {{attribute_name}}",
+          "legendFormat": "{{instance}} {{device}} {{attribute_name}}",
           "refId": "A",
           "instant": false,
           "range": true
@@ -773,7 +758,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 13,
       "type": "timeseries",
       "title": "Power-on hours",
       "datasource": {
@@ -782,7 +767,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 22,
+        "y": 30,
         "w": 12,
         "h": 8
       },
@@ -793,7 +778,7 @@
             "uid": "${DS}"
           },
           "expr": "smartctl_device_power_on_seconds / 3600 * on(instance,device) group_left(model_name) smartctl_device",
-          "legendFormat": "{{device}} {{model_name}}",
+          "legendFormat": "{{instance}} {{device}} {{model_name}}",
           "refId": "A",
           "instant": false,
           "range": true
@@ -820,7 +805,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 14,
       "type": "table",
       "title": "Disk inventory",
       "datasource": {
@@ -829,7 +814,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 22,
+        "y": 30,
         "w": 12,
         "h": 8
       },
@@ -879,20 +864,20 @@
       }
     },
     {
-      "id": 16,
+      "id": 15,
       "type": "row",
-      "title": "Alerts and exporters",
+      "title": "Alerts",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 30,
+        "y": 38,
         "w": 24,
         "h": 1
       },
       "panels": []
     },
     {
-      "id": 17,
+      "id": 16,
       "type": "table",
       "title": "Firing / pending alerts",
       "datasource": {
@@ -901,8 +886,8 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 31,
-        "w": 16,
+        "y": 39,
+        "w": 18,
         "h": 6
       },
       "targets": [
@@ -941,73 +926,7 @@
       }
     },
     {
-      "id": 18,
-      "type": "stat",
-      "title": "NAS metrics age",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS}"
-      },
-      "gridPos": {
-        "x": 16,
-        "y": 31,
-        "w": 4,
-        "h": 6
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS}"
-          },
-          "expr": "time() - nas_storage_textfile_timestamp_seconds",
-          "legendFormat": "",
-          "refId": "A",
-          "instant": false,
-          "range": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 600
-              },
-              {
-                "color": "red",
-                "value": 900
-              }
-            ]
-          },
-          "mappings": [],
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        }
-      }
-    },
-    {
-      "id": 19,
+      "id": 17,
       "type": "stat",
       "title": "Scrape targets down",
       "datasource": {
@@ -1015,9 +934,9 @@
         "uid": "${DS}"
       },
       "gridPos": {
-        "x": 20,
-        "y": 31,
-        "w": 4,
+        "x": 18,
+        "y": 39,
+        "w": 6,
         "h": 6
       },
       "targets": [
@@ -1026,11 +945,11 @@
             "type": "prometheus",
             "uid": "${DS}"
           },
-          "expr": "count(up{job=~\"smartctl|alertmanager\"} == 0) or vector(0)",
+          "expr": "count(up{job=~\"smartctl|alertmanager|all_nodes\"} == 0) or vector(0)",
           "legendFormat": "",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -1063,7 +982,9 @@
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
+          ],
+          "fields": "",
+          "values": false
         }
       }
     }
