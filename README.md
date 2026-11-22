@@ -45,8 +45,9 @@ A Talos Linux cluster on Proxmox (1 control plane `talos-121`, 2 workers `talos-
 - Apps (`k8s-talos/apps/<group>/`, one Flux Kustomization per group; migrated from the former k3s cluster in November 2026):
   - mediaserver: Jellyfin (media streaming), Navidrome (music streaming), Joplin (notes, with its Postgres), Karakeep (bookmarks and notes, with nightly restic backup to TrueNAS), Meal Plan (personal dashboard at personal.enricoruggieri.com), Calibre-Web (ebook library), Jackett and Prowlarr (indexers), Sonarr (TV shows) and Radarr (movies), Transmission (torrent client), arr-postgres (one shared Postgres for Sonarr, Radarr and Prowlarr, with nightly restic backup to TrueNAS), FlareSolverr (Cloudflare challenge solver for the indexers)
   - cloud: Nextcloud (cloud storage, with its Postgres and Redis, nightly restic backup to TrueNAS and a nightly one-way sync of the NAS library), OnlyOffice (document server for Nextcloud)
+  - photos: Immich (photo library, reached over Tailscale at photos.enricoruggieri.com; originals on the NAS dataset `tank-fast/immich-library` over NFS, own Postgres with VectorChord, Valkey, machine learning on the GPU worker through time-slicing, nightly restic backup of library and DB dump to TrueNAS)
   - ai: Ollama (LLM inference), Open WebUI (chat UI for Ollama), Qdrant (vector database for Open WebUI), ComfyUI (image generation; created at 0 replicas and scaled by hand, outputs on the NAS)
-- GPU: worker `talos-133` with the RTX 3060 passed through (`gpu = true` in `talos_tf/variables.tf`), NVIDIA LTS driver + container toolkit as Talos extensions, RuntimeClass `nvidia`, nvidia-device-plugin and dcgm-exporter in `nvidia`
+- GPU: worker `talos-133` with the RTX 3060 passed through (`gpu = true` in `talos_tf/variables.tf`), NVIDIA LTS driver + container toolkit as Talos extensions, RuntimeClass `nvidia`, nvidia-device-plugin and dcgm-exporter in `nvidia`; the device plugin time-slices the GPU into 4 shares so Ollama, ComfyUI and Immich can run together (no VRAM isolation)
 
 ## Quick Start
 
