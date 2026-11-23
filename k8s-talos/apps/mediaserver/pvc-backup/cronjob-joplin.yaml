@@ -1,0 +1,63 @@
+# Nightly Joplin backup: pg_dump of its Postgres (notes live in the DB), restic to TrueNAS.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: joplin-pvc-backup
+  namespace: mediaserver
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+            - name: pg-dump
+              image: postgres:15
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  pg_dump -h postgres -U joplin -d joplin -Fc -f /dump/joplin.dump
+                  [ -s /dump/joplin.dump ]
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: joplin-postgres-credentials
+                      key: postgres-password
+              volumeMounts:
+                - { name: dump, mountPath: /dump }
+          containers:
+            - name: backup
+              image: restic/restic:0.18.0
+              command: ["/bin/sh", "/scripts/backup.sh"]
+              env:
+                - { name: APP, value: joplin }
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: pvc-backup-restic
+                      key: password
+              volumeMounts:
+                - { name: dump, mountPath: /dump }
+                - { name: cache, mountPath: /cache }
+                - { name: repos, mountPath: /repos }
+                - { name: scripts, mountPath: /scripts, readOnly: true }
+          volumes:
+            - name: repos
+              nfs:
+                server: truenas-backup.enricoruggieri.com
+                path: /mnt/backup-pool-2/k8s-pvc
+            - name: scripts
+              configMap:
+                name: pvc-backup-script
+            - name: dump
+              emptyDir: {}
+            - name: cache
+              emptyDir: {}

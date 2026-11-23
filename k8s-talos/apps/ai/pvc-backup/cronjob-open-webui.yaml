@@ -1,0 +1,65 @@
+# Nightly Open WebUI backup: webui.db (users, chats, settings) and uploads/; cache/ (embedding models) excluded.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: open-webui-pvc-backup
+  namespace: ai
+spec:
+  schedule: "45 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          # The PVC is ReadWriteOnce: run on the same node as the app.
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/component: open-webui
+          tolerations:
+            - key: nvidia.com/gpu
+              operator: Exists
+              effect: NoSchedule
+          containers:
+            - name: backup
+              image: restic/restic:0.18.0
+              command: ["/bin/sh", "/scripts/backup.sh"]
+              env:
+                - { name: APP, value: open-webui }
+                - name: EXCLUDES
+                  value: |
+                    /data/cache
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: pvc-backup-restic
+                      key: password
+              volumeMounts:
+                - { name: data, mountPath: /data }
+                - { name: dump, mountPath: /dump }
+                - { name: cache, mountPath: /cache }
+                - { name: repos, mountPath: /repos }
+                - { name: scripts, mountPath: /scripts, readOnly: true }
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: open-webui
+            - name: repos
+              nfs:
+                server: truenas-backup.enricoruggieri.com
+                path: /mnt/backup-pool-2/k8s-pvc
+            - name: scripts
+              configMap:
+                name: pvc-backup-script
+            - name: dump
+              emptyDir: {}
+            - name: cache
+              emptyDir: {}

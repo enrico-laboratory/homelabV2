@@ -1,0 +1,19 @@
+# Nightly restic backups of the mediaserver PVCs that hold state (02:00-02:40, one CronJob per app
+# because the PVCs are ReadWriteOnce). Repos: TrueNAS backup-pool-2/k8s-pvc/<app>.
+# Karakeep and arr-postgres have their own backups (karakeep-backup, arr-postgres-backup).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mediaserver
+components:
+- ../../../components/pvc-backup
+resources:
+- sops_secret.yaml
+- cronjob-joplin.yaml
+- cronjob-jellyfin.yaml
+- cronjob-navidrome.yaml
+- cronjob-calibreweb.yaml
+- cronjob-sonarr.yaml
+- cronjob-radarr.yaml
+- cronjob-prowlarr.yaml
+- cronjob-jackett.yaml
+- cronjob-transmission.yaml

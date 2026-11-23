@@ -6,3 +6,4 @@ resources:
 - qdrant
 - ollama
 - open-webui
+- pvc-backup

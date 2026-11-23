@@ -1,0 +1,9 @@
+# Shared script for the <app>-pvc-backup CronJobs (apps/<group>/pvc-backup/).
+# Add to a kustomization with `components: [<relative path>/components/pvc-backup]`; the ConfigMap
+# gets that kustomization's namespace, and its hashed name is rewritten in the CronJobs.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+configMapGenerator:
+- name: pvc-backup-script
+  files:
+  - backup.sh

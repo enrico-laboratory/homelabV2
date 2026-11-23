@@ -1,0 +1,11 @@
+# Nightly restic backup of the Open WebUI PVC. Repo: TrueNAS backup-pool-2/k8s-pvc/open-webui.
+# Not backed up: ollama (models are re-pulled), qdrant (vector index, rebuilt from Open WebUI
+# documents), comfyui PVCs (models and custom nodes are re-downloaded; outputs are on the NAS).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ai
+components:
+- ../../../components/pvc-backup
+resources:
+- sops_secret.yaml
+- cronjob-open-webui.yaml

@@ -1,0 +1,65 @@
+# Nightly Prowlarr config backup (config.xml with API key, Backups/, asp keys). The DB is in arr-postgres; Definitions/ is re-downloaded.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prowlarr-pvc-backup
+  namespace: mediaserver
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          # The PVC is ReadWriteOnce: run on the same node as the app.
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      app: prowlarr
+          containers:
+            - name: backup
+              image: restic/restic:0.18.0
+              command: ["/bin/sh", "/scripts/backup.sh"]
+              env:
+                - { name: APP, value: prowlarr }
+                - name: EXCLUDES
+                  value: |
+                    /data/logs
+                    /data/MediaCover
+                    /data/Sentry
+                    /data/*.pid
+                    /data/Definitions
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: pvc-backup-restic
+                      key: password
+              volumeMounts:
+                - { name: data, mountPath: /data }
+                - { name: dump, mountPath: /dump }
+                - { name: cache, mountPath: /cache }
+                - { name: repos, mountPath: /repos }
+                - { name: scripts, mountPath: /scripts, readOnly: true }
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: prowlarr-config
+            - name: repos
+              nfs:
+                server: truenas-backup.enricoruggieri.com
+                path: /mnt/backup-pool-2/k8s-pvc
+            - name: scripts
+              configMap:
+                name: pvc-backup-script
+            - name: dump
+              emptyDir: {}
+            - name: cache
+              emptyDir: {}
