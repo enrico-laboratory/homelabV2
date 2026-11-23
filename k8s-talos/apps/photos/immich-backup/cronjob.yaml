@@ -44,6 +44,8 @@ spec:
               args:
                 - |
                   restic cat config >/dev/null 2>&1 || restic init || { touch /status/failed; exit 0; }
+                  # concurrencyPolicy is Forbid, so any lock left here is stale (a killed pod); unlock removes only stale ones
+                  restic unlock || true
                   restic backup /data /dump --host immich || { touch /status/failed; exit 0; }
                   restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune \
                     || touch /status/failed
