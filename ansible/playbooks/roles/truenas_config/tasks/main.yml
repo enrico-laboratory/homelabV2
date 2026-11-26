@@ -1,0 +1,35 @@
+# truenas_config: TrueNAS SCALE 25.10 desired state over the websocket API (runs on the controller).
+#
+# Managed: time zone and usage collection, SSH settings, service enable flags, group/user eruggieri,
+# system dataset pool, datasets (create only), NFS service and exports, scrub task, SMART LONG tests
+# (cron jobs since 25.10), monitoring cron job, node_exporter init script, keychain (SSH key pair and the
+# SSH connection to the NAS), PULL replication tasks, alert services.
+#
+# Not managed: install, network settings (asserted only), the API key itself, passwords, pools/disks and
+# the ZFS feature upgrade, replica target datasets and their data, version upgrades, boot environments,
+# the UI certificate. Items that exist but are not declared are reported ("unmanaged"), never deleted.
+#
+# Each truenas_api task is one login; TrueNAS rate-limits logins (about 20 per minute), so sections are
+# batched. A run is about 8 logins.
+- name: Lookups and assertions
+  ansible.builtin.import_tasks: lookups.yml
+
+- name: System settings and services
+  ansible.builtin.import_tasks: system.yml
+
+- name: Group and user
+  ansible.builtin.import_tasks: identity.yml
+
+- name: System dataset, datasets, NFS
+  ansible.builtin.import_tasks: storage.yml
+
+- name: Scrub, SMART, cron, init script, alerts
+  ansible.builtin.import_tasks: schedules.yml
+
+- name: Keychain and replication
+  ansible.builtin.import_tasks: replication.yml
+
+- name: Unmanaged items (exist on the box, not declared in vars)
+  ansible.builtin.debug:
+    msg: "{{ tn_unmanaged }}"
+  when: tn_unmanaged | default({}) | dict2items | selectattr('value') | list | length > 0

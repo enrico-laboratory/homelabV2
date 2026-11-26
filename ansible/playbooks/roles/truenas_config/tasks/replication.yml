@@ -1,0 +1,63 @@
+# Key material is in vars.sops.yaml (truenas_keychain_private_key/_public_key, truenas_nas_remote_host_key).
+- name: SSH key pair
+  truenas_api:
+    ns: keychaincredential
+    key: [name]
+    secret_keys: [private_key]
+    items:
+      - name: "{{ truenas_keypair_name }}"
+        type: SSH_KEY_PAIR
+        attributes:
+          private_key: "{{ truenas_keychain_private_key }}"
+          public_key: "{{ truenas_keychain_public_key }}"
+  register: tn_keypair
+  no_log: true   # the items carry the private key
+
+- name: SSH connection to the NAS
+  truenas_api:
+    ns: keychaincredential
+    key: [name]
+    # one expression so port/timeout/key id stay integers (see identity.yml)
+    items: >-
+      {{ [{
+           'name': truenas_nas_credential.name,
+           'type': 'SSH_CREDENTIALS',
+           'attributes': {
+             'host': truenas_nas_credential.host,
+             'port': truenas_nas_credential.port | int,
+             'username': truenas_nas_credential.username,
+             'private_key': tn_keypair.ids[truenas_keypair_name] | int,
+             'remote_host_key': truenas_nas_remote_host_key,
+             'connect_timeout': truenas_nas_credential.connect_timeout | int,
+           },
+         }] }}
+  register: tn_credential
+  when: tn_keypair.ids[truenas_keypair_name] is not none
+
+- name: Build the replication tasks
+  ansible.builtin.set_fact:
+    tn_replications: >-
+      {{ tn_replications | default([]) + [truenas_replication_defaults | combine({
+           'name': 'nas:' ~ item.source ~ ' -> ' ~ truenas_data_pool ~ '/' ~ item.target,
+           'source_datasets': [item.source],
+           'target_dataset': truenas_data_pool ~ '/' ~ item.target,
+           'ssh_credentials': tn_credential.ids[truenas_nas_credential.name] | int,
+           'name_regex': item.regex,
+           'schedule': {'minute': item.minute, 'hour': item.hour, 'dom': '*', 'month': '*', 'dow': item.dow,
+                        'begin': '00:00', 'end': '23:59'},
+         })] }}
+  loop: "{{ truenas_replications }}"
+  when: tn_credential.ids is defined and tn_credential.ids[truenas_nas_credential.name] is not none
+
+- name: Replication tasks (matched by target dataset)
+  truenas_api:
+    ns: replication
+    key: [target_dataset]
+    report_unmanaged: true
+    items: "{{ tn_replications }}"
+  register: tn_replication
+  when: tn_replications is defined
+
+- name: Collect unmanaged replication tasks
+  ansible.builtin.set_fact:
+    tn_unmanaged: "{{ tn_unmanaged | combine({'replication': tn_replication.unmanaged | default([])}) }}"

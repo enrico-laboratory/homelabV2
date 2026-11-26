@@ -1,0 +1,41 @@
+- name: Build the NFS export list
+  ansible.builtin.set_fact:
+    tn_nfs_items: >-
+      {{ tn_nfs_items | default([]) + [{
+           'path': '/mnt/' ~ truenas_data_pool ~ '/' ~ item.dataset,
+           'networks': [truenas_lan],
+           'hosts': [],
+           'ro': false,
+           'enabled': true,
+           'maproot_user': 'root',
+           'maproot_group': item.maproot_group | default(''),
+         }] }}
+  loop: "{{ truenas_nfs_exports }}"
+
+- name: System dataset, datasets, NFS service and exports
+  truenas_api:
+    batch:
+      - name: systemdataset
+        mode: config
+        ns: systemdataset
+        data: { pool: "{{ truenas_data_pool }}" }
+        job: true
+      - name: datasets
+        ns: pool.dataset
+        key: [name]
+        update: false   # create only; never touches existing datasets
+        items: "{{ truenas_datasets | map('regex_replace', '^', truenas_data_pool ~ '/') | map('community.general.dict_kv', 'name') | list }}"
+      - name: nfs
+        mode: config
+        ns: nfs
+        data: { protocols: "{{ truenas_nfs_protocols }}" }
+      - name: nfs exports
+        ns: sharing.nfs
+        key: [path]
+        items: "{{ tn_nfs_items }}"
+        report_unmanaged: true
+  register: tn_storage
+
+- name: Collect unmanaged exports
+  ansible.builtin.set_fact:
+    tn_unmanaged: "{{ tn_unmanaged | combine({'sharing.nfs': tn_storage.sections['nfs exports'].unmanaged | default([])}) }}"

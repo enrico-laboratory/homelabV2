@@ -1,0 +1,102 @@
+# truenas-backup desired state, applied by playbooks/truenas_backup_config.yaml (make truenas_config).
+# API access: user + key (key in vars.sops.yaml). The box is TrueNAS SCALE 25.10, websocket JSON-RPC API.
+truenas_api_url: "wss://truenas-backup.enricoruggieri.com/api/current"
+truenas_api_user: admin
+truenas_api_verify_ssl: false   # UI certificate is the self-signed truenas_default
+
+truenas_data_pool: backup-pool-2
+truenas_lan: 192.168.100.0/24
+
+# Assert only (never changed by the playbook: a wrong value would lock us out)
+truenas_expected_hostname: truenas-backup
+
+truenas_system_general:
+  timezone: Europe/Amsterdam
+  usage_collection: false
+
+truenas_ssh:
+  passwordauth: false
+  tcpfwd: false
+  weak_ciphers: []
+
+# enable flag only; running state is asserted for the enabled ones
+truenas_services:
+  - { service: nfs, enable: true }
+  - { service: ssh, enable: true }
+  - { service: cifs, enable: false }
+  - { service: ftp, enable: false }
+  - { service: iscsitarget, enable: false }
+  - { service: snmp, enable: false }
+  - { service: ups, enable: false }
+  - { service: nvmet, enable: false }
+
+truenas_user: eruggieri
+truenas_user_uid: 1000
+truenas_user_gid: 3000
+truenas_user_home: "/mnt/{{ truenas_data_pool }}/home/{{ truenas_user }}"
+truenas_user_sshpubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+truenas_monitoring_dir: "{{ truenas_user_home }}/monitoring"
+truenas_node_exporter_version: "1.9.1"
+
+# Created if missing, never updated or deleted. Replica targets are NOT listed (the replication creates them).
+truenas_datasets:
+  - home
+  - pve-vms-backup
+  - nextcloud
+  - karakeep
+  - arr-postgres
+  - immich
+  - k8s-pvc
+
+truenas_nfs_protocols: [NFSV3, NFSV4]
+# consumers: pve_node3 (vzdump), k8s restic CronJobs (nextcloud, karakeep, arr-postgres, immich, *-pvc-backup)
+truenas_nfs_exports:
+  - { dataset: pve-vms-backup, maproot_group: wheel }
+  - { dataset: nextcloud }
+  - { dataset: karakeep }
+  - { dataset: arr-postgres }
+  - { dataset: immich }
+  - { dataset: k8s-pvc }
+
+# Schedules are Europe/Amsterdam. Avoid: restic CronJobs 03:05-05:30, vzdump Sun 01:00, host updates Sun 03:00.
+truenas_scrub: { threshold: 35, schedule: { minute: "0", hour: "10", dom: "*", month: "*", dow: "5" } }   # Fri 10:00
+
+truenas_smart_long_tests:   # TrueNAS 25.10 runs SMART tests as cron jobs
+  - { serial: ZFN4QQAE, schedule: { minute: "0", hour: "10", dom: "*", month: "*", dow: "6" } }        # Sat 10:00
+
+# keychain: SSH key pair (secret in vars.sops.yaml) + connection to the NAS used by the PULL replications
+truenas_keypair_name: eruggieri
+truenas_nas_credential:
+  name: "to nas 2"
+  host: 192.168.100.160
+  port: 22
+  username: eruggieri
+  connect_timeout: 10
+
+truenas_replication_defaults:
+  direction: PULL
+  transport: SSH
+  recursive: false
+  auto: true
+  retention_policy: SOURCE
+  readonly: SET
+  allow_from_scratch: true
+  properties: true
+  large_block: true
+  compressed: true
+  retries: 5
+  enabled: true
+  also_include_naming_schema: []
+  naming_schema: []
+
+truenas_replications:
+  - { source: tank-data/archivio,         target: archivio,   regex: "^(auto|autosnap)[-_].*", dow: mon, hour: "22", minute: "0" }
+  - { source: tank-data/audio,            target: audio,      regex: "^(auto|autosnap)[-_].*", dow: tue, hour: "22", minute: "0" }
+  - { source: tank-data/media/audiobooks, target: audiobooks, regex: "^(auto|autosnap)[-_].*", dow: tue, hour: "22", minute: "30" }
+  - { source: tank-data/media/library,    target: library,    regex: "^(auto|autosnap)[-_].*", dow: tue, hour: "23", minute: "0" }
+  - { source: tank-data/media/music,      target: music,      regex: "^(auto|autosnap)[-_].*", dow: tue, hour: "23", minute: "30" }
+  - { source: tank-data/media/videos,     target: videos,     regex: "^(auto-|autosnap_).*",   dow: wed, hour: "22", minute: "0" }
+  - { source: tank-fast/minecraft,        target: minecraft,  regex: "^(auto-|autosnap_).*",   dow: thu, hour: "22", minute: "0" }
+
+truenas_alert_level: WARNING
+truenas_alert_services_absent: ["E-Mail", "SNMP Trap"]

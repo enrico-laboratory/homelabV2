@@ -1,0 +1,72 @@
+- name: Build the SMART cron jobs
+  ansible.builtin.set_fact:
+    tn_smart_cron: >-
+      {{ tn_smart_cron | default([]) + [{
+           'description': 'S.M.A.R.T. LONG ' ~ item.serial,
+           'user': 'root',
+           'command': 'midclt call disk.smart_test LONG ' ~ ([tn_disk_identifier[item.serial]] | to_json | quote),
+           'schedule': item.schedule,
+           'enabled': true,
+           'stdout': true,
+           'stderr': true,
+         }] }}
+  loop: "{{ truenas_smart_long_tests }}"
+
+- name: Scrub, cron jobs, init script, alert services
+  truenas_api:
+    batch:
+      - name: scrub
+        ns: pool.scrub
+        key: [pool]
+        # one expression so pool/threshold stay integers (see identity.yml)
+        items: "{{ [{'pool': tn_pool_id | int, 'threshold': truenas_scrub.threshold | int, 'schedule': truenas_scrub.schedule, 'enabled': true}] }}"
+      - name: cron
+        ns: cronjob
+        key: [description]
+        report_unmanaged: true
+        items: >-
+          {{ [{
+               'description': 'monitoring metrics',
+               'user': 'root',
+               'command': 'OUT_DIR=' ~ truenas_monitoring_dir ~ '/textfile python3 ' ~ truenas_monitoring_dir ~ '/bin/smart-metrics.py; '
+                          ~ 'OUT_DIR=' ~ truenas_monitoring_dir ~ '/textfile ' ~ truenas_monitoring_dir ~ '/bin/nas-storage-metrics.sh',
+               'schedule': {'minute': '*/5', 'hour': '*', 'dom': '*', 'month': '*', 'dow': '*'},
+               'enabled': true,
+               'stdout': true,
+               'stderr': false,
+             },
+             {'description': 'S.M.A.R.T. Test', 'state': 'absent'},
+           ] + tn_smart_cron }}
+      - name: init script
+        ns: initshutdownscript
+        key: [comment]
+        report_unmanaged: true
+        items:
+          - comment: node_exporter
+            type: COMMAND
+            when: POSTINIT
+            command: "su -s /bin/bash {{ truenas_user }} -c '{{ truenas_monitoring_dir }}/bin/start-node-exporter.sh'"
+            timeout: 10   # literal YAML int, not templated
+            enabled: true
+      - name: alert services
+        ns: alertservice
+        key: [name]
+        report_unmanaged: true
+        secret_keys: [bot_token]
+        items: >-
+          {{ [{
+               'name': 'Telegram',
+               'level': truenas_alert_level,
+               'enabled': true,
+               'attributes': {'type': 'Telegram', 'bot_token': telegram_bot_token, 'chat_ids': [telegram_chat_id | int]},
+             }] + truenas_alert_services_absent | map('community.general.dict_kv', 'name') | map('combine', {'state': 'absent'}) | list }}
+  register: tn_schedules
+
+- name: Collect unmanaged cron jobs, init scripts, alert services
+  ansible.builtin.set_fact:
+    tn_unmanaged: >-
+      {{ tn_unmanaged | combine({
+           'cronjob': tn_schedules.sections.cron.unmanaged | default([]),
+           'initshutdownscript': tn_schedules.sections['init script'].unmanaged | default([]),
+           'alertservice': tn_schedules.sections['alert services'].unmanaged | default([]),
+         }) }}

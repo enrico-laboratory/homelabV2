@@ -1,0 +1,31 @@
+# The user's password is not managed (not readable). On a fresh box, user.create also needs either a
+# password or password_disabled: true, and the home directory must exist (create the user once in the UI
+# with home_create, then let this play take over).
+#
+# Items with integer fields are built as one Jinja expression: leaf templates ("{{ x | int }}") reach
+# the module as strings, and the API (and the query filters) need real integers.
+- name: Group
+  truenas_api:
+    ns: group
+    key: [name]
+    items: "{{ [{'name': truenas_user, 'gid': truenas_user_gid | int}] }}"
+  register: tn_group
+
+- name: User
+  truenas_api:
+    ns: user
+    key: [username]
+    items: >-
+      {{ [{
+           'username': truenas_user,
+           'uid': truenas_user_uid | int,
+           'group': tn_group.ids[truenas_user] | int,
+           'home': truenas_user_home,
+           'shell': '/usr/bin/bash',
+           'sshpubkey': truenas_user_sshpubkey,
+           'ssh_password_enabled': false,
+           'sudo_commands': [],
+           'sudo_commands_nopasswd': [],
+           'smb': false,
+         }] }}
+  when: tn_group.ids[truenas_user] is not none   # in check mode on a fresh box the group has no id yet

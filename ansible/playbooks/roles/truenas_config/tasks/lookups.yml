@@ -1,0 +1,35 @@
+- name: Read pool, network, disks and services
+  truenas_api:
+    batch:
+      - name: pool
+        mode: call
+        method: pool.query
+        params: [[["name", "=", "{{ truenas_data_pool }}"]], {"select": ["id", "name", "status", "healthy"]}]
+      - name: network
+        mode: call
+        method: network.configuration.config
+      - name: disks
+        mode: call
+        method: disk.query
+        params: [[["serial", "in", "{{ truenas_smart_long_tests | map(attribute='serial') | list }}"]], {"select": ["identifier", "serial", "name"]}]
+      - name: services
+        mode: call
+        method: service.query
+        params: [[], {"select": ["service", "state", "enable"]}]
+  register: tn_lookup
+
+- name: Data pool exists and is ONLINE, hostname as expected
+  ansible.builtin.assert:
+    that:
+      - tn_lookup.sections.pool.result | length == 1
+      - tn_lookup.sections.pool.result[0].status == 'ONLINE'
+      - tn_lookup.sections.network.result.hostname == truenas_expected_hostname
+      - tn_lookup.sections.disks.result | length == truenas_smart_long_tests | length
+    fail_msg: "pool/hostname/disk check failed: {{ tn_lookup.sections.pool.result }} {{ tn_lookup.sections.network.result.hostname }} {{ tn_lookup.sections.disks.result }}"
+    quiet: true
+
+- name: Remember ids
+  ansible.builtin.set_fact:
+    tn_pool_id: "{{ tn_lookup.sections.pool.result[0].id }}"
+    tn_disk_identifier: "{{ tn_lookup.sections.disks.result | items2dict(key_name='serial', value_name='identifier') }}"
+    tn_unmanaged: {}

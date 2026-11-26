@@ -1,0 +1,32 @@
+# truenas-backup (TrueNAS SCALE 25.10): desired configuration, `make truenas_config`.
+#
+# Play 1 runs on the controller and talks to the TrueNAS middleware over the websocket API
+# (library/truenas_api.py, module_utils/truenas_ws.py; API key in group_vars/truenas/vars.sops.yaml).
+# Play 2 copies the monitoring files into the user's home over SSH (as eruggieri, no root).
+#
+# Desired state: inventories/group_vars/truenas/vars.yaml. What is and is not managed: see the header of
+# roles/truenas_config/tasks/main.yml. Always try `--check --diff` first.
+- name: truenas-backup configuration (API)
+  hosts: truenas
+  connection: local
+  gather_facts: false
+  vars:
+    # the controller's Python; also keeps interpreter discovery from caching a Mac path for play 2
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  module_defaults:
+    truenas_api:
+      url: "{{ truenas_api_url }}"
+      api_user: "{{ truenas_api_user }}"
+      api_key: "{{ truenas_api_key }}"
+      verify_ssl: "{{ truenas_api_verify_ssl }}"
+  roles:
+    - truenas_config
+
+- name: truenas-backup monitoring files (SSH)
+  hosts: truenas
+  gather_facts: true
+  tasks:
+    - name: Monitoring files
+      ansible.builtin.include_role:
+        name: truenas_config
+        tasks_from: monitoring_files

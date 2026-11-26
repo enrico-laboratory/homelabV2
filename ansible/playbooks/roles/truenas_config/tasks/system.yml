@@ -1,0 +1,25 @@
+- name: General settings, SSH, service enable flags
+  truenas_api:
+    batch:
+      - name: system.general
+        mode: config
+        ns: system.general
+        data: "{{ truenas_system_general }}"
+      - name: ssh
+        mode: config
+        ns: ssh
+        data: "{{ truenas_ssh }}"
+      - name: services
+        ns: service
+        key: [service]
+        items: "{{ truenas_services }}"
+  register: tn_system
+
+- name: Enabled services are running
+  ansible.builtin.assert:
+    that: >-
+      tn_lookup.sections.services.result
+      | selectattr('service', 'in', truenas_services | selectattr('enable') | map(attribute='service') | list)
+      | rejectattr('state', 'eq', 'RUNNING') | list | length == 0
+    fail_msg: "enabled but not running: {{ tn_lookup.sections.services.result | rejectattr('state', 'eq', 'RUNNING') | selectattr('enable') | map(attribute='service') | list }}"
+    quiet: true

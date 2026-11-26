@@ -1,0 +1,55 @@
+# Runs over SSH as the TrueNAS user (no root). The cron job (root, SMART + ZFS metrics) and the POSTINIT
+# script that starts node_exporter are created by the API play (schedules.yml), with the same paths.
+- name: Create monitoring directories
+  ansible.builtin.file:
+    path: "{{ truenas_monitoring_dir }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop: [bin, textfile]
+
+- name: Is node_exporter installed
+  ansible.builtin.stat:
+    path: "{{ truenas_monitoring_dir }}/bin/node_exporter"
+  register: tn_ne_bin
+
+- name: Download node_exporter
+  when: not tn_ne_bin.stat.exists   # /tmp is wiped on every reboot, do not re-download each run
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ truenas_node_exporter_version }}/node_exporter-{{ truenas_node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/node_exporter-{{ truenas_node_exporter_version }}.tar.gz"
+    checksum: "sha256:https://github.com/prometheus/node_exporter/releases/download/v{{ truenas_node_exporter_version }}/sha256sums.txt"
+    mode: "0644"
+
+- name: Install the node_exporter binary
+  when: not tn_ne_bin.stat.exists
+  ansible.builtin.unarchive:
+    src: "/tmp/node_exporter-{{ truenas_node_exporter_version }}.tar.gz"
+    dest: "{{ truenas_monitoring_dir }}/bin"
+    remote_src: true
+    extra_opts: ["--strip-components=1", "--wildcards", "*/node_exporter"]
+    creates: "{{ truenas_monitoring_dir }}/bin/node_exporter"
+
+- name: Copy the metrics scripts
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ truenas_monitoring_dir }}/bin/{{ item.dest }}"
+    mode: "0755"
+  loop:
+    - { src: "{{ role_path }}/../nas_maintenance/files/nas-storage-metrics.sh", dest: nas-storage-metrics.sh }
+    - { src: smart-metrics.py, dest: smart-metrics.py }
+
+- name: Wrapper that starts node_exporter (idempotent), called by the POSTINIT script
+  ansible.builtin.copy:
+    dest: "{{ truenas_monitoring_dir }}/bin/start-node-exporter.sh"
+    mode: "0755"
+    content: |
+      #!/bin/bash
+      pgrep -x node_exporter >/dev/null && exit 0
+      nohup {{ truenas_monitoring_dir }}/bin/node_exporter \
+        --collector.textfile.directory={{ truenas_monitoring_dir }}/textfile \
+        --web.listen-address=:9100 >/dev/null 2>&1 &
+
+- name: Start node_exporter if it is not running
+  ansible.builtin.command: "{{ truenas_monitoring_dir }}/bin/start-node-exporter.sh"
+  register: tn_ne_start
+  changed_when: false
