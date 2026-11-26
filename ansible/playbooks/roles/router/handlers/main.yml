@@ -1,0 +1,18 @@
+---
+# reload only (nft -f): a restart runs "nft flush ruleset" and wipes Docker's iptables-nft tables
+- name: Reload nftables
+  ansible.builtin.service:
+    name: nftables
+    state: reloaded
+
+- name: Restart dnsmasq
+  ansible.builtin.service:
+    name: dnsmasq
+    state: restarted
+  when: router_cutover | bool
+
+- name: Restart router docker-user rules
+  ansible.builtin.systemd:
+    name: router-docker-user
+    state: restarted
+  when: router_cutover | bool

@@ -8,7 +8,7 @@ Infrastructure-as-Code homelab: a Talos Linux Kubernetes cluster on Proxmox, man
 - **GitOps with Flux**: Flux is bootstrapped by Terraform and reconciles `k8s-talos/` from this repository
 - **Unified secret management**: SOPS + age for every secret across Kubernetes, Ansible and Terraform
 - **Infrastructure as Code**: Terraform for Proxmox VMs (`pve_tf/`), the cluster (`talos_tf/`) and DNS (`dns/`)
-- **Host automation**: Ansible for the Proxmox node, the NAS, the `ops` Docker host (Traefik and the other compose apps) and the weekly host updates
+- **Host automation**: Ansible for the Proxmox node, the NAS, the `ops` Docker host (Traefik and the other compose apps, plus its role as the lab router: gateway, NAT, firewall and DHCP) and the weekly host updates
 
 ## Repository Structure
 

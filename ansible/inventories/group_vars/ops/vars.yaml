@@ -2,3 +2,10 @@ homelab_repo_dest: "/opt/homelabV2"
 bin_path: "/usr/local/bin:/usr/bin"
 inventory_path: "inventories/hosts.yaml"
 playbooks_folder: "playbooks"
+
+# Router role (playbooks/router.yaml)
+router_lan_interface: enp2s0     # onboard NIC, 192.168.100.78
+router_wan_interface: enp1s0f0   # first port of the 2-port card, plugged into the home router
+# No DHCP reservations needed; format if one is added later:
+# - {mac: "aa:bb:cc:dd:ee:ff", name: homeassistant, ip: 192.168.100.50}
+router_dhcp_reservations: []

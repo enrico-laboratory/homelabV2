@@ -1,0 +1,6 @@
+#!/bin/sh
+# {{ ansible_managed }}
+# Armed by the router role before "netplan apply"; stopped once ops answers again.
+rm -f /etc/netplan/50-router-lan.yaml /etc/netplan/60-router-wan.yaml
+cp -n {{ router_netplan_backup_dir }}/*.yaml /etc/netplan/ 2>/dev/null
+netplan apply

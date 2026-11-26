@@ -1,0 +1,13 @@
+---
+# ops as the lab router (gateway, NAT, firewall, DHCP).
+# Default is parallel mode: the Ubiquiti keeps routing. Cutover:
+#   make router args="-e router_cutover=true"
+- name: Configure OPS as the lab router
+  hosts: ops
+  become: true
+
+  tasks:
+
+    - name: Router
+      ansible.builtin.include_role:
+        name: router

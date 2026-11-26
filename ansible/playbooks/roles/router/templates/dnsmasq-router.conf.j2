@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+# DHCP only: DNS stays on Pi-hole, so dnsmasq must not open port 53
+port=0
+interface={{ router_lan_interface }}
+bind-interfaces
+{% if router_cutover | bool %}
+
+dhcp-authoritative
+dhcp-range={{ router_dhcp_range_start }},{{ router_dhcp_range_end }},{{ router_lan_netmask }},{{ router_dhcp_lease }}
+dhcp-option=option:router,{{ router_gateway_ip }}
+dhcp-option=option:dns-server,{{ router_dhcp_dns_servers | join(',') }}
+dhcp-option=option:domain-name,{{ router_lan_search_domain }}
+{% for reservation in router_dhcp_reservations %}
+dhcp-host={{ reservation.mac }},{{ reservation.name }},{{ reservation.ip }}
+{% endfor %}
+{% else %}
+# parallel mode: no dhcp-range, so nothing can be served while the old router is active
+{% endif %}

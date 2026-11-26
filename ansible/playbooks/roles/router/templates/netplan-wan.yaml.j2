@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+network:
+  version: 2
+  ethernets:
+    {{ router_wan_interface }}:
+      optional: true
+      dhcp4: true
+      dhcp6: false
+      accept-ra: false
+      dhcp4-overrides:
+        # parallel mode: the old router stays the default route
+        use-routes: {{ router_cutover | bool | lower }}
+        use-dns: false

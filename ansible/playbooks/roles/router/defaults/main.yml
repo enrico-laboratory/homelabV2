@@ -1,0 +1,31 @@
+---
+# router_lan_interface and router_wan_interface have no default on purpose:
+# set them in group_vars/ops/vars.yaml (the role asserts they exist).
+
+# false = parallel mode (the old router keeps routing), true = ops is the gateway
+router_cutover: false
+
+router_host_ip: "{{ ansible_host | default(inventory_hostname) }}"
+router_gateway_ip: 192.168.100.1
+router_lan_cidr: 192.168.100.0/24
+router_lan_prefix: 24
+router_lan_netmask: 255.255.255.0
+router_lan_search_domain: enricoruggieri.com
+# resolvers of ops itself: its own Pi-hole, then a public fallback
+router_lan_nameservers:
+  - "{{ router_host_ip }}"
+  - 8.8.8.8
+
+# DHCP: the range stays clear of the NAS (.160), the Talos static IPs (.121, .131-.133)
+# and the Cilium LB pool (.200-.219)
+router_dhcp_range_start: 192.168.100.180
+router_dhcp_range_end: 192.168.100.199
+router_dhcp_lease: 12h
+router_dhcp_dns_servers:
+  - "{{ router_host_ip }}"
+# list of {mac: "aa:bb:cc:dd:ee:ff", name: "host", ip: "192.168.100.50"}
+router_dhcp_reservations: []
+
+# seconds before the netplan rollback timer restores the previous config
+router_netplan_rollback_seconds: 120
+router_netplan_backup_dir: /root/netplan-backup

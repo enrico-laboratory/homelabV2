@@ -1,0 +1,81 @@
+---
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_file: /etc/sysctl.d/90-router.conf
+    sysctl_set: true
+    reload: true
+
+- name: Create the netplan backup directory
+  ansible.builtin.file:
+    path: "{{ router_netplan_backup_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: Check for the original netplan file
+  ansible.builtin.stat:
+    path: /etc/netplan/50-cloud-init.yaml
+  register: router_original_netplan
+
+- name: Back up the original netplan file
+  ansible.builtin.copy:
+    src: /etc/netplan/50-cloud-init.yaml
+    dest: "{{ router_netplan_backup_dir }}/50-cloud-init.yaml"
+    remote_src: true
+    force: false
+    mode: "0600"
+  when: router_original_netplan.stat.exists
+
+- name: Stop cloud-init from rewriting the network config
+  ansible.builtin.copy:
+    content: |
+      network: {config: disabled}
+    dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+    mode: "0644"
+
+- name: Configure the LAN interface (adds the gateway address)
+  ansible.builtin.template:
+    src: netplan-lan.yaml.j2
+    dest: /etc/netplan/50-router-lan.yaml
+    mode: "0600"
+  register: router_lan_netplan
+
+- name: Remove the original netplan file
+  ansible.builtin.file:
+    path: /etc/netplan/50-cloud-init.yaml
+    state: absent
+  register: router_original_removed
+
+- name: Install the Docker FORWARD accept rules
+  ansible.builtin.template:
+    src: router-docker-user.service.j2
+    dest: /etc/systemd/system/router-docker-user.service
+    mode: "0644"
+  notify: Restart router docker-user rules
+
+- name: Enable the Docker FORWARD accept rules
+  ansible.builtin.systemd:
+    name: router-docker-user
+    daemon_reload: true
+    enabled: true
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"  # unit file not written yet in check mode
+
+# NAT and the FORWARD rules must be live before the default route moves to the WAN
+- name: Load the firewall and DHCP config now
+  ansible.builtin.meta: flush_handlers
+
+- name: Apply netplan (default route moves to the WAN)
+  ansible.builtin.include_tasks: netplan_apply.yml
+  when: >-
+    router_wan_netplan is changed
+    or router_lan_netplan is changed
+    or router_original_removed is changed
+
+- name: Serve DHCP
+  ansible.builtin.service:
+    name: dnsmasq
+    state: started
+    enabled: true
+  ignore_errors: "{{ ansible_check_mode }}"  # not installed yet in check mode

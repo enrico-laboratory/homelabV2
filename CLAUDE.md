@@ -17,6 +17,7 @@ make dns_config                 # Configure DNS records via Ansible
 make nas_config                 # NAS datasets, NFS exports, SMB shares, sanoid
 make update_hosts               # apt upgrade + reboot of nas, pve and ops (see Host updates)
 make ops                        # Ops-level tasks
+make router                     # ops as router (parallel mode; cutover: args="-e router_cutover=true")
 ```
 
 To run any arbitrary playbook:
@@ -150,6 +151,7 @@ All NFS datasets are exported with:
 - **cert-manager**: Let's Encrypt wildcard certificate for `*.enricoruggieri.com` via DNS01 (Cloudflare). ClusterIssuer: `letsencrypt-cloudflare`
 - **Cloudflared**: Cloudflare tunnel (`apps/cloudflare/cloudflared`) for external access; its only public hostname is `nextcloud.enricoruggieri.com` -> `http://nextcloud.cloud.svc.cluster.local:8080`, configured in the Cloudflare dashboard (not Terraform)
 - **DNS**: `enricoruggieri.com` managed via Cloudflare; internal records in Terraform (`dns/`); Pi-hole for local resolution
+- **Router**: `ops` is the lab gateway (replacing the Ubiquiti at `192.168.100.1`), role `ansible/playbooks/roles/router`, `make router`. LAN `enp2s0` (`.78` plus the gateway address `.1`), WAN `enp1s0f0` into the home router (double NAT). nftables in its own tables (`inet router`, `ip router_nat`; never `flush ruleset`, Docker owns the iptables-nft tables) plus accept rules in Docker's `DOCKER-USER` chain (`router-docker-user.service`); dnsmasq is DHCP only (`port=0`, range `.180-.199`, reservations in `router_dhcp_reservations`), DNS stays on Pi-hole. Default is parallel mode (Ubiquiti still routing); cutover with `make router args="-e router_cutover=true"`. netplan applies are protected by a rollback timer (`netplan-rollback`)
 
 ### Secret Management
 

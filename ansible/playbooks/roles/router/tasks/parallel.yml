@@ -1,0 +1,39 @@
+---
+# Also the way back from a cutover: put the original LAN netplan file back
+- name: Check for the cutover LAN netplan file
+  ansible.builtin.stat:
+    path: /etc/netplan/50-router-lan.yaml
+  register: router_lan_file
+
+- name: Restore the original netplan file
+  ansible.builtin.copy:
+    src: "{{ router_netplan_backup_dir }}/50-cloud-init.yaml"
+    dest: /etc/netplan/50-cloud-init.yaml
+    remote_src: true
+    mode: "0600"
+  when: router_lan_file.stat.exists
+
+- name: Remove the cutover LAN netplan file
+  ansible.builtin.file:
+    path: /etc/netplan/50-router-lan.yaml
+    state: absent
+  when: router_lan_file.stat.exists
+  register: router_lan_removed
+
+- name: Apply netplan when the WAN or LAN file changed
+  ansible.builtin.include_tasks: netplan_apply.yml
+  when: router_wan_netplan is changed or router_lan_removed is changed
+
+- name: Keep dnsmasq off while the old router serves DHCP
+  ansible.builtin.service:
+    name: dnsmasq
+    state: stopped
+    enabled: false
+  ignore_errors: "{{ ansible_check_mode }}"  # not installed yet in check mode
+
+- name: Stop the Docker FORWARD accept rules
+  ansible.builtin.systemd:
+    name: router-docker-user
+    state: stopped
+    enabled: false
+  failed_when: false

@@ -1,0 +1,69 @@
+#!/usr/sbin/nft -f
+# {{ ansible_managed }}
+# Own tables only. No "flush ruleset": that would wipe the iptables-nft tables Docker owns.
+
+define lan = "{{ router_lan_interface }}"
+define wan = "{{ router_wan_interface }}"
+
+table inet router
+delete table inet router
+
+table inet router {
+
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        iif lo accept
+        ct state invalid drop
+        ct state established,related accept
+
+        # trusted: lab LAN, Tailscale, containers talking to host services
+        iifname $lan accept
+        iifname "tailscale0" accept
+        iifname "docker0" accept
+        iifname "br-*" accept
+
+        # WAN: only what is needed to be a DHCP client and answer ping
+        iifname $wan udp sport 67 udp dport 68 accept
+        iifname $wan icmp type echo-request limit rate 5/second accept
+        iifname $wan icmpv6 type { echo-request, nd-neighbor-solicit, nd-neighbor-advert, nd-router-advert } accept
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+
+        ct state invalid drop
+        ct state established,related accept
+
+        # lab -> internet
+        iifname $lan oifname $wan accept
+
+        # Tailscale subnet routing and exit node
+        iifname "tailscale0" accept
+
+        # containers <-> LAN / WAN (bridge_nf_call also sends same-bridge traffic through here;
+        # Docker's own chains keep the bridges isolated from each other)
+        # (wildcard names cannot go in sets on nft 1.0.x, hence one rule each)
+        iifname "docker0" oifname { $lan, $wan } accept
+        iifname "br-*" oifname { $lan, $wan } accept
+        iifname "br-*" oifname "br-*" accept
+        iifname "br-*" oifname "docker0" accept
+        iifname "docker0" oifname "br-*" accept
+        iifname $lan oifname "docker0" accept
+        iifname $lan oifname "br-*" accept
+
+        # anything started from WAN (including published container ports) falls through to the drop policy
+    }
+}
+
+table ip router_nat
+delete table ip router_nat
+
+table ip router_nat {
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+{% if router_cutover | bool %}
+        ip saddr {{ router_lan_cidr }} oifname $wan masquerade
+{% endif %}
+    }
+}

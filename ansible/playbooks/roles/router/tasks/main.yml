@@ -1,0 +1,108 @@
+---
+- name: Check the router settings
+  ansible.builtin.assert:
+    that:
+      - router_lan_interface is defined
+      - router_wan_interface is defined
+      - router_lan_interface != router_wan_interface
+      - router_lan_interface in ansible_facts.interfaces
+      - router_wan_interface in ansible_facts.interfaces
+    fail_msg: >-
+      Set router_lan_interface and router_wan_interface (existing, different NICs)
+      in inventories/group_vars/ops/vars.yaml
+
+- name: Check the WAN link before the cutover
+  ansible.builtin.assert:
+    that:
+      - ansible_facts[router_wan_interface].ipv4 is defined
+      - ansible_facts[router_wan_interface].ipv4.network != router_lan_cidr | ansible.builtin.regex_replace('/.*$', '')
+    fail_msg: >-
+      {{ router_wan_interface }} has no IPv4 lease, or it is on the lab subnet.
+      Plug it into the home router and run the role in parallel mode first.
+  when: router_cutover | bool
+
+- name: Install nftables
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+    # the cutover runs while ops has no internet (the WAN cable has just moved)
+    update_cache: "{{ not (router_cutover | bool) }}"
+    cache_valid_time: 3600
+
+# Ubuntu's unit stops with "nft flush ruleset", which also deletes Docker's iptables-nft
+# tables (NAT and published ports) until Docker is restarted: only remove our own tables
+- name: Create the nftables unit drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/nftables.service.d
+    state: directory
+    mode: "0755"
+
+- name: Keep nftables.service from flushing Docker's rules
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      ExecStop=
+      ExecStop=-/usr/sbin/nft delete table inet router
+      ExecStop=-/usr/sbin/nft delete table ip router_nat
+    dest: /etc/systemd/system/nftables.service.d/router.conf
+    mode: "0644"
+  register: router_nftables_dropin
+
+- name: Reload systemd units
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: router_nftables_dropin is changed
+
+# Placed before the package so the Ubuntu postinst start cannot bind port 53 or serve DHCP
+- name: Create the dnsmasq config directory
+  ansible.builtin.file:
+    path: /etc/dnsmasq.d
+    state: directory
+    mode: "0755"
+
+- name: Configure dnsmasq (DHCP only)
+  ansible.builtin.template:
+    src: dnsmasq-router.conf.j2
+    dest: /etc/dnsmasq.d/router.conf
+    mode: "0644"
+  notify: Restart dnsmasq
+
+- name: Install dnsmasq
+  ansible.builtin.apt:
+    name: dnsmasq
+    state: present
+
+- name: Configure the firewall and NAT
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    mode: "0644"
+    validate: /usr/sbin/nft -c -f %s
+  notify: Reload nftables
+
+- name: Enable nftables
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started
+
+- name: Configure the WAN interface
+  ansible.builtin.template:
+    src: netplan-wan.yaml.j2
+    dest: /etc/netplan/60-router-wan.yaml
+    mode: "0600"
+  register: router_wan_netplan
+
+- name: Install the netplan rollback script
+  ansible.builtin.template:
+    src: router-netplan-rollback.sh.j2
+    dest: /usr/local/sbin/router-netplan-rollback
+    mode: "0755"
+
+- name: Apply the WAN side (parallel mode)
+  ansible.builtin.include_tasks: parallel.yml
+  when: not (router_cutover | bool)
+
+- name: Switch ops to gateway (cutover mode)
+  ansible.builtin.include_tasks: cutover.yml
+  when: router_cutover | bool

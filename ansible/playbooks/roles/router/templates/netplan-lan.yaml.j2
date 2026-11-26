@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+# Replaces 50-cloud-init.yaml (original kept in {{ router_netplan_backup_dir }}).
+# No default route here: it comes from the WAN DHCP lease.
+network:
+  version: 2
+  ethernets:
+    {{ router_lan_interface }}:
+      addresses:
+        - {{ router_host_ip }}/{{ router_lan_prefix }}
+        - {{ router_gateway_ip }}/{{ router_lan_prefix }}
+      nameservers:
+        addresses:
+{% for nameserver in router_lan_nameservers %}
+          - {{ nameserver }}
+{% endfor %}
+        search:
+          - {{ router_lan_search_domain }}

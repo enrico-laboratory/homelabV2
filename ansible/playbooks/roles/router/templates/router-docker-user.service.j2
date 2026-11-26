@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+# Docker sets the iptables FORWARD policy to DROP; lab <-> WAN traffic has to be
+# accepted in DOCKER-USER (evaluated first) or it never leaves the host.
+[Unit]
+Description=Allow routed LAN <-> WAN traffic through Docker's FORWARD policy
+After=docker.service
+Requires=docker.service
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'iptables -C DOCKER-USER -i {{ router_lan_interface }} -o {{ router_wan_interface }} -j ACCEPT 2>/dev/null || iptables -I DOCKER-USER -i {{ router_lan_interface }} -o {{ router_wan_interface }} -j ACCEPT'
+ExecStart=/bin/sh -c 'iptables -C DOCKER-USER -i {{ router_wan_interface }} -o {{ router_lan_interface }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || iptables -I DOCKER-USER -i {{ router_wan_interface }} -o {{ router_lan_interface }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT'
+ExecStop=-/bin/sh -c 'iptables -D DOCKER-USER -i {{ router_lan_interface }} -o {{ router_wan_interface }} -j ACCEPT'
+ExecStop=-/bin/sh -c 'iptables -D DOCKER-USER -i {{ router_wan_interface }} -o {{ router_lan_interface }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT'
+
+[Install]
+WantedBy=multi-user.target
