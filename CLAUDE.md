@@ -207,6 +207,18 @@ The installer image and schematic (qemu-guest-agent extension) are taken from ea
 
 Changing a node's CPU or memory (`nodes` in `talos_tf/variables.tf`) reboots the VM: drain it first, apply with `-target` one node at a time, then uncordon.
 
+### Application updates (Renovate)
+
+Renovate (`renovate.json`, run by `.github/workflows/renovate.yaml` at 01:30 UTC Monday-Saturday, or by hand with `gh workflow run renovate.yaml` / `-f dryRun=true`) updates image tags and Helm chart versions in `k8s-talos/`, the images in the compose templates (`ansible/playbooks/roles/compose_apps/templates/*/docker-compose.yml.j2`, through a regex manager because the Jinja tags break YAML parsing), the Terraform providers and the workflow's own actions. There are no PRs: each update is a short-lived `renovate/*` branch that Renovate merges straight into `main` (`automergeType: branch`), one commit per update (Immich server + ML grouped).
+
+- Patch and minor updates merge automatically. Majors, Meilisearch minors and minors of 0.x Terraform providers wait for a tick in the "Renovate: Dependency Dashboard" GitHub issue; ticked updates merge on the next run. Database majors (postgres, immich postgres, valkey, meilisearch) are disabled. Flux itself (`clusters/talos/flux-system`) is excluded: Terraform owns it. Talos/Kubernetes versions (Tuppr) are not managed by Renovate.
+- k8s updates are live as soon as Flux reconciles. Compose updates only land on ops with the next `make compose_apps`; Terraform provider bumps only change `provider.tf`/`.terraform.lock.hcl`, nothing is applied.
+- Renovate pushes to `main` nightly: `git pull --rebase` before pushing.
+- Rollback: `git revert <renovate commit>`, push, `flux reconcile kustomization <name> --with-source`. To freeze an app, add a `packageRules` entry with `enabled: false` (or `allowedVersions`) in `renovate.json`.
+- Always pin real version tags (no `latest`/`stable`): Renovate cannot tell when a floating tag changes. Variant tags that are not versions (e.g. `yanwk/comfyui-boot:cu130-slim-v2`) are disabled in `renovate.json`.
+- Token: repo secret `RENOVATE_TOKEN`, a fine-grained PAT on this repo only (Contents, Issues, Workflows: read/write). ghcr.io lookups use the job's `GITHUB_TOKEN` (anonymous ones get rate-limited).
+- Validate config changes: `npx --yes --package renovate -- renovate-config-validator --strict renovate.json`.
+
 ## Infrastructure
 
 - **Proxmox**: single node `pve_node3` at `192.168.100.23`

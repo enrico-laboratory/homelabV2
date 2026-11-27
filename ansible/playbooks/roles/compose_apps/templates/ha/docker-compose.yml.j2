@@ -1,6 +1,6 @@
 services:
   mqtt:
-    image: eclipse-mosquitto:2.0
+    image: eclipse-mosquitto:2.0.22
     container_name: mosquitto
     restart: unless-stopped
     ports:
@@ -12,7 +12,7 @@ services:
 
   zigbee2mqtt:
     container_name: zigbee2mqtt
-    image: koenkk/zigbee2mqtt:latest
+    image: koenkk/zigbee2mqtt:2.8.0
     restart: unless-stopped
     volumes:
       - ./zigbee2mqtt/data:/app/data
@@ -26,7 +26,7 @@ services:
 
   homeassistant:
     container_name: homeassistant
-    image: "ghcr.io/home-assistant/home-assistant:stable"
+    image: ghcr.io/home-assistant/home-assistant:2026.2.0
     volumes:
       - ./homeassistant/config:/config
       - /etc/localtime:/etc/localtime:ro

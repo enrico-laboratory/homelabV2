@@ -1,0 +1,154 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":timezone(Europe/Amsterdam)"
+  ],
+  "dependencyDashboard": {
+    "enabled": true,
+    "title": "Renovate: Dependency Dashboard"
+  },
+  "automerge": true,
+  "automergeType": "branch",
+  "ignoreTests": true,
+  "platformAutomerge": false,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "branchConcurrentLimit": 0,
+  "rebaseWhen": "behind-base-branch",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "ignorePaths": [
+    "**/node_modules/**",
+    ".claude/**",
+    "k8s-talos/clusters/talos/flux-system/**",
+    "**/sops_secret.yaml",
+    "**/*.enc.yaml"
+  ],
+  "enabledManagers": [
+    "flux",
+    "kubernetes",
+    "terraform",
+    "github-actions",
+    "custom.regex"
+  ],
+  "flux": {
+    "managerFilePatterns": [
+      "/^k8s-talos/.+\\.ya?ml$/"
+    ]
+  },
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/^k8s-talos/.+\\.ya?ml$/"
+    ]
+  },
+  "customManagers": [
+    {
+      "description": "Images in the docker-compose Jinja templates on ops (Jinja tags break the docker-compose manager's YAML parser)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^ansible/playbooks/roles/compose_apps/templates/.+/docker-compose\\.yml\\.j2$/"
+      ],
+      "matchStrings": [
+        "image:\\s*[\"']?(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[A-Za-z0-9._-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?[\"']?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Flux itself is installed and upgraded by Terraform (talos_tf, flux_bootstrap_git)",
+      "matchFileNames": [
+        "k8s-talos/clusters/talos/flux-system/**"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Majors are never automatic: they wait for a tick on the Dependency Dashboard",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Databases stay on their current major (a major needs a dump/restore or migration)",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "postgres",
+        "ghcr.io/immich-app/postgres",
+        "docker.io/valkey/valkey",
+        "valkey/valkey",
+        "getmeili/meilisearch"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Meilisearch 1.x minors change the on-disk format: hold them like majors",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "getmeili/meilisearch"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Immich server and machine-learning must move together",
+      "matchPackageNames": [
+        "ghcr.io/immich-app/immich-server",
+        "ghcr.io/immich-app/immich-machine-learning"
+      ],
+      "groupName": "immich"
+    },
+    {
+      "description": "Variant tags that are not versions: leave them alone",
+      "matchPackageNames": [
+        "yanwk/comfyui-boot"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "linuxserver calibre-web once used a 5.x numbering; ignore it",
+      "matchPackageNames": [
+        "lscr.io/linuxserver/calibre-web"
+      ],
+      "allowedVersions": "<1"
+    },
+    {
+      "description": "Terraform providers: only the constraint/lock files change, nothing is applied. 0.x providers break on minors: hold those",
+      "matchManagers": [
+        "terraform"
+      ],
+      "commitMessageTopic": "Terraform provider {{depName}}"
+    },
+    {
+      "description": "0.x Terraform providers (bpg/proxmox, siderolabs/talos): minors are breaking, hold them",
+      "matchManagers": [
+        "terraform"
+      ],
+      "matchCurrentVersion": "/^(~>\\s*)?0\\./",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Group GitHub Actions bumps",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions",
+      "pinDigests": true
+    }
+  ]
+}

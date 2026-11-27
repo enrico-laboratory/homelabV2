@@ -11,7 +11,7 @@ networks:
 
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.7.2
     container_name: prometheus
     networks:
       - main
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
 
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:v0.35.0
     container_name: alertmanager
     networks:
       - main
@@ -54,7 +54,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.2.1
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
@@ -76,7 +76,7 @@ services:
     restart: unless-stopped
 
   gatus:
-    image: twinproduction/gatus:latest
+    image: twinproduction/gatus:v5.33.0
     container_name: gatus
     restart: unless-stopped
     networks:
@@ -94,7 +94,7 @@ services:
       - gatus_db:/data
 
   dozzle:
-    image: amir20/dozzle:latest
+    image: amir20/dozzle:v8.14.9
     container_name: dozzle
     restart: unless-stopped
     environment:
@@ -117,7 +117,7 @@ services:
       - main
 
   netalertx:
-    image: ghcr.io/jokob-sk/netalertx:latest
+    image: ghcr.io/jokob-sk/netalertx:25.10.1
     container_name: netalertx
     restart: unless-stopped
     network_mode: host
