@@ -9,6 +9,9 @@ metadata:
     kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   replicas: 0
+  strategy:
+    type: Recreate # RWO volume: a rolling update deadlocks when the new pod lands on another node
+    rollingUpdate: null
   selector:
     matchLabels:
       app: comfyui

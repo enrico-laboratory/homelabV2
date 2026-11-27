@@ -7,6 +7,9 @@ metadata:
     app: onlyoffice
 spec:
   replicas: 1
+  strategy:
+    type: Recreate # RWO volume: a rolling update deadlocks when the new pod lands on another node
+    rollingUpdate: null
   selector:
     matchLabels:
       app: onlyoffice
