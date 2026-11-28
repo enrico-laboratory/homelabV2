@@ -216,7 +216,7 @@ Renovate (`renovate.json`, run by `.github/workflows/renovate.yaml` at 01:30 UTC
 - Renovate pushes to `main` nightly: `git pull --rebase` before pushing.
 - Rollback: `git revert <renovate commit>`, push, `flux reconcile kustomization <name> --with-source`. To freeze an app, add a `packageRules` entry with `enabled: false` (or `allowedVersions`) in `renovate.json`.
 - Always pin real version tags (no `latest`/`stable`): Renovate cannot tell when a floating tag changes. Variant tags that are not versions (e.g. `yanwk/comfyui-boot:cu130-slim-v2`) are disabled in `renovate.json`.
-- Token: repo secret `RENOVATE_TOKEN`, a fine-grained PAT on this repo only (Contents, Issues, Workflows: read/write). ghcr.io lookups use the job's `GITHUB_TOKEN` (anonymous ones get rate-limited).
+- Token: repo secret `RENOVATE_TOKEN`, a fine-grained PAT on this repo only (Contents, Issues, Workflows: read/write). `platformCommit: enabled`: commits go through the GitHub API as the token owner, signed by GitHub (verified). ghcr.io lookups use the job's `GITHUB_TOKEN` (anonymous ones get rate-limited).
 - Validate config changes: `npx --yes --package renovate -- renovate-config-validator --strict renovate.json`.
 
 ## Infrastructure

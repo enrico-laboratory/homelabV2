@@ -16,7 +16,7 @@
   "prConcurrentLimit": 0,
   "branchConcurrentLimit": 0,
   "rebaseWhen": "behind-base-branch",
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "platformCommit": "enabled",
   "ignorePaths": [
     "**/node_modules/**",
     ".claude/**",
