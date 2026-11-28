@@ -5,6 +5,7 @@ resources:
   - cilium-config
   - gateway
   - headlamp
+  - kyverno
   - monitoring
   - nvidia
   - proxmox-csi
