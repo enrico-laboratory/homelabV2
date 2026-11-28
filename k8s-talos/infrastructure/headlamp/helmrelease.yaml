@@ -30,6 +30,9 @@ spec:
           - name: flux
             source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_flux
             version: 0.8.0
+          - name: kyverno
+            source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_kyverno
+            version: 0.2.0-alpha
         installOptions:
           parallel: true
           maxConcurrent: 2

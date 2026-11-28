@@ -25,6 +25,7 @@
           - { "src": 'grafana/grafana_datasource_provisioning.yml', "dest": 'grafana/provisioning/datasources/datasource.yml' }
           - { "src": 'grafana/dashboards_provisioning.yml', "dest": 'grafana/provisioning/dashboards/dashboards.yml' }
           - { "src": 'grafana/nas-storage-dashboard.json', "dest": 'grafana/provisioning/dashboards/nas-storage.json' }
+          - { "src": 'grafana/kyverno-dashboard.json', "dest": 'grafana/provisioning/dashboards/kyverno.json' }
         copy_folder_content:
           name: "prometheus/rules"
           glob: "prometheus/rules/*.yml"
